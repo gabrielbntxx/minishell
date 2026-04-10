@@ -14,18 +14,26 @@ void cd(char *args, char **env) {
   char **cmd;
   char *home;
   char *path;
-  home = getenv("home");
-  if (!home)
+  char *pwd;
+  path = getenv("PWD");
+  pwd = path;
+  home = getenv("HOME");
+  if (!home) {
     perror("cd: Home not set\n");
     return;
+  }
   cmd = ft_split(args, ' ');
-  if (!args[1]) {
+  if (!cmd[1]) {
     path = home;
+    printf("%s\n", path);
     chdir(home);
+
+    printf("%s\n", path);
 }
 }
 
 int main(int argc, char *argv[], char **envp) {
-  cd(argv[1], envp);
+  if (argv[1])
+    cd(argv[1], envp);
   return 0;
 }
