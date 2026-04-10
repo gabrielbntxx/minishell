@@ -1,13 +1,13 @@
 #include "executor.h"
 
-void	free_array(char **a)
+void	free_array(char **array)
 {
 	int	i;
 
 	i = 0;
-	while (a && a[i])
-		free(a[i++]);
-	free(a);
+	while (array && array[i])
+		free(array[i++]);
+	free(array);
 }
 
 
@@ -26,7 +26,7 @@ char	**find_path(char **envp)
 }
 
 
-char	*find_cmd(char **p, char *c)
+char	*find_cmd(char **paths, char *cmd)
 {
 	int		i;
 	char	*path;
@@ -49,10 +49,13 @@ char	*find_cmd(char **p, char *c)
 
 static void	cmd_not_found(char **args, char **paths)
 {
-	write(2, args[0], ft_strlen(args[0]));
+	if (args) {
+		write(2, args[0], ft_strlen(args[0]));
+		free_array(args);
+		if (paths)
+			free_array(paths);
+	}
 	write(2, ": command not found\n", 20);
-	free_array(args);
-	free_array(paths);
 	exit(127);
 }
 
@@ -60,6 +63,7 @@ void execute_cmd(char *cmd, char **envp) {
   char **paths;
   char **args;
   char *cmd_path;
+	int pid;
 
   paths = find_path(envp);
 	args = ft_split(cmd, ' ');
@@ -70,9 +74,13 @@ void execute_cmd(char *cmd, char **envp) {
 	cmd_path = find_cmd(paths, cmd);
 	if (!cmd_path)
 		cmd_not_found(args, paths);
-	execve(cmd_path, args, envp);
-		if (cmd_path)
+	pid = fork();
+	if (pid == 0)
+		execve(cmd_path, args, envp);
+	if (cmd_path)
 			free(cmd_path);
+	waitpid(pid, NULL, 0);
+	printf("c bon\n");
     free_array(args);
     free_array(paths);
     exit(126);
