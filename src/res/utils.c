@@ -1,4 +1,52 @@
 
+#include "res.h"
+
+char	*ft_strchr(const char *s, int c)
+{
+	int	i;
+	int	j;
+
+	j = 0;
+	i = 0;
+	while (s[j])
+	{
+		j++;
+	}
+	while (s[i] != (char)c && i <= j - 1)
+	{
+		i++;
+	}
+	if (s[i] == (char)c)
+		return (&((char *)s)[i]);
+	else
+		return (NULL);
+}
+
+
+char	*ft_substr(char const *s, unsigned int start, size_t len)
+{
+	char	*dest;
+	size_t	size;
+
+	if (!s)
+		return (NULL);
+	size = ft_strlen(s) - start;
+	if (size > len)
+		size = len;
+	if (start >= ft_strlen(s))
+	{
+		dest = malloc(sizeof(char));
+		if (!dest)
+			return (0);
+		dest[0] = 0;
+		return (dest);
+	}
+	dest = malloc(sizeof(char) * (size + 1));
+	if (!dest)
+		return (0);
+	ft_strlcpy(dest, &s[start], (size + 1));
+	return (dest);
+}
 
 
 int	ft_isdigit(int c)
