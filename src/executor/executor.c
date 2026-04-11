@@ -32,11 +32,11 @@ char	*find_cmd(char **paths, char *cmd)
 	char	*path;
 
 	i = 0;
-	if (!c || !*c || access(c, X_OK) == 0)
-		return (c);
-	while (p && p[i])
+	if (!cmd || !*cmd || access(cmd, X_OK) == 0)
+		return (cmd);
+	while (paths && paths[i])
 	{
-		path = ft_strjoin(p[i++], c);
+		path = ft_strjoin(paths[i++], cmd);
 		if (!path)
 			return (NULL);
 		if (access(path, X_OK) == 0)
@@ -80,8 +80,7 @@ void execute_cmd(char *cmd, char **envp) {
 	if (cmd_path)
 			free(cmd_path);
 	waitpid(pid, NULL, 0);
-	printf("c bon\n");
-    free_array(args);
-    free_array(paths);
+  free_array(args);
+  free_array(paths);
     exit(126);
 }
