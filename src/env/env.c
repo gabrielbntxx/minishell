@@ -62,6 +62,29 @@ void env_unset(t_env **env, char *key) {
   }
 }
 
+char **env_to_array(t_env *env) {
+  char **array;
+  t_env *current;
+  int i;
+
+  current = env;
+  while (current) {
+    i++;
+    current = current->next;
+  }
+  array = malloc(sizeof(char *) * i);
+  i = 0;
+  current = env;
+  while (current) {
+    array[i] = ft_strjoin(ft_strjoin(current->key, "="), current->value);
+    i++;
+    current = current->next;
+  }
+  array[i] = NULL;
+  return (array);
+}
+
+
 void init_env(char **envp, t_env **first) {
   t_env *node;
   t_env *current;
@@ -110,9 +133,30 @@ int    main(int ac, char **av, char **envp)
   value = env_get(env, "TEST", 0);
   printf("supp -> %s\n\n", value);
 
-  while (i < 9){
-    printf("%s     %s\n", env->key, env->value);
-    env = env->next;
+
+  char **array = env_to_array(env);
+  while (array[i]) {
+    printf("%s\n", array[i]);
     i++;
   }
+
+
+    env_set(&env, "TEST", "hello");
+
+    value = env_get(env, "TEST", 0);
+    printf("existe -> %s\n", value);
+
+
+      array = env_to_array(env);
+      while (array[i]) {
+        printf("%s\n", array[i]);
+        i++;
+      }
+
+
+  // while (i < 9){
+  //   printf("%s     %s\n", env->key, env->value);
+  //   env = env->next;
+  //   i++;
+  // }
 }
