@@ -1,12 +1,12 @@
 void built_exit(char **cmd) {
-  if (args[1]) {
+  if (cmd[1]) {
     if (is_numeric(cmd[1]))  {
-      write(1, "needs numeric arguments\n", 24)
+      write(1, "needs numeric arguments\n", 24);
       return;
     }
-    if (args[2]) {
+    if (cmd[2]) {
       write(1, "too many arguments\n", 19);
-      return()
+      return();
     }
     exit(ft_atoi(args[1]) % 256);
   }

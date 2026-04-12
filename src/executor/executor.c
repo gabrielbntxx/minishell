@@ -36,7 +36,7 @@ char	*find_cmd(char **paths, char *cmd)
 		return (cmd);
 	while (paths && paths[i])
 	{
-		path = ft_strjoin(paths[i++], cmd);
+		path = ft_strjoin(ft_strjoin(paths[i++], "/"), cmd);
 		if (!path)
 			return (NULL);
 		if (access(path, X_OK) == 0)
@@ -56,7 +56,7 @@ static void	cmd_not_found(char **args, char **paths)
 			free_array(paths);
 	}
 	write(2, ": command not found\n", 20);
-	exit(127);
+	return;
 }
 
 void execute_cmd(char *cmd, char **envp) {
@@ -72,8 +72,10 @@ void execute_cmd(char *cmd, char **envp) {
     free_array(paths);
   }
 	cmd_path = find_cmd(paths, cmd);
-	if (!cmd_path)
+	if (!cmd_path) {
 		cmd_not_found(args, paths);
+		return;
+	}
 	pid = fork();
 	if (pid == 0)
 		execve(cmd_path, args, envp);
@@ -82,5 +84,5 @@ void execute_cmd(char *cmd, char **envp) {
 	waitpid(pid, NULL, 0);
   free_array(args);
   free_array(paths);
-    exit(126);
+		return;
 }
