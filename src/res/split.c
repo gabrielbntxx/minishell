@@ -30,30 +30,6 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 	return (len);
 }
 
-char	*ft_substr(char const *s, unsigned int start, size_t len)
-{
-	char	*dest;
-	size_t	size;
-
-	if (!s)
-		return (NULL);
-	if (start >= ft_strlen(s))
-	{
-		dest = malloc(sizeof(char));
-		if (!dest)
-			return (NULL);
-		dest[0] = 0;
-		return (dest);
-	}
-	size = ft_strlen(s) - start;
-	if (size > len)
-		size = len;
-	dest = malloc(sizeof(char) * (size + 1));
-	if (!dest)
-		return (NULL);
-	ft_strlcpy(dest, s + start, size + 1);
-	return (dest);
-}
 
 int	ft_strncmp(const char *s1, const char *s2, unsigned int n)
 {
