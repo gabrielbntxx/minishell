@@ -39,10 +39,28 @@ void env_set(t_env **env, char *key, char *value)
     current->value = ft_strdup(value);
     current->next = NULL;
 }
-//
-// void env_unset(t_env *env, key) {
-//
-// }
+
+void env_unset(t_env **env, char *key) {
+  t_env *current;
+  t_env *prev;
+
+  current = *env;
+  prev = NULL;
+  while (current) {
+    if (ft_strcmp(current->key, key) == 0) {
+      if (prev)
+        prev->next = current->next;
+      else
+        *env = current->next;
+      free(current->key);
+      free(current->value);
+      free(current);
+    }
+
+    prev = current;
+    current = current->next;
+  }
+}
 
 void init_env(char **envp, t_env **first) {
   t_env *node;
@@ -78,11 +96,20 @@ int    main(int ac, char **av, char **envp)
   t_env *env;
   int i = 0;
   init_env(envp, &env);
+
   char *value = env_get(env, "TEST", 0);
-  printf("%s\n", value);
+  printf("exist pas -> %s\n", value);
+
   env_set(&env, "TEST", "hello");
+
   value = env_get(env, "TEST", 0);
-  printf("%s\n", value);
+  printf("existe -> %s\n", value);
+
+  env_unset(&env, "TEST");
+
+  value = env_get(env, "TEST", 0);
+  printf("supp -> %s\n\n", value);
+
   while (i < 9){
     printf("%s     %s\n", env->key, env->value);
     env = env->next;
