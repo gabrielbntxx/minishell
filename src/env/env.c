@@ -3,14 +3,18 @@
 #include "../res/res.h"
 
 char *env_get(t_env *env, char *key) {
-  while (env->next != NULL) {
-    ft_strcmp(env->key, key);
+  char *value;
+
+  while (env) {
+    if (ft_strcmp(env->key, key) == 0)
+      return(env->value);
+    env = env->next;
   }
+  return (NULL);
 }
 
 
 void init_env(char **envp, t_env **first) {
-  //t_env *first;
   t_env *node;
   t_env *current;
   int i = 0;
@@ -24,7 +28,7 @@ void init_env(char **envp, t_env **first) {
     node->next = NULL;
       if (sep != -1) {
         node->key = ft_substr(envp[i], 0, sep);
-        node->value = ft_substr(envp[i], sep, len );
+        node->value = ft_substr(envp[i], sep + 1, len );
       }
       else {
         node->key = ft_strdup(envp[i]);
@@ -44,9 +48,7 @@ int    main(int ac, char **av, char **envp)
   t_env *env;
   int i = 0;
   init_env(envp, &env);
-  while (i < 4){
-    printf("%s     %s\n", env->key, env->value);
-    env = env->next;
-    i++;
-  }
+  char *value = env_get(env, "PWD");
+  printf("%s\n", value);
+  printf("%s\n", getenv("PWD"));
 }
