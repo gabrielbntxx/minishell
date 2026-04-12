@@ -1,6 +1,6 @@
 
-#include "../../Includes/minishel.h"
-
+#include "../../Includes/minishell.h"
+#include "../res/res.h"
 
 char *env_get(t_env *env, char *key) {
   while (env->next != NULL) {
@@ -9,19 +9,25 @@ char *env_get(t_env *env, char *key) {
 }
 
 
-t_env int_env(char **envp) {
+void init_env(char **envp) {
   t_env env;
   int i;
-  char *split;
+  char *sep;
   int len;
 
-  i = 0;
+  env.next = malloc(sizeof(t_env));
+
   while (envp[i]) {
-      split = ft_strchr(envp[i], '=');
-      len = ft_strlen(envp);
-      env.key = ft_substr(envp, 0, split - 1);
-      env.value = ft_substr(envp, split + 1, len);
-      i++;
+    sep = ft_strchr(envp[i], '=');
+    if (sep) {
+    env.key = ft_substr(envp[i], 0, sep - envp[i]);
+    env.value = ft_strdup(sep);
   }
-  env = NULL;
+  else
+    env.key = ft_strdup(envp[i]);
+  env = env.next;
+  env.next = malloc(sizeof(t_env));
+  i++;
+
+  }
 }

@@ -4,7 +4,7 @@
   # include <stdlib.h>
   # include <unistd.h>
   #include <sys/wait.h>
-
+#include "../src/res/res.h"
   #include <stdio.h>
 
 
