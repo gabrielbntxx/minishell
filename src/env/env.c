@@ -18,23 +18,31 @@ void *env_get(t_env *env, char *key, int option) {
   return ("dont exist\n");
 }
 
-void env_set(t_env **env, char *key, char *value) {
-  t_env *node;
+void env_set(t_env **env, char *key, char *value)
+{
+    t_env *current;
+    t_env *node;
 
-  node = env_get(*env, key, 1);
-  if (!node) {
-    while ((*env)->next != NULL) {
-      *env = (*env)->next;
+    node = env_get(*env, key, 1);
+    if (node)
+    {
+        free(node->value);
+        node->value = ft_strdup(value);
+        return ;
     }
-    (*env)->next = malloc(sizeof(t_env));
-    *env = (*env)->next;
-    (*env)->key = key;
-    (*env)->value = value;
-    return;
-  }
-  (*env)->next = node;
-  *env = node;
+    current = *env;
+    while (current->next != NULL)
+        current = current->next;
+    current->next = malloc(sizeof(t_env));
+    current = current->next;
+    current->key = ft_strdup(key);
+    current->value = ft_strdup(value);
+    current->next = NULL;
 }
+//
+// void env_unset(t_env *env, key) {
+//
+// }
 
 void init_env(char **envp, t_env **first) {
   t_env *node;
@@ -75,4 +83,9 @@ int    main(int ac, char **av, char **envp)
   env_set(&env, "TEST", "hello");
   value = env_get(env, "TEST", 0);
   printf("%s\n", value);
+  while (i < 9){
+    printf("%s     %s\n", env->key, env->value);
+    env = env->next;
+    i++;
+  }
 }
