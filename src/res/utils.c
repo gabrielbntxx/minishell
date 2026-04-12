@@ -1,7 +1,39 @@
 
 #include "res.h"
 
-char	*ft_strchr(const char *s, int c)
+
+int     ft_strcmp(char *s1, char *s2)
+{
+    while (*s1 || *s2)
+    {
+        if (*s1 != *s2)
+            return ((unsigned char)*s1 - (unsigned char)*s2);
+        s1++;
+        s2++;
+    }
+    return (0);
+}
+
+char    *ft_strdup(const char *src)
+{
+        int             i;
+        char    *dest;
+
+        dest = (char *)malloc(ft_strlen(src) + 1);
+        if (!dest)
+                return (NULL);
+        i = 0;
+        while (src[i] != '\0')
+        {
+                dest[i] = src[i];
+                i++;
+        }
+        dest[i] = '\0';
+        return (dest);
+}
+
+
+int ft_strchr(const char *s, int c)
 {
 	int	i;
 	int	j;
@@ -17,9 +49,9 @@ char	*ft_strchr(const char *s, int c)
 		i++;
 	}
 	if (s[i] == (char)c)
-		return (&((char *)s)[i]);
+    return (i);
 	else
-		return (NULL);
+    return (-1);
 }
 
 
