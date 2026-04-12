@@ -33,7 +33,7 @@ char    *ft_strdup(const char *src)
 }
 
 
-char	*ft_strchr(const char *s, int c)
+int ft_strchr(const char *s, int c)
 {
 	int	i;
 	int	j;
@@ -49,9 +49,9 @@ char	*ft_strchr(const char *s, int c)
 		i++;
 	}
 	if (s[i] == (char)c)
-		return (&((char *)s)[i]);
+    return (i);
 	else
-		return (NULL);
+    return (-1);
 }
 
 
