@@ -1,5 +1,6 @@
 
 
+#include <stdio.h>
 #include <string.h>
 #include <string.h>
 
@@ -29,12 +30,28 @@ char **sort_array(char **env) {
     return env;
 }
 
+char	*ft_strjoin(const char *s1, const char *s2);
 
-void export(char **env) {
+void print_export(char **env) {
+    int i = 0;
+    char *tmp;
+    char *decla = "declare -x ";
+
+
+    while(env[i]) {
+        tmp = ft_strjoin(decla, ft_strjoin(ft_strjoin("\"", env[i]), "\""));
+        printf("%s\n", tmp);
+        i++;
+    }
+    return;
+}
+
+void ft_export(char **env) {
     char **sorted;
     int i = 0;
     //sorted = env_to_array(env);
     sorted = sort_array(sorted);
+    print_export(env);
 }
 
 int main(int ac, char **av, char **envp) {
@@ -42,8 +59,4 @@ int main(int ac, char **av, char **envp) {
     char **env;
     //while (envp[])
     env = sort_array(envp);
-    while (envp[i]) {
-        printf("%s\n", envp[i]);
-        i++;
-    }
 }
