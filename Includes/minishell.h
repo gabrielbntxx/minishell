@@ -9,6 +9,8 @@
   #include "../src/res/res.h"
   #include "../src/env/env.h"
   #include "../src/executor/executor.h"
+# include <signal.h>
+
 
 typedef struct s_env {
   char *key;
