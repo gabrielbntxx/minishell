@@ -1,4 +1,5 @@
-
+#include "builtins.h"
+char	*ft_strjoin(const char *s1, const char *s2);
 
 #include <stdio.h>
 #include <string.h>
@@ -8,7 +9,7 @@ char **sort_array(char **env) {
     if (!env) return (env);
 
     int n = 0;
-    while (env[n]) 
+    while (env[n])
         n++;
 
     int pass = 0;
@@ -30,7 +31,29 @@ char **sort_array(char **env) {
     return env;
 }
 
-char	*ft_strjoin(const char *s1, const char *s2);
+
+
+char **env_to_export(t_env *env) {
+  char **array;
+  t_env *current;
+  int i;
+
+  current = env;
+  while (current) {
+    i++;
+    current = current->next;
+  }
+  array = malloc(sizeof(char *) * i);
+  i = 0;
+  current = env;
+  while (current) {
+    array[i] = ft_strjoin(ft_strjoin(ft_strjoin(ft_strjoin(current->key, "="), "\""), current->value), "\"");
+    i++;
+    current = current->next;
+  }
+  array[i] = NULL;
+  return (array);
+}
 
 void print_export(char **env) {
     int i = 0;
@@ -39,7 +62,7 @@ void print_export(char **env) {
 
 
     while(env[i]) {
-        tmp = ft_strjoin(decla, ft_strjoin(ft_strjoin("\"", env[i]), "\""));
+        tmp = ft_strjoin(decla, env[i]);
         printf("%s\n", tmp);
         i++;
     }
@@ -57,6 +80,10 @@ void ft_export(char **env) {
 int main(int ac, char **av, char **envp) {
     int i = 0;
     char **env;
+    t_env *nodenv;
+    init_env(envp, &nodenv);
+    env = env_to_export(nodenv);
     //while (envp[])
-    env = sort_array(envp);
+    env = sort_array(env);
+    print_export(env);
 }
