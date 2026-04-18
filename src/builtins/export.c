@@ -56,7 +56,8 @@ char **env_to_export(t_env *env) {
 }
 
 void print_export(char **env) {
-    int i = 0;
+
+  int i = 0;
     char *tmp;
     char *decla = "declare -x ";
 
@@ -69,21 +70,36 @@ void print_export(char **env) {
     return;
 }
 
-void ft_export(char **env) {
-    char **sorted;
-    int i = 0;
-    //sorted = env_to_array(env);
-    sorted = sort_array(sorted);
+void ft_export(char **cmd, t_env *nodenv) {
+  int i = 0;
+  char **env;
+  char *key;
+  char *value;
+  int len;
+  env = env_to_export(nodenv);
+  env = sort_array(env);
+  if (!cmd[1]) {
     print_export(env);
+    return;
+  }
+  while (cmd[i]) {
+    sep = ft_strchr(envp[i], '=');
+    len = ft_strlen(envp[i]);
+    if (sep != -1) {
+      key = ft_substr(envp[i], 0, sep);
+      value = ft_substr(envp[i], sep + 1, len - sep - 1);
+    }
+    else {
+      key = ft_strdup(envp[i]);
+        value = NULL;
+    }
+  }
 }
 
 int main(int ac, char **av, char **envp) {
-    int i = 0;
-    char **env;
-    t_env *nodenv;
-    init_env(envp, &nodenv);
-    env = env_to_export(nodenv);
-    //while (envp[])
-    env = sort_array(env);
-    print_export(env);
+  t_env *nodenv;
+  char **cmd[0] = export;
+  char **cmd[1] = "test4=icilaba";
+  init_env(envp, &nodenv);
+  ft_export(cmd, nodenv);
 }
