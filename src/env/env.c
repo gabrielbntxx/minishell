@@ -35,8 +35,10 @@ void env_set(t_env **env, char *key, char *value)
         current = current->next;
     current->next = malloc(sizeof(t_env));
     current = current->next;
-    current->key = ft_strdup(key);
-    current->value = ft_strdup(value);
+    if (key)
+      current->key = ft_strdup(key);
+    if (value)
+      current->value = ft_strdup(value);
     current->next = NULL;
 }
 
@@ -128,54 +130,4 @@ void init_env(char **envp, t_env **first) {
       i++;
     }
   return;
-}
-
-
-int    main(int ac, char **av, char **envp)
-{
-  t_env *env;
-  int i = 0;
-  env = NULL;
-  init_env(envp, &env);
-
-  char *value = env_get(env, "TEST", 0);
-  printf("exist pas -> %s\n", value);
-
-  env_set(&env, "TEST", "hello");
-
-  value = env_get(env, "TEST", 0);
-  printf("existe -> %s\n", value);
-
-  env_unset(&env, "TEST");
-
-  value = env_get(env, "TEST", 0);
-  printf("supp -> %s\n\n", value);
-
-
-  // char **array = env_to_array(env);
-  // while (array[i]) {
-  //   printf("%s\n", array[i]);
-  //   i++;
-  // }
-
-
-    //env_set(&env, "TEST", "hello");
-
-    value = env_get(env, "TEST", 0);
-    printf("existe -> %s\n", value);
-
-
-      // array = env_to_array(env);
-      // while (array[i]) {
-      //   printf("%s\n", array[i]);
-      //   i++;
-      // }
-
-      env_free(env);
-
-  // while (i < 9){
-  //   printf("%s     %s\n", env->key, env->value);
-  //   env = env->next;
-  //   i++;
-  // }
 }
