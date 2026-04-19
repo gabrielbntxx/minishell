@@ -67,6 +67,7 @@ void print_export(char **env) {
         printf("%s\n", tmp);
         i++;
     }
+    printf("\n\n\n");
     return;
 }
 
@@ -75,31 +76,38 @@ void ft_export(char **cmd, t_env *nodenv) {
   char **env;
   char *key;
   char *value;
+  int sep;
   int len;
   env = env_to_export(nodenv);
   env = sort_array(env);
+  //print_export(env);
   if (!cmd[1]) {
     print_export(env);
     return;
   }
-  while (cmd[i]) {
-    sep = ft_strchr(envp[i], '=');
-    len = ft_strlen(envp[i]);
+  while (cmd[++i]) {
+    sep = ft_strchr(cmd[i], '=');
+    len = ft_strlen(cmd[i]);
     if (sep != -1) {
-      key = ft_substr(envp[i], 0, sep);
-      value = ft_substr(envp[i], sep + 1, len - sep - 1);
+      key = ft_substr(cmd[i], 0, sep);
+      value = ft_substr(cmd[i], sep + 1, len - sep - 1);
+      env_set(&nodenv, key, value);
     }
     else {
-      key = ft_strdup(envp[i]);
-        value = NULL;
+      key = ft_strdup(cmd[i]);
+      value = NULL;
+      env_set(&nodenv, key, value);
     }
   }
+  env = env_to_export(nodenv);
+  env = sort_array(env);
+  print_export(env);
 }
 
 int main(int ac, char **av, char **envp) {
   t_env *nodenv;
-  char **cmd[0] = export;
-  char **cmd[1] = "test4=icilaba";
+  //char *cmd[] = {"export", "test4=icilaba", NULL};
   init_env(envp, &nodenv);
-  ft_export(cmd, nodenv);
+  ft_export(av, nodenv);
+
 }
