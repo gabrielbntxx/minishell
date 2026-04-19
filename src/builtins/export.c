@@ -36,18 +36,21 @@ char **sort_array(char **env) {
 char **env_to_export(t_env *env) {
   char **array;
   t_env *current;
-  int i;
+  int i = 0;
 
   current = env;
   while (current) {
     i++;
     current = current->next;
   }
-  array = malloc(sizeof(char *) * i);
+  array = malloc(sizeof(char *) * i + 1);
   i = 0;
   current = env;
   while (current) {
-    array[i] = ft_strjoin(ft_strjoin(ft_strjoin(ft_strjoin(current->key, "="), "\""), current->value), "\"");
+    if (current->value)
+      array[i] = ft_strjoin(ft_strjoin(ft_strjoin(ft_strjoin(current->key, "="), "\""), current->value), "\"");
+    else
+      array[i] = ft_strjoin(current->key, "");
     i++;
     current = current->next;
   }
@@ -71,14 +74,14 @@ void print_export(char **env) {
     return;
 }
 
-void ft_export(char **cmd, t_env *nodenv) {
+void ft_export(char **cmd, t_env **nodenv) {
   int i = 0;
   char **env;
   char *key;
   char *value;
   int sep;
   int len;
-  env = env_to_export(nodenv);
+  env = env_to_export(*nodenv);
   env = sort_array(env);
   //print_export(env);
   if (!cmd[1]) {
@@ -91,15 +94,15 @@ void ft_export(char **cmd, t_env *nodenv) {
     if (sep != -1) {
       key = ft_substr(cmd[i], 0, sep);
       value = ft_substr(cmd[i], sep + 1, len - sep - 1);
-      env_set(&nodenv, key, value);
+      env_set(nodenv, key, value);
     }
     else {
       key = ft_strdup(cmd[i]);
       value = NULL;
-      env_set(&nodenv, key, value);
+      env_set(nodenv, key, value);
     }
   }
-  env = env_to_export(nodenv);
+  env = env_to_export(*nodenv);
   env = sort_array(env);
   print_export(env);
 }
@@ -107,7 +110,7 @@ void ft_export(char **cmd, t_env *nodenv) {
 int main(int ac, char **av, char **envp) {
   t_env *nodenv;
   //char *cmd[] = {"export", "test4=icilaba", NULL};
-  init_env(envp, &nodenv);
-  ft_export(av, nodenv);
+  init_env(av, &nodenv);
+  ft_export(av, &nodenv);
 
 }
