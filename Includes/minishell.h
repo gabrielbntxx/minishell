@@ -10,11 +10,11 @@
   #include "../src/env/env.h"
   #include "../src/executor/executor.h"
 
-typedef struct s_env {
-  char *key;
-  char *value;
-  struct s_env *next;
-} t_env;
+// typedef struct s_env {
+//   char *key;
+//   char *value;
+//   struct s_env *next;
+// } t_env;
 
 
 #endif

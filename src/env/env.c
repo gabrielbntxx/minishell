@@ -27,7 +27,8 @@ void env_set(t_env **env, char *key, char *value)
     if (node)
     {
         free(node->value);
-        node->value = ft_strdup(value);
+        if (value)
+          node->value = ft_strdup(value);
         return ;
     }
     current = *env;
@@ -35,7 +36,7 @@ void env_set(t_env **env, char *key, char *value)
         current = current->next;
     current->next = malloc(sizeof(t_env));
     current = current->next;
-    if (key)
+    if (!key) return;
       current->key = ft_strdup(key);
     if (value)
       current->value = ft_strdup(value);
@@ -80,7 +81,10 @@ char **env_to_array(t_env *env) {
   i = 0;
   current = env;
   while (current) {
-    array[i] = ft_strjoin(ft_strjoin(current->key, "="), current->value);
+    if (current->value)
+      array[i] = ft_strjoin(ft_strjoin(current->key, "="), current->value);
+    else
+      array[i] = ft_strjoin(current->key, NULL);
     i++;
     current = current->next;
   }
