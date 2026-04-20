@@ -5,6 +5,14 @@ char	*ft_strjoin(const char *s1, const char *s2);
 #include <string.h>
 #include <string.h>
 
+/*
+listes des choses a fix -> 
+
+manque -> verification du nom de la clef (une key commencant par un chiffre est invalide et uniquement la value et pas la clef)
+          exit status
+fix -> verification malloc et possibiliter de leaks dans les strjoin(strjoin()) 
+        et evidement la norme de con
+*/
 char **sort_array(char **env) {
     if (!env) return (env);
 
