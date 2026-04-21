@@ -4,6 +4,14 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+static void    handler0(int sig)
+{
+    (void) sig;
+    printf("\n");
+    rl_on_new_line();
+    rl_replace_line("", 0);
+    rl_redisplay();
+}
 
 int	main(int ac, char **av, char **envp)
 {
@@ -19,6 +27,8 @@ int	main(int ac, char **av, char **envp)
 	array = env_to_array(env);
 	while (1)
 	{
+    signal(SIGINT, handler0);
+    signal(SIGQUIT, SIG_IGN); 
 		cmd = readline("minishell> ");
 		if (!cmd)
 			break ;
@@ -26,7 +36,7 @@ int	main(int ac, char **av, char **envp)
 			add_history(cmd);
 		tokens = lexer(cmd);
     cmds = parser(tokens);
-		printf("---- LEXER ----\n");
+    printf("---- LEXER ----\n");
 		print_tokens(tokens);
 		printf("---- command ----\n");
     print_cmds(cmds); 
