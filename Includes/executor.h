@@ -1,6 +1,8 @@
 #ifndef SPLIT_H
 # define SPLIT_H
 
+#include "minishell.h"
+#include "parser.h"
 
 size_t	ft_strlen(const char *s);
 int		ft_strncmp(const char *s1, const char *s2, unsigned int n);
@@ -10,6 +12,6 @@ char	*ft_strjoin(const char *s1, const char *s2);
 void	free_array(char **a);
 char	**find_path(char **envp);
 char	*find_cmd(char **p, char *c);
-void	execute_cmd(char *cmd, char **envp);
+void	execute_cmd(t_cmd *cmd, char **envp);
 
 #endif

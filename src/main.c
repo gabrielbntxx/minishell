@@ -11,7 +11,7 @@ int	main(int ac, char **av, char **envp)
 	t_token	*tokens;
 	char	*cmd;
 	char	**array;
-
+  t_cmd *cmds;
 	(void)ac;
 	(void)av;
 	env = NULL;
@@ -25,10 +25,13 @@ int	main(int ac, char **av, char **envp)
 		if (*cmd)
 			add_history(cmd);
 		tokens = lexer(cmd);
+    cmds = parser(tokens);
 		printf("---- LEXER ----\n");
 		print_tokens(tokens);
-		printf("---- EXEC ----\n");
-		execute_cmd(cmd, array);
+		printf("---- command ----\n");
+    print_cmds(cmds); 
+    printf("---- EXEC ----\n");
+		execute_cmd(cmds, array);
 		free(cmd);
 	}
 	return (0);
