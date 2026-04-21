@@ -143,15 +143,6 @@ void    print_cmds(t_cmd *head)
     }                                                                                                                        
 }                                                                                                                            
                                                                                                   
-int main(void)                                                                                                               
-{                                                                                                                            
-    t_token *tokens;                                                                                                         
-    t_cmd *cmds;                                                                                                             
-                                                                                                                               
-    tokens = lexer("cat < in.txt >> out.txt");                                                                                  
-    cmds = parser(tokens);                                                                                                   
-    print_cmds(cmds);                                                                                                        
-    return (0);                                                                                                              
-}               
+               
 
 

@@ -107,10 +107,4 @@ void ft_export(char **cmd, t_env **nodenv) {
   print_export(env);
 }
 
-int main(int ac, char **av, char **envp) {
-  t_env *nodenv;
-  //char *cmd[] = {"export", "test4=icilaba", NULL};
-  init_env(av, &nodenv);
-  ft_export(av, &nodenv);
 
-}
