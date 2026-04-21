@@ -6,9 +6,6 @@
   #include <sys/wait.h>
   #include <stdio.h>
   #include <readline/readline.h>
-  #include "../src/res/res.h"
-  #include "../src/env/env.h"
-  #include "../src/executor/executor.h"
 # include <signal.h>
 
 
