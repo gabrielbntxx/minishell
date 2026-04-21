@@ -68,6 +68,7 @@ void execute_cmd(t_cmd *cmd, char **envp) {
   if (!cmd->args || !cmd->args[0]) {
     free_array(cmd->args);
     free_array(paths);
+    return;
   }
 	cmd_path = find_cmd(paths, cmd->args[0]);
 	if (!cmd_path) {
