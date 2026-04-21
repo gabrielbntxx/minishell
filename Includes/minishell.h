@@ -12,11 +12,11 @@
 # include <signal.h>
 
 
-typedef struct s_env {
-  char *key;
-  char *value;
-  struct s_env *next;
-} t_env;
-
+  #include "res.h"
+  #include "env.h"
+  #include "executor.h"
+  #include "parser.h"
+  #include "lexer.h"
+  #include "builtins.h"
 
 #endif
