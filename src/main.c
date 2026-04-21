@@ -1,14 +1,29 @@
 #include "../Includes/minishell.h"
+#include "../Includes/lexer.h"
+#include "../Includes/parser.h"
+#include <readline/readline.h>
+#include <readline/history.h>
 
-int main(int ac, char **av, char **envp) {
-  t_env *env;
-  char *cmd;
-  char **array;
+int main(void)
+{
+	char	*input;
+	t_token	*tokens;
+	t_cmd	*cmds;
 
-  init_env(envp, &env);
-  array = env_to_array(env);
-  while (1) {
-    cmd = readline("enter cmd -> ");
-    execute_cmd(cmd, array);
-  }
+	while (1)
+	{
+		input = readline("minishell> ");
+		if (!input)
+			break ;
+		if (*input)
+			add_history(input);
+		tokens = lexer(input);
+		printf("--- TOKENS ---\n");
+		print_tokens(tokens);
+		cmds = parser(tokens);
+		printf("--- CMDS ---\n");
+		print_cmds(cmds);
+		free(input);
+	}
+	return (0);
 }
