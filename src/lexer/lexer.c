@@ -75,11 +75,3 @@ t_token *lexer(char *input)
         current = current->next;
     }
  }
-
- int main(void)
- {
-    t_token *tokens;
-    tokens = lexer("echo \"hello\"'world' test");                                                                                                
-    print_tokens(tokens);
-    return(0);
- }
