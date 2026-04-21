@@ -82,6 +82,11 @@ void print_export(char **env) {
     return;
 }
 
+int new_var(char **cmd, t_env *nodenv) {
+
+}
+
+
 void ft_export(char **cmd, t_env **nodenv) {
   int i = 0;
   char **env;
@@ -114,7 +119,6 @@ void ft_export(char **cmd, t_env **nodenv) {
   env = sort_array(env);
   print_export(env);
 }
-
 int main(int ac, char **av, char **envp) {
   t_env *nodenv;
   //char *cmd[] = {"export", "test4=icilaba", NULL};

@@ -1,5 +1,11 @@
 #include "../Includes/minishell.h"
 
+
+int test() {
+  printf("test\n");
+}
+
+
 int main(int ac, char **av, char **envp) {
   t_env *env;
   char *cmd;
