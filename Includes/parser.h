@@ -20,7 +20,8 @@ t_cmd   *parser(t_token *tokens);
 void    add_arg(t_cmd *cmd, char *arg);         
 void    add_cmd(t_cmd **head, t_cmd *new);                                                                                   
 void    print_cmds(t_cmd *head);      
-void    init_first_arg(t_cmd *cmd, char *arg);                                                                                       
+void    init_first_arg(t_cmd *cmd, char *arg);  
+                                                                                     
 
 
 #endif

@@ -33,6 +33,9 @@ char	*ft_substr(char const *s, unsigned int start, int len);
 int	    ft_strlcpy(char *dst, const char *src, int dstsize);
 char	*ft_strdup(const char *s1);
 int	    ft_strlen(const char *str);
+char	*ft_itoa(int n);
+char	*ft_strjoin(char const *s1, char const *s2);
+char    *expand_str(char *str, int exit_status);
 int     get_operator_token(char *input, int *i, t_token **head);
 int    is_operator(char c);
 t_token *new_token(t_token_type type, char *value, t_quote_type quote, int no_space);                                                                     
@@ -45,6 +48,11 @@ int     is_operator(char c);
 int     get_operator_token(char *input, int *i, t_token **head);
 int     handle_single_quote(char *input, int *i, t_token **head);
 int    handle_double_quote(char *input, int *i, t_token **head);
+
+
+void    expand_field(char **field, int exit_status);                                                                                                   
+void    expand_cmds(t_cmd *cmds, int exit_status);                                                                                                     
+char    *expand_str(char *str, int exit_status);
 
 
 #endif
