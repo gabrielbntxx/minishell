@@ -1,8 +1,8 @@
-#include "executor.h"
+#include "../../Includes/minishell.h"
 
-int main(int argc, char *argv[], char **envp) {
-  char *cmd = argv[1];
-  execute_cmd(cmd, envp);
 
+int main() {
+  int flags =  O_CREAT;
+  printf("flags = %d\n", flags);
   return 0;
 }
