@@ -124,5 +124,5 @@ int main(int ac, char **av, char **envp) {
   //char *cmd[] = {"export", "test4=icilaba", NULL};
   init_env(av, &nodenv);
   ft_export(av, &nodenv);
-
 }
+

@@ -1,12 +1,9 @@
 
 #include "../../Includes/minishell.h"
-#include "../res/res.h"
 
 
 
 void *env_get(t_env *env, char *key, int option) {
-  char *value;
-
   while (env) {
     if (ft_strcmp(env->key, key) == 0) {
       if (option == 1) return(env);
@@ -72,12 +69,16 @@ char **env_to_array(t_env *env) {
   t_env *current;
   int i;
 
+  i = 0;
   current = env;
   while (current) {
     i++;
     current = current->next;
   }
-  array = malloc(sizeof(char *) * i);
+  array = malloc(sizeof(char *) * (i + 1));
+  if (!array) {
+    return (NULL);
+  }
   i = 0;
   current = env;
   while (current) {
