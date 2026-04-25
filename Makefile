@@ -1,10 +1,11 @@
 NAME	= minishell
 
-CC		= cc -g
+CC		= cc
 CFLAGS	= -Wall -Wextra -Werror
 
 SRCS	= src/main.c \
 		  src/lexer/lexer.c \
+		  src/lexer/lexer_util.c \
 		  src/lexer/operator.c \
 		  src/parser/parser.c \
 		  src/parser/pipes.c \
@@ -14,6 +15,7 @@ SRCS	= src/main.c \
 		  src/builtins/cd.c \
 		  src/builtins/echo.c \
 		  src/builtins/env.c \
+		  src/builtins/exit.c \
 		  src/builtins/export.c \
 		  src/builtins/pwd.c \
 		  src/builtins/unset.c \
