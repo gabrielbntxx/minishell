@@ -51,7 +51,7 @@ char **env_to_export(t_env *env) {
     i++;
     current = current->next;
   }
-  array = malloc(sizeof(char *) * i + 1);
+  array = malloc(sizeof(char *) * (i + 1));
   i = 0;
   current = env;
   while (current) {
