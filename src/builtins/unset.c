@@ -1,12 +1,10 @@
 #include "../../Includes/minishell.h"
-#include "builtins.h"
 
-
-void ft_unset(t_cmd *cmd, t_env *env) {
+void builtin_unset(char **args, t_env *env) {
     int i = 1;
 
-    while(cmd->args[i]) {
-        env_unset(&env, cmd->args[i]);
+    while(args[i]) {
+        env_unset(&env, args[i]);
         i++;
     }
     return;

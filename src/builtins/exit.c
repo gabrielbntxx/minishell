@@ -1,6 +1,6 @@
-#include "../../Includes/parser.h"
+
 #include "../../Includes/minishell.h"
-#include "../../Includes/lexer.h"
+
 
 int ft_atoi(char *str)
 {
@@ -30,23 +30,6 @@ int ft_atoi(char *str)
 }
 
 
-int is_numeric(char *str)
-{
-    int i;
-
-    i = 0;
-    if (str[i] == '+' || str[i] == '-')
-        i++;
-    if (str[i] == '\0')
-        return(0);
-    while (str[i] != '\0')
-    {
-        if (str[i] < '0' || str[i] > '9')
-            return(0);
-        i++;
-    }
-    return(1);
-}
 
 int builtin_exit(char **args, int current_exit_status)
 {
