@@ -70,11 +70,10 @@ void print_export(char **env) {
         printf("%s\n", tmp);
         i++;
     }
-    printf("\n\n\n");
     return;
 }
 
-void ft_export(char **cmd, t_env **nodenv) {
+void builtin_export(char **cmd, t_env **nodenv) {
   int i = 0;
   char **env;
   char *key;
@@ -83,7 +82,6 @@ void ft_export(char **cmd, t_env **nodenv) {
   int len;
   env = env_to_export(*nodenv);
   env = sort_array(env);
-  //print_export(env);
   if (!cmd[1]) {
     print_export(env);
     return;
@@ -102,9 +100,7 @@ void ft_export(char **cmd, t_env **nodenv) {
       env_set(nodenv, key, value);
     }
   }
-  env = env_to_export(*nodenv);
-  env = sort_array(env);
-  print_export(env);
+  return;
 }
 
 
