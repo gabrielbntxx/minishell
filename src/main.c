@@ -18,13 +18,11 @@ int	main(int ac, char **av, char **envp)
 	t_env	*env;
 	t_token	*tokens;
 	char	*cmd;
-	char	**array;
   t_cmd *cmds;
 	(void)ac;
 	(void)av;
 	env = NULL;
 	init_env(envp, &env);
-	array = env_to_array(env);
 	while (1)
 	{
     signal(SIGINT, handler0);
@@ -41,8 +39,7 @@ int	main(int ac, char **av, char **envp)
 		printf("---- command ----\n");
     print_cmds(cmds); 
     printf("---- EXEC ----\n");
-    if (dispatch(cmds, env) == 1)
-		  super_exec(cmds, array);
+		super_exec(cmds, env);
 		free(cmd);
 	}
 	return (0);
