@@ -41,7 +41,8 @@ int	main(int ac, char **av, char **envp)
 		printf("---- command ----\n");
     print_cmds(cmds); 
     printf("---- EXEC ----\n");
-		super_exec(cmds, env);
+    if (dispatch(cmds, env) == 1)
+		  super_exec(cmds, array);
 		free(cmd);
 	}
 	return (0);
