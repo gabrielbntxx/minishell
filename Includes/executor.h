@@ -14,4 +14,6 @@ char	**find_path(char **envp);
 char	*find_cmd(char **p, char *c);
 void	execute_cmd(t_cmd *cmd, char **envp);
 
+void super_exec(t_cmd *cmd, t_env *env);
+
 #endif

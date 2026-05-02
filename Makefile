@@ -1,7 +1,7 @@
 NAME	= minishell
 
 CC		= cc -g
-CFLAGS	= -Wall -Wextra -Werror
+CFLAGS	= -Wall -Wextra 
 
 SRCS	= src/main.c \
 		  src/lexer/lexer.c \
@@ -21,7 +21,8 @@ SRCS	= src/main.c \
 			src/builtins/exit.c \
 		  src/expansion/expand.c \
 		  src/res/split.c \
-		  src/res/utils.c
+		  src/res/utils.c	\
+			src/executor/super_exec.c \
 
 OBJS	= $(SRCS:.c=.o)
 
