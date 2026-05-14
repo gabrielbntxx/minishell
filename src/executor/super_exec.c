@@ -20,6 +20,7 @@ void apply_redir(t_cmd *cmd) {
     dup2(fd[1], STDOUT_FILENO);
     close(fd[1]);
   }
+  return;
 }
 
 
@@ -55,11 +56,12 @@ void super_exec(t_cmd *cmd, t_env *env) {
           execute_cmd(current, array);
         exit(1);
       }
-    }
+    
     close(pipe_fd[1]);
     last_fd = pipe_fd[0];
     current = current->next;
     while(wait(NULL) > 0);
+    }
   }
   else {
     apply_redir(current);
