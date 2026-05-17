@@ -4,6 +4,7 @@
   # include <stdlib.h>
   # include <unistd.h>
   #include <sys/wait.h>
+  #include <fcntl.h>
   #include <stdio.h>
   #include <readline/readline.h>
 # include <signal.h>
