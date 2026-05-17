@@ -14,9 +14,9 @@ void apply_redir(t_cmd *cmd) {
   } 
   if(cmd->redir_out) {
     if (cmd->append == 0)
-      fd[1] = open(cmd->redir_out, O_WRONLY | O_TRUNC | O_CREAT | 0644);
+      fd[1] = open(cmd->redir_out, O_WRONLY | O_TRUNC | O_CREAT, 0644);
     else
-      fd[1] = open(cmd->redir_out, O_WRONLY | O_APPEND | O_CREAT | 0644);
+      fd[1] = open(cmd->redir_out, O_WRONLY | O_APPEND | O_CREAT, 0644);
     dup2(fd[1], STDOUT_FILENO);
     close(fd[1]);
   }
@@ -54,20 +54,24 @@ void super_exec(t_cmd *cmd, t_env *env) {
         apply_redir(current);
         if (dispatch(current, &env) == 1)
           execute_cmd(current, array);
-        exit(1);
+        exit(127);
       }
       if (current->next) {
         if (last_fd != -1) close(last_fd);
         close(pipe_fd[1]);
         last_fd = pipe_fd[0];
       }
+      else close(last_fd);
       current = current->next;
     }
     while(wait(NULL) > 0);
   }
   else {
-    apply_redir(current);
-    if (dispatch(cmd, &env) == 1)
-    execute_cmd(cmd, array);
+    if (pid == 0) {
+      apply_redir(current);
+      if (dispatch(cmd, &env) == 1)
+      execute_cmd(cmd, array);
+      exit(127); 
+    }
   }
 }
