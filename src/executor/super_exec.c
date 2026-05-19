@@ -23,11 +23,21 @@ void apply_redir(t_cmd *cmd) {
   return;
 }
 
-
-
-// ici reside un truc misterieux
+void base_cmd(t_cmd *cmd, char **array, t_env *env) {
+  int save[2];
+  save[0] = dup(STDIN_FILENO);
+  save[1] = dup(STDOUT_FILENO);
+  apply_redir(cmd);
+  if (dispatch(cmd, &env) == 1)
+  execute_cmd(cmd, array);
+  dup2(save[0], STDIN_FILENO);
+  dup2(save[1], STDOUT_FILENO);
+  close(save[0]);
+  close(save[1]);
+}
 
 void super_exec(t_cmd *cmd, t_env *env) {
+
   char **array; 
   t_cmd *current;
   int pipe_fd[2]; // pipe_fd[0] = in, pipe_fd[1] = out,
@@ -61,17 +71,10 @@ void super_exec(t_cmd *cmd, t_env *env) {
         close(pipe_fd[1]);
         last_fd = pipe_fd[0];
       }
-      else close(last_fd);
+      else if (last_fd != -1) close(last_fd);
       current = current->next;
     }
     while(wait(NULL) > 0);
   }
-  else {
-    if (pid == 0) {
-      apply_redir(current);
-      if (dispatch(cmd, &env) == 1)
-      execute_cmd(cmd, array);
-      exit(127); 
-    }
-  }
+  base_cmd(cmd, array, env);
 }
