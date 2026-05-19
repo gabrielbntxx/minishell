@@ -76,8 +76,10 @@ void execute_cmd(t_cmd *cmd, char **envp) {
 		return;
 	}
 	pid = fork();
-	if (pid == 0)
+	if (pid == 0) {
 		execve(cmd_path, cmd->args, envp);
+    exit(127);
+  }
 	if (cmd_path)
 			free(cmd_path);
 	waitpid(pid, NULL, 0);
