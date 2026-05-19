@@ -2,7 +2,7 @@
 #include "../../Includes/minishell.h"
 #include "../../Includes/lexer.h"
 
-int builtin_cd(char **args)
+int builtin_cd(t_env *env, char **args)
 {
     char *path;
 

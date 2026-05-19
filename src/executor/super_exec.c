@@ -23,6 +23,43 @@ void apply_redir(t_cmd *cmd) {
   return;
 }
 
+void super_cmd(t_cmd *cmd, char **array, t_env *env) {
+
+  int pipe_fd[2];
+  int last_fd = -1;
+  int pid; 
+  t_cmd *current;
+
+  current = cmd;
+  while (current) {
+      if (current->next) pipe(pipe_fd);
+      pid = fork();
+    if (pid == 0) {
+      if (last_fd != -1) { 
+        dup2(last_fd, STDIN_FILENO);
+        close(last_fd);
+      } 
+      if (current->next) { 
+        dup2(pipe_fd[1], STDOUT_FILENO);
+        close(pipe_fd[0]);
+        close(pipe_fd[1]);
+      }
+      apply_redir(current);
+      if (dispatch(current, &env) == 1)
+        execute_cmd(current, array);
+      exit(127);
+    }
+    if (current->next) {
+      if (last_fd != -1) close(last_fd);
+      close(pipe_fd[1]);
+      last_fd = pipe_fd[0];
+    }
+    else if (last_fd != -1) close(last_fd);
+    current = current->next;
+  }
+  while(wait(NULL) > 0);
+}
+
 void base_cmd(t_cmd *cmd, char **array, t_env *env) {
   int save[2];
   save[0] = dup(STDIN_FILENO);
@@ -37,44 +74,9 @@ void base_cmd(t_cmd *cmd, char **array, t_env *env) {
 }
 
 void super_exec(t_cmd *cmd, t_env *env) {
-
   char **array; 
-  t_cmd *current;
-  int pipe_fd[2]; // pipe_fd[0] = in, pipe_fd[1] = out,
-  int last_fd = -1; // save pour la prochaine commande
-  int pid; 
-
-  current = cmd;
   array = env_to_array(env);
 
-  if (current->next) {
-    while (current) {
-        if (current->next) pipe(pipe_fd);
-        pid = fork();
-      if (pid == 0) {
-        if (last_fd != -1) { 
-          dup2(last_fd, STDIN_FILENO);
-          close(last_fd);
-        } 
-        if (current->next) { 
-          dup2(pipe_fd[1], STDOUT_FILENO);
-          close(pipe_fd[0]);
-          close(pipe_fd[1]);
-        }
-        apply_redir(current);
-        if (dispatch(current, &env) == 1)
-          execute_cmd(current, array);
-        exit(127);
-      }
-      if (current->next) {
-        if (last_fd != -1) close(last_fd);
-        close(pipe_fd[1]);
-        last_fd = pipe_fd[0];
-      }
-      else if (last_fd != -1) close(last_fd);
-      current = current->next;
-    }
-    while(wait(NULL) > 0);
-  }
-  base_cmd(cmd, array, env);
+  if (cmd->next) super_cmd(cmd, array, env);
+  else base_cmd(cmd, array, env);
 }
