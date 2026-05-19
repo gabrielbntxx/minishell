@@ -8,7 +8,7 @@ int builtin_cd(char **args)
 
     if (args[1] == NULL)
     {
-        path = getenv("HOME");
+        path = env_get(env, "HOME", 0);
         if (path == NULL)
         {
             write(2, "minishell: cd: HOME not set\n", 28);
