@@ -3,9 +3,53 @@
 #include "../../Includes/minishell.h"
 #include <stdio.h>
 
+
+char *find_deli(char *str, char *deli)
+{
+  int i;
+  int j;
+
+  if (!*deli)
+    return (str);
+  i = 0;
+  while (str[i])
+  {
+    j = 0;
+    while (str[i + j] && str[i + j] == deli[j])
+        j++;
+    if (!deli[j])
+        return (&str[i]);
+    i++;
+}
+  return NULL;
+  }
+
+
+void handl_heredoc(t_cmd *cmd) {
+  int hd[2];
+  int pid;
+  char *str;
+  
+  if (cmd->heredoc) {
+    pipe(hd);
+    pid = fork();
+    if (pid == 0) {
+      while (ft_strcmp(cmd->heredoc, find_deli(str, cmd->heredoc))) {
+        write(1, "\n", 1);
+        str = readline(">");
+      }
+      exit(0);
+    }
+    else 
+  }
+  return;
+}
+
+
 void apply_redir(t_cmd *cmd) {
   int fd[2];
-
+  
+  handl_heredoc(cmd);
   if(cmd->redir_in) {
     fd[0] = open(cmd->redir_in, O_RDONLY);
     dup2(fd[0], STDIN_FILENO);
