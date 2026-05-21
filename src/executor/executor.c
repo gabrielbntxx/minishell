@@ -79,11 +79,11 @@ void execute_cmd(t_cmd *cmd, char **envp) {
 	if (pid == 0) {
 		execve(cmd_path, cmd->args, envp);
     exit(127);
+  }
+    waitpid(pid, NULL, 0);
 	  if (cmd_path)
 			free(cmd_path);
-	  free(cmd_path);
     free_array(cmd->args);
     free_array(paths);
 		return;
-  }
 }

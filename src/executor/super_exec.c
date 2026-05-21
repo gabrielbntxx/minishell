@@ -9,7 +9,7 @@ char *find_deli(char *str, char *deli)
   int i;
   int j;
 
-  if (!*deli)
+  if (!*deli | !str)
     return (str);
   i = 0;
   while (str[i])
@@ -30,20 +30,24 @@ void handl_heredoc(t_cmd *cmd) {
   int pid;
   char *str;
   
+  str = NULL;
   if (cmd->heredoc) {
     pipe(hd);
     pid = fork();
     if (pid == 0) {
-      while (ft_strcmp(cmd->heredoc, find_deli(str, cmd->heredoc))) {
-        write(1, "\n", 1);
+      while (1) {
+        write(hd[1], "\n", 1);
         str = readline(">");
+        if (!ft_strcmp(str, cmd->heredoc)) break;
       }
       exit(0);
     }
-    else 
+    waitpid(pid, NULL, 0);
   }
   return;
 }
+
+
 
 
 void apply_redir(t_cmd *cmd) {
@@ -121,6 +125,10 @@ void super_exec(t_cmd *cmd, t_env *env) {
   char **array; 
   array = env_to_array(env);
 
+  if (!cmd->args) {
+    if (cmd->heredoc) handl_heredoc(cmd);
+    return;
+  }
   if (cmd->next) super_cmd(cmd, array, env);
   else base_cmd(cmd, array, env);
 }
