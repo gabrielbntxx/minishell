@@ -35,14 +35,20 @@ void handl_heredoc(t_cmd *cmd) {
     pipe(hd);
     pid = fork();
     if (pid == 0) {
+      close(hd[0]);
       while (1) {
-        write(hd[1], "\n", 1);
         str = readline(">");
         if (!ft_strcmp(str, cmd->heredoc)) break;
+        write(hd[1], str, ft_strlen(str));
+        write(hd[1], "\n", 1);
       }
+      close(hd[1]);
       exit(0);
     }
     waitpid(pid, NULL, 0);
+    close(hd[1]);
+    dup2(hd[0], STDIN_FILENO);
+    close(hd[0]);
   }
   return;
 }
