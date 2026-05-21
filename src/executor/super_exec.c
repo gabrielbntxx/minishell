@@ -3,9 +3,57 @@
 #include "../../Includes/minishell.h"
 #include <stdio.h>
 
+
+char *find_deli(char *str, char *deli)
+{
+  int i;
+  int j;
+
+  if (!*deli | !str)
+    return (str);
+  i = 0;
+  while (str[i])
+  {
+    j = 0;
+    while (str[i + j] && str[i + j] == deli[j])
+        j++;
+    if (!deli[j])
+        return (&str[i]);
+    i++;
+}
+  return NULL;
+  }
+
+
+void handl_heredoc(t_cmd *cmd) {
+  int hd[2];
+  int pid;
+  char *str;
+  
+  str = NULL;
+  if (cmd->heredoc) {
+    pipe(hd);
+    pid = fork();
+    if (pid == 0) {
+      while (1) {
+        write(hd[1], "\n", 1);
+        str = readline(">");
+        if (!ft_strcmp(str, cmd->heredoc)) break;
+      }
+      exit(0);
+    }
+    waitpid(pid, NULL, 0);
+  }
+  return;
+}
+
+
+
+
 void apply_redir(t_cmd *cmd) {
   int fd[2];
-
+  
+  handl_heredoc(cmd);
   if(cmd->redir_in) {
     fd[0] = open(cmd->redir_in, O_RDONLY);
     dup2(fd[0], STDIN_FILENO);
@@ -77,6 +125,10 @@ void super_exec(t_cmd *cmd, t_env *env) {
   char **array; 
   array = env_to_array(env);
 
+  if (!cmd->args) {
+    if (cmd->heredoc) handl_heredoc(cmd);
+    return;
+  }
   if (cmd->next) super_cmd(cmd, array, env);
   else base_cmd(cmd, array, env);
 }

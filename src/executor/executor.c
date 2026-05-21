@@ -80,10 +80,10 @@ void execute_cmd(t_cmd *cmd, char **envp) {
 		execve(cmd_path, cmd->args, envp);
     exit(127);
   }
-	if (cmd_path)
-	  free(cmd_path);
-	waitpid(pid, NULL, 0);
-  free_array(cmd->args);
-  free_array(paths);
+    waitpid(pid, NULL, 0);
+	  if (cmd_path)
+			free(cmd_path);
+    free_array(cmd->args);
+    free_array(paths);
 		return;
 }
