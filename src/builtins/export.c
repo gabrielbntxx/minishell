@@ -17,7 +17,7 @@ char **sort_array(char **env) {
         int i = 0;
         int swapped = 0;
         while (i < n - 1 - pass) {
-            if (strcmp(env[i], env[i + 1]) > 0) {
+            if (ft_strcmp(env[i], env[i + 1]) > 0) {
                 char *tmp = env[i];
                 env[i] = env[i + 1];
                 env[i + 1] = tmp;

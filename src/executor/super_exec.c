@@ -131,10 +131,11 @@ void super_exec(t_cmd *cmd, t_env *env) {
   char **array; 
   array = env_to_array(env);
 
-  if (!cmd->args) {
+  if (!cmd->args) {    
     if (cmd->heredoc) handl_heredoc(cmd);
     return;
   }
+  expand(cmd, env);
   if (cmd->next) super_cmd(cmd, array, env);
   else base_cmd(cmd, array, env);
 }
