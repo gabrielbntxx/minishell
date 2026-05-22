@@ -16,5 +16,6 @@
   #include "parser.h"
   #include "lexer.h"
   #include "builtins.h"
+  #include "expand.h"
 
 #endif
