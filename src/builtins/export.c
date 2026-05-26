@@ -6,19 +6,25 @@ char	*ft_strjoin(const char *s1, const char *s2);
 #include <string.h>
 
 char **sort_array(char **env) {
+    int n;
+    int i; 
+    char *tmp; 
+    int swapped;
+    int pass; 
+
     if (!env) return (env);
 
-    int n = 0;
+    n = 0;
     while (env[n])
         n++;
 
-    int pass = 0;
+    pass = 0;
     while (pass < n - 1) {
-        int i = 0;
-        int swapped = 0;
+        i = 0;
+        swapped = 0;
         while (i < n - 1 - pass) {
             if (ft_strcmp(env[i], env[i + 1]) > 0) {
-                char *tmp = env[i];
+                tmp = env[i];
                 env[i] = env[i + 1];
                 env[i + 1] = tmp;
                 swapped = 1;
@@ -43,7 +49,8 @@ char **env_to_export(t_env *env) {
     i++;
     current = current->next;
   }
-  array = malloc(sizeof(char *) * i + 1);
+  array = malloc(sizeof(t_env *) * i + 1);
+  if (!array) return (NULL); 
   i = 0;
   current = env;
   while (current) {

@@ -12,7 +12,7 @@ void *env_get(t_env *env, char *key, int option) {
     env = env->next;
   }
   if (option == 1) return(NULL);
-  return ("dont exist\n");
+  return ("");
 }
 
 void env_set(t_env **env, char *key, char *value)
