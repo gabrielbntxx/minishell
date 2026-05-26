@@ -61,7 +61,7 @@ void expand(t_cmd *cmd, t_env *env) {
             value = ft_substr(cmd->args[i], y + 1, end - (y + 1));
             value = env_get(env, value, 0);
             post = ft_substr(cmd->args[i], end, ft_strlen(cmd->args[i] + end));
-            if (!value) return;
+            if (!value) ft_strdup("");
             cmd->args[i] = ft_strjoin(tmp, value);
             //if (end - 1 > (int)ft_strlen(cmd->args[i]))
             cmd ->args[i] = ft_strjoin(cmd->args[i], post);
