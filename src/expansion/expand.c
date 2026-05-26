@@ -2,7 +2,7 @@
 
 int	ft_isalnum(int c)
 {
-	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
+	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_')
 	{
 		return (8);
 	}
@@ -41,8 +41,10 @@ void expand(t_cmd *cmd, t_env *env) {
     int end; 
     char *value; 
     char *tmp; 
+    char *post;
 
     tmp = NULL; 
+    post = NULL;
     i = 0;
     end = 0;
     y = 0;
@@ -50,17 +52,19 @@ void expand(t_cmd *cmd, t_env *env) {
         if (ft_strchr(cmd->args[i], '$') != -1) {
             y = ft_strchr(cmd->args[i], '$');
             end = y + 1; 
-            ft_strlcpy(tmp, cmd->args[i], y);
+            tmp = ft_substr(cmd->args[i], 0, y);
             if (cmd->args[i][y + 1] == '?') {
                 return; //exit value  
             }
             while(ft_isalnum(cmd->args[i][end]))
               end++;
-            value = env_get(env, &cmd->args[i][y + 1], 0);
+            value = ft_substr(cmd->args[i], y + 1, end - (y + 1));
+            value = env_get(env, value, 0);
+            post = ft_substr(cmd->args[i], end, ft_strlen(cmd->args[i] + end));
             if (!value) return;
             cmd->args[i] = ft_strjoin(tmp, value);
             //if (end - 1 > (int)ft_strlen(cmd->args[i]))
-              //cmd ->args[i] = ft_strjoin(cmd->args[i], ft_substr(cmd->args[i], y + 1, end));
+            cmd ->args[i] = ft_strjoin(cmd->args[i], post);
             //ft_strlcpy(&cmd->args[i][y], value, ft_strlen(value) + 1);
         }
         i++;
