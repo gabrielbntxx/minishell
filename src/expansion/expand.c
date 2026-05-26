@@ -42,6 +42,7 @@ void expand(t_cmd *cmd, t_env *env) {
     char *value; 
     char *tmp; 
     char *post;
+    char *mid;
 
     tmp = NULL; 
     post = NULL;
@@ -62,10 +63,13 @@ void expand(t_cmd *cmd, t_env *env) {
             value = env_get(env, value, 0);
             post = ft_substr(cmd->args[i], end, ft_strlen(cmd->args[i] + end));
             if (!value) value = ft_strdup("");
-            cmd->args[i] = ft_strjoin(tmp, value);
+            mid = ft_strjoin(tmp, value);
             //if (end - 1 > (int)ft_strlen(cmd->args[i]))
-            cmd ->args[i] = ft_strjoin(cmd->args[i], post);
+            cmd ->args[i] = ft_strjoin(mid, post);
             //ft_strlcpy(&cmd->args[i][y], value, ft_strlen(value) + 1);
+            free(mid);
+            free(tmp);
+            free(post);
         }
         i++;
     }   

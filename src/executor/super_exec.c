@@ -136,4 +136,5 @@ void super_exec(t_cmd *cmd, t_env *env) {
   expand(cmd, env);
   if (cmd->next) super_cmd(cmd, array, env);
   else base_cmd(cmd, array, env);
+  free_array(array);
 }
