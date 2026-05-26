@@ -83,6 +83,7 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
   int last_fd = -1;
   int pid; 
   t_cmd *current;
+  int status;
 
   current = cmd;
   while (current) {
@@ -111,7 +112,8 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
     else if (last_fd != -1) close(last_fd);
     current = current->next;
   }
-  while(wait(NULL) > 0);
+  while(waitpid(-1, &status, 0) > 0);
+  update_exit(status);
 }
 
 void base_cmd(t_cmd *cmd, char **array, t_env *env) {

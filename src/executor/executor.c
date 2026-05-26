@@ -63,6 +63,7 @@ void execute_cmd(t_cmd *cmd, char **envp) {
   char **paths;
   char *cmd_path;
 	int pid;
+  int status;
 
   paths = find_path(envp);
   if (!cmd->args || !cmd->args[0]) {
@@ -80,7 +81,8 @@ void execute_cmd(t_cmd *cmd, char **envp) {
 		execve(cmd_path, cmd->args, envp);
     exit(127);
   }
-    waitpid(pid, NULL, 0);
+    waitpid(pid, &status, 0);
+    update_exit(status);
 	  if (cmd_path)
 			free(cmd_path);
     free_array(cmd->args);

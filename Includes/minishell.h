@@ -17,5 +17,11 @@
   #include "lexer.h"
   #include "builtins.h"
   #include "expand.h"
+  
+  extern int exit_status;
+
+void handler0(int sig);
+void update_exit(int status);
+
 
 #endif

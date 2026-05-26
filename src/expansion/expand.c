@@ -49,24 +49,27 @@ void expand(t_cmd *cmd, t_env *env) {
     end = 0;
     y = 0;
     while (cmd->args[i]) {
-        if (ft_strchr(cmd->args[i], '$') != -1) {
-            y = ft_strchr(cmd->args[i], '$');
-            end = y + 1; 
-            tmp = ft_substr(cmd->args[i], 0, y);
-            if (cmd->args[i][y + 1] == '?') {
-                return; //exit value  
-            }
-            while(ft_isalnum(cmd->args[i][end]))
-              end++;
-            value = ft_substr(cmd->args[i], y + 1, end - (y + 1));
-            value = env_get(env, value, 0);
-            post = ft_substr(cmd->args[i], end, ft_strlen(cmd->args[i] + end));
-            if (!value) value = ft_strdup("");
-            cmd->args[i] = ft_strjoin(tmp, value);
-            //if (end - 1 > (int)ft_strlen(cmd->args[i]))
-            cmd ->args[i] = ft_strjoin(cmd->args[i], post);
-            //ft_strlcpy(&cmd->args[i][y], value, ft_strlen(value) + 1);
+      if (ft_strchr(cmd->args[i], '$') != -1) {
+        y = ft_strchr(cmd->args[i], '$');
+        end = y + 1; 
+        tmp = ft_substr(cmd->args[i], 0, y);
+
+        while(ft_isalnum(cmd->args[i][end]))
+          end++;
+        value = ft_substr(cmd->args[i], y + 1, end - (y + 1));
+        if (cmd->args[i][y + 1] == '?') {
+          write(1, &exit_status, 3);
+          return; //exit value  
         }
-        i++;
-    }   
+        else 
+            value = env_get(env, value, 0);
+        post = ft_substr(cmd->args[i], end, ft_strlen(cmd->args[i] + end));
+        if (!value) value = ft_strdup("");
+        cmd->args[i] = ft_strjoin(tmp, value);
+          //if (end - 1 > (int)ft_strlen(cmd->args[i]))
+        cmd ->args[i] = ft_strjoin(cmd->args[i], post);
+          //ft_strlcpy(&cmd->args[i][y], value, ft_strlen(value) + 1);
+      }
+      i++;
+  }   
 }

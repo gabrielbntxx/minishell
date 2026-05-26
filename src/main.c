@@ -4,13 +4,19 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-static void    handler0(int sig)
+int exit_status;
+void    handler0(int sig)
 {
     (void) sig;
     printf("\n");
     rl_on_new_line();
     rl_replace_line("", 0);
     rl_redisplay();
+}
+
+void update_exit(int status) {
+  if (WIFEXITED(status)) exit_status = WEXITSTATUS(status); 
+  else if (WIFSIGNALED(status)) exit_status = 128 + WTERMSIG(status);
 }
 
 int	main(int ac, char **av, char **envp)
