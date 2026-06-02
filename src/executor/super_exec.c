@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:30 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 21:13:27 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/02 22:03:21 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,15 @@ char *find_deli(char *str, char *deli)
   return NULL;
   }
 
+ static void    handler1(int sig)
+{
+     (void) sig;
+    // printf("\n");
+    // rl_on_new_line();
+    // rl_replace_line("", 0);
+    // rl_redisplay();
+    exit(0);
+}
 
 void handl_heredoc(t_cmd *cmd) {
   int hd[2];
@@ -49,6 +58,9 @@ void handl_heredoc(t_cmd *cmd) {
     if (pid == 0) {
       close(hd[0]);
       while (1) {
+         signal(SIGINT, handler1);
+    signal(SIGQUIT, SIG_IGN); 
+
         str = readline(">");
         if (!ft_strcmp(str, cmd->heredoc)) break;
         write(hd[1], str, ft_strlen(str));
