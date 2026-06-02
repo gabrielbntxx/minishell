@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:30 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:54:31 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/02 21:13:27 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,8 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
 
   current = cmd;
   while (current) {
+      expand(cmd, env);
+
       if (current->next) pipe(pipe_fd);
       pid = fork();
     if (pid == 0) {
@@ -121,12 +123,14 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
       last_fd = pipe_fd[0];
     }
     else if (last_fd != -1) close(last_fd);
+
     current = current->next;
   }
   while(wait(NULL) > 0);
 }
 
 void base_cmd(t_cmd *cmd, char **array, t_env *env) {
+    expand(cmd, env);
   int save[2];
   save[0] = dup(STDIN_FILENO);
   save[1] = dup(STDOUT_FILENO);
@@ -143,9 +147,11 @@ void super_exec(t_cmd *cmd, t_env *env) {
   char **array; 
   array = env_to_array(env);
 
-  if (cmd->heredoc) handl_heredoc(cmd);
-  if (!cmd->args) return;
-  expand(cmd, env);
+  if (!cmd->args) {
+    if (cmd->heredoc) handl_heredoc(cmd);
+    free_array(array);
+    return;
+  }
   if (cmd->next) super_cmd(cmd, array, env);
   else base_cmd(cmd, array, env);
   free_array(array);
