@@ -29,10 +29,10 @@ typedef struct s_token
 }   t_token; 
 
 
-char	*ft_substr(char const *s, unsigned int start, int len);
-int	    ft_strlcpy(char *dst, const char *src, int dstsize);
-char	*ft_strdup(const char *s1);
-int	    ft_strlen(const char *str);
+//char	*ft_substr(char const *s, unsigned int start, int len);
+//int	    ft_strlcpy(char *dst, const char *src, int dstsize);
+//char	*ft_strdup(const char *s1);
+//int	    ft_strlen(const char *str);
 int     get_operator_token(char *input, int *i, t_token **head);
 int    is_operator(char c);
 t_token *new_token(t_token_type type, char *value, t_quote_type quote, int no_space);                                                                     

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/02 20:54:13 by mguilber          #+#    #+#             */
+/*   Updated: 2026/06/02 20:54:14 by mguilber         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "builtins.h"
 char	*ft_strjoin(const char *s1, const char *s2);
 
@@ -6,19 +18,25 @@ char	*ft_strjoin(const char *s1, const char *s2);
 #include <string.h>
 
 char **sort_array(char **env) {
+    int n;
+    int i; 
+    char *tmp; 
+    int swapped;
+    int pass; 
+
     if (!env) return (env);
 
-    int n = 0;
+    n = 0;
     while (env[n])
         n++;
 
-    int pass = 0;
+    pass = 0;
     while (pass < n - 1) {
-        int i = 0;
-        int swapped = 0;
+        i = 0;
+        swapped = 0;
         while (i < n - 1 - pass) {
-            if (strcmp(env[i], env[i + 1]) > 0) {
-                char *tmp = env[i];
+            if (ft_strcmp(env[i], env[i + 1]) > 0) {
+                tmp = env[i];
                 env[i] = env[i + 1];
                 env[i + 1] = tmp;
                 swapped = 1;
@@ -43,7 +61,8 @@ char **env_to_export(t_env *env) {
     i++;
     current = current->next;
   }
-  array = malloc(sizeof(char *) * i + 1);
+  array = malloc(sizeof(t_env *) * i + 1);
+  if (!array) return (NULL); 
   i = 0;
   current = env;
   while (current) {
@@ -70,11 +89,10 @@ void print_export(char **env) {
         printf("%s\n", tmp);
         i++;
     }
-    printf("\n\n\n");
     return;
 }
 
-void ft_export(char **cmd, t_env **nodenv) {
+void builtin_export(char **cmd, t_env **nodenv) {
   int i = 0;
   char **env;
   char *key;
@@ -83,7 +101,6 @@ void ft_export(char **cmd, t_env **nodenv) {
   int len;
   env = env_to_export(*nodenv);
   env = sort_array(env);
-  //print_export(env);
   if (!cmd[1]) {
     print_export(env);
     return;
@@ -102,15 +119,7 @@ void ft_export(char **cmd, t_env **nodenv) {
       env_set(nodenv, key, value);
     }
   }
-  env = env_to_export(*nodenv);
-  env = sort_array(env);
-  print_export(env);
+  return;
 }
 
-int main(int ac, char **av, char **envp) {
-  t_env *nodenv;
-  //char *cmd[] = {"export", "test4=icilaba", NULL};
-  init_env(av, &nodenv);
-  ft_export(av, &nodenv);
 
-}

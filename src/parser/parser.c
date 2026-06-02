@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parser.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/02 20:54:52 by mguilber          #+#    #+#             */
+/*   Updated: 2026/06/02 20:54:52 by mguilber         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../Includes/parser.h"
 #include "../../Includes/minishell.h"
 #include "../../Includes/lexer.h"
@@ -143,15 +155,6 @@ void    print_cmds(t_cmd *head)
     }                                                                                                                        
 }                                                                                                                            
                                                                                                   
-int main(void)                                                                                                               
-{                                                                                                                            
-    t_token *tokens;                                                                                                         
-    t_cmd *cmds;                                                                                                             
-                                                                                                                               
-    tokens = lexer("cat < in.txt >> out.txt");                                                                                  
-    cmds = parser(tokens);                                                                                                   
-    print_cmds(cmds);                                                                                                        
-    return (0);                                                                                                              
-}               
+               
 
 

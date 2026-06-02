@@ -1,12 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/02 20:54:23 by mguilber          #+#    #+#             */
+/*   Updated: 2026/06/02 20:54:24 by mguilber         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 
 #include "../../Includes/minishell.h"
-#include "../res/res.h"
 
 
 
 void *env_get(t_env *env, char *key, int option) {
-  char *value;
-
   while (env) {
     if (ft_strcmp(env->key, key) == 0) {
       if (option == 1) return(env);
@@ -15,7 +24,7 @@ void *env_get(t_env *env, char *key, int option) {
     env = env->next;
   }
   if (option == 1) return(NULL);
-  return ("dont exist\n");
+  return ("");
 }
 
 void env_set(t_env **env, char *key, char *value)
@@ -72,12 +81,16 @@ char **env_to_array(t_env *env) {
   t_env *current;
   int i;
 
+  i = 0;
   current = env;
   while (current) {
     i++;
     current = current->next;
   }
-  array = malloc(sizeof(char *) * i);
+  array = malloc(sizeof(char *) * (i + 1));
+  if (!array) {
+    return (NULL);
+  }
   i = 0;
   current = env;
   while (current) {

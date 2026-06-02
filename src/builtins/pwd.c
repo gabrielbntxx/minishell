@@ -1,0 +1,28 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pwd.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/02 20:54:16 by mguilber          #+#    #+#             */
+/*   Updated: 2026/06/02 20:54:17 by mguilber         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../../Includes/parser.h"
+#include "../../Includes/minishell.h"
+#include "../../Includes/lexer.h"
+
+
+int builtin_pwd(void)
+{
+    char buff[1024];
+    if (getcwd(buff, 1024) == NULL)
+    {
+        perror("pwd");
+        return(1);
+    }
+    printf("%s\n", buff);
+    return(0);
+}

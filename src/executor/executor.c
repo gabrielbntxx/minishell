@@ -1,4 +1,16 @@
-#include "executor.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   executor.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/02 20:54:27 by mguilber          #+#    #+#             */
+/*   Updated: 2026/06/02 20:54:27 by mguilber         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../../Includes/executor.h"
 
 void	free_array(char **array)
 {
@@ -59,30 +71,31 @@ static void	cmd_not_found(char **args, char **paths)
 	return;
 }
 
-void execute_cmd(char *cmd, char **envp) {
+void execute_cmd(t_cmd *cmd, char **envp) {
   char **paths;
-  char **args;
   char *cmd_path;
 	int pid;
 
   paths = find_path(envp);
-	args = ft_split(cmd, ' ');
-  if (!args || !args[0]) {
-    free_array(args);
+  if (!cmd->args || !cmd->args[0]) {
+    free_array(cmd->args);
     free_array(paths);
+    return;
   }
-	cmd_path = find_cmd(paths, cmd);
+	cmd_path = find_cmd(paths, cmd->args[0]);
 	if (!cmd_path) {
-		cmd_not_found(args, paths);
+		cmd_not_found(cmd->args, paths);
 		return;
 	}
 	pid = fork();
-	if (pid == 0)
-		execve(cmd_path, args, envp);
-	if (cmd_path)
+	if (pid == 0) {
+		execve(cmd_path, cmd->args, envp);
+    exit(127);
+  }
+    waitpid(pid, NULL, 0);
+	  if (cmd_path)
 			free(cmd_path);
-	waitpid(pid, NULL, 0);
-  free_array(args);
-  free_array(paths);
+    free_array(cmd->args);
+    free_array(paths);
 		return;
 }
