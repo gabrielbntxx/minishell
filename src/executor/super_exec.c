@@ -46,6 +46,7 @@ void handl_heredoc(t_cmd *cmd) {
         if (!ft_strcmp(str, cmd->heredoc)) break;
         write(hd[1], str, ft_strlen(str));
         write(hd[1], "\n", 1);
+        free(str);
       }
       close(hd[1]);
       exit(0);
@@ -92,6 +93,7 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
   int last_fd = -1;
   int pid; 
   t_cmd *current;
+  int status;
 
   current = cmd;
   while (current) {
@@ -111,7 +113,7 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
         close(pipe_fd[1]);
       }
       apply_redir(current);
-      if (dispatch(current, env) == 1)
+      if (dispatch(current, &env) == 1)
         execute_cmd(current, array);
       exit(127);
     }
@@ -124,17 +126,20 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
 
     current = current->next;
   }
-  while(wait(NULL) > 0);
+  while(wait(&status) > 0);
+  update_exit(status);
 }
 
 void base_cmd(t_cmd *cmd, char **array, t_env *env) {
-    expand(cmd, env);
   int save[2];
+
+  expand(cmd, env);
   save[0] = dup(STDIN_FILENO);
   save[1] = dup(STDOUT_FILENO);
   apply_redir(cmd);
-  if (dispatch(cmd, &env) == 1)
-  execute_cmd(cmd, array);
+  g_exit_st = dispatch(cmd, &env);
+  if (g_exit_st == 1)
+    execute_cmd(cmd, array);
   dup2(save[0], STDIN_FILENO);
   dup2(save[1], STDOUT_FILENO);
   close(save[0]);
@@ -148,7 +153,6 @@ void super_exec(t_cmd *cmd, t_env *env) {
     return;
   array = env_to_array(env);
     if (!cmd->args) {
-      if (cmd->heredoc) handl_heredoc(cmd);
       free_array(array);
       return;
     }

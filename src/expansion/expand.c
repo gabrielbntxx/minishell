@@ -46,8 +46,54 @@ int	ft_strlcat(char *dst, const char *src, int size)
 	return (i + j);
 }
 
+void expand(t_cmd *cmd, t_env *env)
+{
+	int		i;
+	int		y;
+	int		end;
+	char	*value;
+	char	*tmp;
+	char	*post;
+	char	*mid;
+	char	*old;
 
-void expand(t_cmd *cmd, t_env *env) {
+	i = 0;
+	while (cmd->args && cmd->args[i])
+	{
+		if (ft_strchr(cmd->args[i], '$') != -1)
+		{
+			y = ft_strchr(cmd->args[i], '$');
+			end = y + 1;
+			tmp = ft_substr(cmd->args[i], 0, y);
+			if (cmd->args[i][y + 1] == '?')
+			{
+				value = ft_itoa(g_exit_st);
+				end++;
+			}
+			else
+			{
+				while (cmd->args[i][end] && ft_isalnum(cmd->args[i][end]))
+					end++;
+				value = ft_substr(cmd->args[i], y + 1, end - (y + 1));
+				value = env_get(env, value, 0);
+				if (!value)
+					value = ft_strdup("");
+			}
+			post = ft_substr(cmd->args[i], end, ft_strlen(cmd->args[i]) - end);
+			mid = ft_strjoin(tmp, value);
+			old = cmd->args[i];
+			cmd->args[i] = ft_strjoin(mid, post);
+			free(old);
+			free(tmp);
+			free(post);
+			free(mid);
+			free(value);
+		}
+		i++;
+	}
+}
+
+/*void expand(t_cmd *cmd, t_env *env) {
     int i;
     int y;
     int end; 
@@ -67,7 +113,8 @@ void expand(t_cmd *cmd, t_env *env) {
             end = y + 1; 
             tmp = ft_substr(cmd->args[i], 0, y);
             if (cmd->args[i][y + 1] == '?') {
-                return; //exit value  
+                tmp = ft_itoa(g_exit_st);  
+                end++;
             }
             while(ft_isalnum(cmd->args[i][end]))
               end++;
@@ -85,4 +132,4 @@ void expand(t_cmd *cmd, t_env *env) {
         }
         i++;
     }   
-}
+}*/

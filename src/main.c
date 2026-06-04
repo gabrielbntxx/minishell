@@ -16,7 +16,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-static void    handler0(int sig)
+void    handler0(int sig)
 {
     (void) sig;
     printf("\n");
@@ -27,6 +27,15 @@ static void    handler0(int sig)
 
 #include <stdlib.h>
 #include <string.h>
+
+int g_exit_st = 0;
+
+void update_exit(int status) {
+  if (WIFEXITED(status))
+      g_exit_st = WIFEXITED(status);
+  else if (WIFSIGNALED(status))
+      g_exit_st = 128 + WTERMSIG(status);
+}
 
 void free_tokens(t_token *tok)
 {
