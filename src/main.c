@@ -70,8 +70,10 @@ void free_env(t_env *env)
 
 void free_all(t_token *tokens, t_cmd *cmds)
 {
-    free_tokens(tokens);
-    free_cmds(cmds);
+    if (tokens)
+      free_tokens(tokens);
+    if (cmds)
+      free_cmds(cmds);
 }
 
 int	main(int ac, char **av, char **envp)
@@ -80,7 +82,7 @@ int	main(int ac, char **av, char **envp)
 	t_token	*tokens;
 	char	*cmd;
   t_cmd *cmds;
-  
+
   tokens = NULL;
   cmds = NULL;
 	(void)ac;

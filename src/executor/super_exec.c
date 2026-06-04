@@ -16,26 +16,6 @@
 #include <stdio.h>
 
 
-char *find_deli(char *str, char *deli)
-{
-  int i;
-  int j;
-
-  if (!*deli | !str)
-    return (str);
-  i = 0;
-  while (str[i])
-  {
-    j = 0;
-    while (str[i + j] && str[i + j] == deli[j])
-        j++;
-    if (!deli[j])
-        return (&str[i]);
-    i++;
-}
-  return NULL;
-  }
-
  static void    handler1(int sig)
 {
      (void) sig;
@@ -53,15 +33,16 @@ void handl_heredoc(t_cmd *cmd) {
   
   str = NULL;
   if (cmd->heredoc) {
-    pipe(hd);
+    if(pipe(hd) == -1) return;
     pid = fork();
     if (pid == 0) {
       close(hd[0]);
       while (1) {
-         signal(SIGINT, handler1);
-    signal(SIGQUIT, SIG_IGN); 
+        signal(SIGINT, handler1);
+        signal(SIGQUIT, SIG_IGN); 
 
         str = readline(">");
+        if (!str) break;
         if (!ft_strcmp(str, cmd->heredoc)) break;
         write(hd[1], str, ft_strlen(str));
         write(hd[1], "\n", 1);
@@ -69,9 +50,10 @@ void handl_heredoc(t_cmd *cmd) {
       close(hd[1]);
       exit(0);
     }
-    waitpid(pid, NULL, 0);
+    else if (pid == -1) return;
+    if (waitpid(pid, NULL, 0) == -1) return;
     close(hd[1]);
-    dup2(hd[0], STDIN_FILENO);
+    if (dup2(hd[0], STDIN_FILENO) == -1) return;
     close(hd[0]);
   }
   return;
@@ -87,7 +69,7 @@ void apply_redir(t_cmd *cmd) {
   if(cmd->redir_in) {
     fd[0] = open(cmd->redir_in, O_RDONLY);
     if (fd[0] == -1) return; 
-    if (!dup2(fd[0], STDIN_FILENO)) return;
+    if (dup2(fd[0], STDIN_FILENO) == -1) return;
     
 
     close(fd[0]);
@@ -98,7 +80,7 @@ void apply_redir(t_cmd *cmd) {
     else
       fd[1] = open(cmd->redir_out, O_WRONLY | O_APPEND | O_CREAT, 0644);
     if (fd[1] == -1) return;
-    if (!dup2(fd[1], STDOUT_FILENO)) return;
+    if (dup2(fd[1], STDOUT_FILENO) == -1) return;
     close(fd[1]);
   }
   return;
@@ -113,9 +95,10 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
 
   current = cmd;
   while (current) {
-      expand(cmd, env);
+      expand(current, env);
 
-      if (current->next) pipe(pipe_fd);
+      if (current->next) 
+        if (pipe(pipe_fd) == -1) return;
       pid = fork();
     if (pid == 0) {
       if (last_fd != -1) { 
@@ -128,7 +111,7 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
         close(pipe_fd[1]);
       }
       apply_redir(current);
-      if (dispatch(current, &env) == 1)
+      if (dispatch(current, env) == 1)
         execute_cmd(current, array);
       exit(127);
     }

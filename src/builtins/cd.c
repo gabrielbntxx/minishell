@@ -32,7 +32,11 @@ int builtin_cd(t_env *env, char **args)
       path = args[1];
     if (args[1]) {
       if (!ft_strcmp(args[1], "-")) {
-          path = env_get(env, "OLDPWD", 0);
+        path = env_get(env, "OLDPWD", 0);
+        if (path == NULL){
+          printf("cd: OLDPWD not set");
+          return (1);
+       }
       }
     }
     if (chdir(path) == -1)
