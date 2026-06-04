@@ -32,7 +32,7 @@ int g_exit_st = 0;
 
 void update_exit(int status) {
   if (WIFEXITED(status))
-      g_exit_st = WIFEXITED(status);
+      g_exit_st = WEXITSTATUS(status);
   else if (WIFSIGNALED(status))
       g_exit_st = 128 + WTERMSIG(status);
 }

@@ -74,7 +74,40 @@ static void	cmd_not_found(char **args, char **paths)
 	return;
 }
 
-void execute_cmd(t_cmd *cmd, char **envp) {
+void	execute_cmd(t_cmd *cmd, char **envp)
+{
+	char	**paths;
+	char	*cmd_path;
+	int		pid;
+	int		status;
+
+	paths = find_path(envp);
+	if (!cmd->args || !cmd->args[0])
+	{
+		free_array(paths);
+		return;
+	}
+	cmd_path = find_cmd(paths, cmd->args[0]);
+	if (!cmd_path)
+	{
+		cmd_not_found(cmd->args, paths);
+		free_array(paths);
+		return;
+	}
+	pid = fork();
+	if (pid == 0)
+	{
+		execve(cmd_path, cmd->args, envp);
+		exit(127);
+	}
+	waitpid(pid, &status, 0);
+	free(cmd_path);
+	free_array(paths);
+  update_exit(status);
+	return;
+}
+
+/*int execute_cmd(t_cmd *cmd, char **envp) {
   char **paths;
   char *cmd_path;
 	int pid;
@@ -101,4 +134,4 @@ void execute_cmd(t_cmd *cmd, char **envp) {
     free_array(cmd->args);
     free_array(paths);
 		return;
-}
+}*/

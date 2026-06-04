@@ -87,7 +87,7 @@ void expand(t_cmd *cmd, t_env *env)
 			free(tmp);
 			free(post);
 			free(mid);
-			free(value);
+			//free(value);
 		}
 		i++;
 	}
