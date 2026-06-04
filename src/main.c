@@ -80,6 +80,9 @@ int	main(int ac, char **av, char **envp)
 	t_token	*tokens;
 	char	*cmd;
   t_cmd *cmds;
+  
+  tokens = NULL;
+  cmds = NULL;
 	(void)ac;
 	(void)av;
 	env = NULL;
