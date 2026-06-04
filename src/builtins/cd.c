@@ -18,6 +18,7 @@ int builtin_cd(t_env *env, char **args)
 {
     char *path;
 
+
     if (args[1] == NULL)
     {
         path = env_get(env, "HOME", 0);
@@ -28,11 +29,11 @@ int builtin_cd(t_env *env, char **args)
         } 
     }
     else
-    {
-        path = args[1];
-    }
-    if (!ft_strcmp(args[1], "-")) {
-        path = env_get(env, "OLDPWD", 0);
+      path = args[1];
+    if (args[1]) {
+      if (!ft_strcmp(args[1], "-")) {
+          path = env_get(env, "OLDPWD", 0);
+      }
     }
     if (chdir(path) == -1)
     {

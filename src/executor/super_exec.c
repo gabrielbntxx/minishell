@@ -86,7 +86,9 @@ void apply_redir(t_cmd *cmd) {
   handl_heredoc(cmd);
   if(cmd->redir_in) {
     fd[0] = open(cmd->redir_in, O_RDONLY);
-    dup2(fd[0], STDIN_FILENO);
+    if (fd[0] == -1) return; 
+    if (!dup2(fd[0], STDIN_FILENO)) return;
+    
 
     close(fd[0]);
   } 
@@ -95,7 +97,8 @@ void apply_redir(t_cmd *cmd) {
       fd[1] = open(cmd->redir_out, O_WRONLY | O_TRUNC | O_CREAT, 0644);
     else
       fd[1] = open(cmd->redir_out, O_WRONLY | O_APPEND | O_CREAT, 0644);
-    dup2(fd[1], STDOUT_FILENO);
+    if (fd[1] == -1) return;
+    if (!dup2(fd[1], STDOUT_FILENO)) return;
     close(fd[1]);
   }
   return;
@@ -157,13 +160,15 @@ void base_cmd(t_cmd *cmd, char **array, t_env *env) {
 
 void super_exec(t_cmd *cmd, t_env *env) {
   char **array; 
-  array = env_to_array(env);
 
-  if (!cmd->args) {
-    if (cmd->heredoc) handl_heredoc(cmd);
-    free_array(array);
+  if (!cmd) 
     return;
-  }
+  array = env_to_array(env);
+    if (!cmd->args) {
+      if (cmd->heredoc) handl_heredoc(cmd);
+      free_array(array);
+      return;
+    }
   if (cmd->next) super_cmd(cmd, array, env);
   else base_cmd(cmd, array, env);
   free_array(array);

@@ -88,6 +88,8 @@ int	main(int ac, char **av, char **envp)
 	{
     signal(SIGINT, handler0);
     signal(SIGQUIT, SIG_IGN); 
+    cmds = NULL;
+    tokens = NULL;
 		cmd = readline("minishell> ");
 		if (!cmd)
 			break ;
