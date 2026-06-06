@@ -142,7 +142,7 @@ void base_cmd(t_cmd *cmd, char **array, t_env *env) {
   save[1] = dup(STDOUT_FILENO);
   apply_redir(cmd);
   g_exit_st = dispatch(cmd, &env);
-  if (g_exit_st = 1)
+  if (g_exit_st == 1)
     execute_cmd(cmd, array);
   dup2(save[0], STDIN_FILENO);
   dup2(save[1], STDOUT_FILENO);

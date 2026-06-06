@@ -9,91 +9,91 @@
 /*   Updated: 2026/06/02 20:54:35 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "../../Includes/expand.h"
 
 int	ft_isalnum(int c)
 {
-	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_')
-	{
+	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+		|| (c >= '0' && c <= '9') || c == '_')
 		return (8);
-	}
-	else
-		return (0);
+	return (0);
 }
 
-int	ft_strlcat(char *dst, const char *src, int size)
+static char	*get_expand_value(char *arg, int y, int *end, t_env *env)
 {
-	int	len;
-	int	i;
-	int	j;
-	int	size2;
-
-	size2 = size;
-	len = 0;
-	i = 0;
-	j = 0;
-	i = ft_strlen(dst);
-	j = ft_strlen(src);
-	if (size2 <= i)
-		return (size2 + j);
-	while (src[len] && i + len < size2 - 1)
-	{
-		dst[i + len] = src[len];
-		len++;
-	}
-	dst[i + len] = '\0';
-	return (i + j);
-}
-
-void expand(t_cmd *cmd, t_env *env)
-{
-	int		i;
-	int		y;
-	int		end;
+	char	*name;
+	char	*env_value;
 	char	*value;
+
+	if (arg[y + 1] == '?')
+	{
+		*end = y + 2;
+		return (ft_itoa(g_exit_st));
+	}
+	while (arg[*end] && ft_isalnum(arg[*end]))
+		(*end)++;
+	if (*end == y + 1)
+		return (NULL);
+	name = ft_substr(arg, y + 1, *end - (y + 1));
+	env_value = env_get(env, name, 0);
+	if (env_value)
+		value = ft_strdup(env_value);
+	else
+		value = ft_strdup("");
+	free(name);
+	return (value);
+}
+
+static int	replace_expand(char **arg, int y, int end, char *value)
+{
 	char	*tmp;
 	char	*post;
 	char	*mid;
 	char	*old;
 
+	tmp = ft_substr(*arg, 0, y);
+	post = ft_substr(*arg, end, ft_strlen(*arg) - end);
+	mid = ft_strjoin(tmp, value);
+	old = *arg;
+	*arg = ft_strjoin(mid, post);
+	free(old);
+	free(tmp);
+	free(post);
+	free(mid);
+	free(value);
+	if (!*arg)
+		return (1);
+	return (0);
+}
+
+static int	expand_one_arg(char **arg, t_env *env)
+{
+	int		y;
+	int		end;
+	char	*value;
+
+	while (ft_strchr(*arg, '$') != -1)
+	{
+		y = ft_strchr(*arg, '$');
+		end = y + 1;
+		value = get_expand_value(*arg, y, &end, env);
+		if (!value)
+			break ;
+		if (replace_expand(arg, y, end, value))
+			return (1);
+	}
+	return (0);
+}
+
+void	expand(t_cmd *cmd, t_env *env)
+{
+	int	i;
+
 	i = 0;
 	while (cmd->args && cmd->args[i])
 	{
-		while (ft_strchr(cmd->args[i], '$') != -1)
-		{
-			y = ft_strchr(cmd->args[i], '$');
-			end = y + 1;
-			tmp = ft_substr(cmd->args[i], 0, y);
-			if (cmd->args[i][y + 1] == '?')
-			{
-				value = ft_itoa(g_exit_st);
-				end++;
-			}
-			else
-			{
-				while (cmd->args[i][end] && ft_isalnum(cmd->args[i][end]))
-					end++;
-				value = ft_substr(cmd->args[i], y + 1, end - (y + 1));
-        if (end == y + 1) {
-          free(tmp);
-          break;
-        }
-				value = env_get(env, value, 0);
-				if (!value)
-					value = ft_strdup("");
-			}
-			post = ft_substr(cmd->args[i], end, ft_strlen(cmd->args[i]) - end);
-			mid = ft_strjoin(tmp, value);
-			old = cmd->args[i];
-			cmd->args[i] = ft_strjoin(mid, post);
-			free(old);
-			free(tmp);
-			free(post);
-			free(mid);
-			free(value);
-		}
+		if (expand_one_arg(&cmd->args[i], env))
+			return ;
 		i++;
 	}
 }
-
