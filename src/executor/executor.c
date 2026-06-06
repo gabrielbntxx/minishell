@@ -52,6 +52,7 @@ char	*find_cmd(char **paths, char *cmd)
 	{
 		tmp = ft_strjoin(paths[i++], "/");
 		path = ft_strjoin(tmp, cmd);
+    free(tmp);
 		if (!path)
 			return (NULL);
 		if (access(path, X_OK) == 0)
@@ -107,31 +108,3 @@ void	execute_cmd(t_cmd *cmd, char **envp)
 	return;
 }
 
-/*int execute_cmd(t_cmd *cmd, char **envp) {
-  char **paths;
-  char *cmd_path;
-	int pid;
-
-  paths = find_path(envp);
-  if (!cmd->args || !cmd->args[0]) {
-    free_array(cmd->args);
-    free_array(paths);
-    return;
-  }
-	cmd_path = find_cmd(paths, cmd->args[0]);
-	if (!cmd_path) {
-		cmd_not_found(cmd->args, paths);
-		return;
-	}
-	pid = fork();
-	if (pid == 0) {
-		execve(cmd_path, cmd->args, envp);
-    exit(127);
-  }
-    waitpid(pid, NULL, 0);
-	  if (cmd_path)
-			free(cmd_path);
-    free_array(cmd->args);
-    free_array(paths);
-		return;
-}*/

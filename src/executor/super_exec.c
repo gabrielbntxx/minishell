@@ -70,9 +70,10 @@ void apply_redir(t_cmd *cmd) {
   if(cmd->redir_in) {
     fd[0] = open(cmd->redir_in, O_RDONLY);
     if (fd[0] == -1) return; 
-    if (dup2(fd[0], STDIN_FILENO) == -1) return;
-    
-
+    if (dup2(fd[0], STDIN_FILENO) == -1) {
+      close(fd[0]);
+      return;
+    }
     close(fd[0]);
   } 
   if(cmd->redir_out) {
@@ -81,7 +82,10 @@ void apply_redir(t_cmd *cmd) {
     else
       fd[1] = open(cmd->redir_out, O_WRONLY | O_APPEND | O_CREAT, 0644);
     if (fd[1] == -1) return;
-    if (dup2(fd[1], STDOUT_FILENO) == -1) return;
+    if (dup2(fd[1], STDOUT_FILENO) == -1) { 
+      close(fd[0]);
+      return;
+    }
     close(fd[1]);
   }
   return;
@@ -93,7 +97,7 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
   int last_fd = -1;
   int pid; 
   t_cmd *current;
-  int status;
+  int status = 0;
 
   current = cmd;
   while (current) {
@@ -113,10 +117,9 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
         close(pipe_fd[1]);
       }
       apply_redir(current);
-      status = dispatch(current, &env);
-      if (status == 1)
+      if (dispatch(current, &env) == 1)
         execute_cmd(current, array);
-      exit(status);
+      exit(127);
     }
     if (current->next) {
       if (last_fd != -1) close(last_fd);
@@ -127,8 +130,8 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
 
     current = current->next;
   }
-  update_exit(status);
   while(wait(&status) > 0);
+  update_exit(status);
 }
 
 void base_cmd(t_cmd *cmd, char **array, t_env *env) {
@@ -139,7 +142,7 @@ void base_cmd(t_cmd *cmd, char **array, t_env *env) {
   save[1] = dup(STDOUT_FILENO);
   apply_redir(cmd);
   g_exit_st = dispatch(cmd, &env);
-  if (g_exit_st == 1)
+  if (g_exit_st = 1)
     execute_cmd(cmd, array);
   dup2(save[0], STDIN_FILENO);
   dup2(save[1], STDOUT_FILENO);
