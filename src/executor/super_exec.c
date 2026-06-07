@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:30 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:54:31 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/02 22:03:21 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,26 +16,15 @@
 #include <stdio.h>
 
 
-char *find_deli(char *str, char *deli)
+ static void    handler1(int sig)
 {
-  int i;
-  int j;
-
-  if (!*deli | !str)
-    return (str);
-  i = 0;
-  while (str[i])
-  {
-    j = 0;
-    while (str[i + j] && str[i + j] == deli[j])
-        j++;
-    if (!deli[j])
-        return (&str[i]);
-    i++;
+     (void) sig;
+    // printf("\n");
+    // rl_on_new_line();
+    // rl_replace_line("", 0);
+    // rl_redisplay();
+    exit(0);
 }
-  return NULL;
-  }
-
 
 void handl_heredoc(t_cmd *cmd) {
   int hd[2];
@@ -44,22 +33,28 @@ void handl_heredoc(t_cmd *cmd) {
   
   str = NULL;
   if (cmd->heredoc) {
-    pipe(hd);
+    if(pipe(hd) == -1) return;
     pid = fork();
     if (pid == 0) {
       close(hd[0]);
       while (1) {
+        signal(SIGINT, handler1);
+        signal(SIGQUIT, SIG_IGN); 
+
         str = readline(">");
+        if (!str) break;
         if (!ft_strcmp(str, cmd->heredoc)) break;
         write(hd[1], str, ft_strlen(str));
         write(hd[1], "\n", 1);
+        free(str);
       }
       close(hd[1]);
       exit(0);
     }
-    waitpid(pid, NULL, 0);
+    else if (pid == -1) return;
+    if (waitpid(pid, NULL, 0) == -1) return;
     close(hd[1]);
-    dup2(hd[0], STDIN_FILENO);
+    if (dup2(hd[0], STDIN_FILENO) == -1) return;
     close(hd[0]);
   }
   return;
@@ -74,7 +69,9 @@ void apply_redir(t_cmd *cmd) {
   handl_heredoc(cmd);
   if(cmd->redir_in) {
     fd[0] = open(cmd->redir_in, O_RDONLY);
-    dup2(fd[0], STDIN_FILENO);
+    if (fd[0] == -1) return; 
+    if (dup2(fd[0], STDIN_FILENO) == -1) return;
+    
 
     close(fd[0]);
   } 
@@ -83,7 +80,8 @@ void apply_redir(t_cmd *cmd) {
       fd[1] = open(cmd->redir_out, O_WRONLY | O_TRUNC | O_CREAT, 0644);
     else
       fd[1] = open(cmd->redir_out, O_WRONLY | O_APPEND | O_CREAT, 0644);
-    dup2(fd[1], STDOUT_FILENO);
+    if (fd[1] == -1) return;
+    if (dup2(fd[1], STDOUT_FILENO) == -1) return;
     close(fd[1]);
   }
   return;
@@ -95,10 +93,14 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
   int last_fd = -1;
   int pid; 
   t_cmd *current;
+  int status;
 
   current = cmd;
   while (current) {
-      if (current->next) pipe(pipe_fd);
+      expand(current, env);
+
+      if (current->next) 
+        if (pipe(pipe_fd) == -1) return;
       pid = fork();
     if (pid == 0) {
       if (last_fd != -1) { 
@@ -113,7 +115,7 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
       apply_redir(current);
       if (dispatch(current, &env) == 1)
         execute_cmd(current, array);
-      exit(127);
+      exit(status);
     }
     if (current->next) {
       if (last_fd != -1) close(last_fd);
@@ -121,18 +123,23 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
       last_fd = pipe_fd[0];
     }
     else if (last_fd != -1) close(last_fd);
+
     current = current->next;
   }
-  while(wait(NULL) > 0);
+  waitpid(pid, &status, 0);
+  update_exit(status);
 }
 
 void base_cmd(t_cmd *cmd, char **array, t_env *env) {
   int save[2];
+
+  expand(cmd, env);
   save[0] = dup(STDIN_FILENO);
   save[1] = dup(STDOUT_FILENO);
   apply_redir(cmd);
-  if (dispatch(cmd, &env) == 1)
-  execute_cmd(cmd, array);
+  g_exit_st = dispatch(cmd, &env);
+  if (g_exit_st == 1)
+    execute_cmd(cmd, array);
   dup2(save[0], STDIN_FILENO);
   dup2(save[1], STDOUT_FILENO);
   close(save[0]);
@@ -141,11 +148,14 @@ void base_cmd(t_cmd *cmd, char **array, t_env *env) {
 
 void super_exec(t_cmd *cmd, t_env *env) {
   char **array; 
-  array = env_to_array(env);
 
-  if (cmd->heredoc) handl_heredoc(cmd);
-  if (!cmd->args) return;
-  expand(cmd, env);
+  if (!cmd) 
+    return;
+  array = env_to_array(env);
+    if (!cmd->args) {
+      free_array(array);
+      return;
+    }
   if (cmd->next) super_cmd(cmd, array, env);
   else base_cmd(cmd, array, env);
   free_array(array);

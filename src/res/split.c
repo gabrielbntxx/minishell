@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "res.h"
 
+#include "../../Includes/res.h"
 
 
 size_t	ft_strlen(const char *str)

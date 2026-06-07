@@ -19,4 +19,6 @@ int is_numeric(char *str);
 int ft_strcmp(char *s1, char *s2);
 
 
+char	*ft_itoa(int n);
+
 #endif

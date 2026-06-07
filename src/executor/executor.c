@@ -6,9 +6,10 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:27 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:54:27 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/02 21:15:36 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "../../Includes/executor.h"
 
@@ -42,13 +43,16 @@ char	*find_cmd(char **paths, char *cmd)
 {
 	int		i;
 	char	*path;
+	char *tmp;
 
 	i = 0;
 	if (!cmd || !*cmd || access(cmd, X_OK) == 0)
 		return (cmd);
 	while (paths && paths[i])
 	{
-		path = ft_strjoin(ft_strjoin(paths[i++], "/"), cmd);
+		tmp = ft_strjoin(paths[i++], "/");
+		path = ft_strjoin(tmp, cmd);
+    free(tmp);
 		if (!path)
 			return (NULL);
 		if (access(path, X_OK) == 0)
@@ -71,31 +75,36 @@ static void	cmd_not_found(char **args, char **paths)
 	return;
 }
 
-void execute_cmd(t_cmd *cmd, char **envp) {
-  char **paths;
-  char *cmd_path;
-	int pid;
+void	execute_cmd(t_cmd *cmd, char **envp)
+{
+	char	**paths;
+	char	*cmd_path;
+	int		pid;
+	int		status;
 
-  paths = find_path(envp);
-  if (!cmd->args || !cmd->args[0]) {
-    free_array(cmd->args);
-    free_array(paths);
-    return;
-  }
+	paths = find_path(envp);
+	if (!cmd->args || !cmd->args[0])
+	{
+		free_array(paths);
+		return;
+	}
 	cmd_path = find_cmd(paths, cmd->args[0]);
-	if (!cmd_path) {
+	if (!cmd_path)
+	{
 		cmd_not_found(cmd->args, paths);
+		free_array(paths);
 		return;
 	}
 	pid = fork();
-	if (pid == 0) {
+	if (pid == 0)
+	{
 		execve(cmd_path, cmd->args, envp);
-    exit(127);
-  }
-    waitpid(pid, NULL, 0);
-	  if (cmd_path)
-			free(cmd_path);
-    free_array(cmd->args);
-    free_array(paths);
-		return;
+		exit(127);
+	}
+	waitpid(pid, &status, 0);
+	free(cmd_path);
+	free_array(paths);
+  update_exit(status);
+	return;
 }
+

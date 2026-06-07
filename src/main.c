@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:55:06 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:55:07 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/02 21:11:55 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-static void    handler0(int sig)
+void    handler0(int sig)
 {
     (void) sig;
     printf("\n");
@@ -25,12 +25,75 @@ static void    handler0(int sig)
     rl_redisplay();
 }
 
+#include <stdlib.h>
+#include <string.h>
+
+int g_exit_st = 0;
+
+void update_exit(int status) {
+  if (WIFEXITED(status))
+      g_exit_st = WEXITSTATUS(status);
+  else if (WIFSIGNALED(status))
+      g_exit_st = 128 + WTERMSIG(status);
+}
+
+void free_tokens(t_token *tok)
+{
+    t_token *tmp;
+    while (tok)
+    {
+        tmp = tok->next;
+        free(tok->value);
+        free(tok);
+        tok = tmp;
+    }
+}
+
+void free_cmds(t_cmd *cmd)
+{
+    t_cmd *tmp;
+    while (cmd)
+    {
+        tmp = cmd->next;
+        free_array(cmd->args);
+        free(cmd->redir_in);
+        free(cmd->redir_out);
+        free(cmd->heredoc);
+        free(cmd);
+        cmd = tmp;
+    }
+}
+
+void free_env(t_env *env)
+{
+    t_env *tmp;
+    while (env)
+    {
+        tmp = env->next;
+        free(env->key);
+        free(env->value);
+        free(env);
+        env = tmp;
+    }
+}
+
+void free_all(t_token *tokens, t_cmd *cmds)
+{
+    if (tokens)
+      free_tokens(tokens);
+    if (cmds)
+      free_cmds(cmds);
+}
+
 int	main(int ac, char **av, char **envp)
 {
 	t_env	*env;
 	t_token	*tokens;
 	char	*cmd;
   t_cmd *cmds;
+
+  tokens = NULL;
+  cmds = NULL;
 	(void)ac;
 	(void)av;
 	env = NULL;
@@ -39,6 +102,8 @@ int	main(int ac, char **av, char **envp)
 	{
     signal(SIGINT, handler0);
     signal(SIGQUIT, SIG_IGN); 
+    cmds = NULL;
+    tokens = NULL;
 		cmd = readline("minishell> ");
 		if (!cmd)
 			break ;
@@ -46,13 +111,10 @@ int	main(int ac, char **av, char **envp)
 			add_history(cmd);
 		tokens = lexer(cmd);
     cmds = parser(tokens);
-    printf("---- LEXER ----\n");
-		print_tokens(tokens);
-		printf("---- command ----\n");
-    print_cmds(cmds); 
-    printf("---- EXEC ----\n");
 		super_exec(cmds, env);
 		free(cmd);
+	  free_all(tokens, cmds);
 	}
+	free_env(env);
 	return (0);
 }
