@@ -113,8 +113,8 @@ int	main(int ac, char **av, char **envp)
     cmds = parser(tokens);
 		super_exec(cmds, env);
 		free(cmd);
+	  free_all(tokens, cmds);
 	}
-	free_all(tokens, cmds);
 	free_env(env);
 	return (0);
 }
