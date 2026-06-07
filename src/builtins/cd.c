@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:26:45 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:26:45 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/02 21:31:35 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ int builtin_cd(t_env *env, char **args)
 {
     char *path;
 
+
     if (args[1] == NULL)
     {
         path = env_get(env, "HOME", 0);
@@ -28,13 +29,22 @@ int builtin_cd(t_env *env, char **args)
         } 
     }
     else
-    {
-        path = args[1];
+      path = args[1];
+    if (args[1]) {
+      if (!ft_strcmp(args[1], "-")) {
+        path = env_get(env, "OLDPWD", 0);
+        if (path == NULL){
+          printf("cd: OLDPWD not set");
+          return (1);
+       }
+      }
     }
     if (chdir(path) == -1)
     {
         perror("minishell: cd");
         return(1);
     }
+    env_set(&env, "OLDPWD", env_get(env, "PWD", 0));
+    env_set(&env, "PWD", path);
     return(0);
 }

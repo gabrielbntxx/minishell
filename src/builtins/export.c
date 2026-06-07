@@ -61,13 +61,13 @@ char **env_to_export(t_env *env) {
     i++;
     current = current->next;
   }
-  array = malloc(sizeof(t_env *) * i + 1);
+  array = malloc(sizeof(char *) * i + 1);
   if (!array) return (NULL); 
   i = 0;
   current = env;
   while (current) {
     if (current->value)
-      array[i] = ft_strjoin(ft_strjoin(ft_strjoin(ft_strjoin(current->key, "="), "\""), current->value), "\"");
+      array[i] = ft_strjoin(ft_strjoin(ft_strjoin(ft_strjoin(current->key, "="), "\""), current->value), "\""); // leak
     else
       array[i] = ft_strjoin(current->key, "");
     i++;
@@ -87,6 +87,7 @@ void print_export(char **env) {
     while(env[i]) {
         tmp = ft_strjoin(decla, env[i]);
         printf("%s\n", tmp);
+        free(tmp);
         i++;
     }
     return;
@@ -103,7 +104,7 @@ void builtin_export(char **cmd, t_env **nodenv) {
   env = sort_array(env);
   if (!cmd[1]) {
     print_export(env);
-    return;
+    return; //need free env
   }
   while (cmd[++i]) {
     sep = ft_strchr(cmd[i], '=');
@@ -118,8 +119,10 @@ void builtin_export(char **cmd, t_env **nodenv) {
       value = NULL;
       env_set(nodenv, key, value);
     }
+    free(key);
+    free(env);
   }
-  return;
+  return; // free env
 }
 
 
