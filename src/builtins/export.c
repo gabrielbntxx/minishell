@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:13 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:54:14 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/08 15:03:09 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,23 @@ char **sort_array(char **env) {
     return env;
 }
 
+static char *super_join(t_env *current,char  **array, int i) {
+  char *tmp;
+  char *tmp2;
 
+   if (current->value) {
+      tmp = ft_strjoin( current->key, "=");
+      tmp2 = ft_strjoin(tmp, "\"");
+      free(tmp);
+      tmp = ft_strjoin(tmp2, current->value);
+      free(tmp2);
+      array[i] = ft_strjoin(tmp, "\"");
+      free(tmp);
+   }
+    else
+      array[i] = ft_strjoin(current->key, NULL);
+    return (*array);
+}
 
 char **env_to_export(t_env *env) {
   char **array;
@@ -67,9 +83,7 @@ char **env_to_export(t_env *env) {
   current = env;
   while (current) {
     if (current->value)
-      array[i] = ft_strjoin(ft_strjoin(ft_strjoin(ft_strjoin(current->key, "="), "\""), current->value), "\""); // leak
-    else
-      array[i] = ft_strjoin(current->key, "");
+      array[i] = super_join(current, array, i);
     i++;
     current = current->next;
   }

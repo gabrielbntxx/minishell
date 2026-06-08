@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:30 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 22:03:21 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/08 13:15:50 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
   int last_fd = -1;
   int pid; 
   t_cmd *current;
-  int status;
+  int status = 0;
 
   current = cmd;
   while (current) {

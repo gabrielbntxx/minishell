@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:55:06 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 21:11:55 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/08 14:27:58 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,9 @@ void free_tokens(t_token *tok)
     t_token *tmp;
     while (tok)
     {
-        tmp = tok->next;
+        if (tmp)
+            tmp = tok->next;
+        if (tok->value)
         free(tok->value);
         free(tok);
         tok = tmp;
@@ -54,11 +56,16 @@ void free_cmds(t_cmd *cmd)
     t_cmd *tmp;
     while (cmd)
     {
-        tmp = cmd->next;
-        free_array(cmd->args);
-        free(cmd->redir_in);
-        free(cmd->redir_out);
-        free(cmd->heredoc);
+        if (cmd->next)
+            tmp = cmd->next;
+        if (cmd->args)
+            free_array(cmd->args);
+        if (cmd->redir_in)
+            free(cmd->redir_in);
+        if (cmd->redir_out)
+            free(cmd->redir_out);
+        if (cmd->heredoc)
+            free(cmd->heredoc);
         free(cmd);
         cmd = tmp;
     }
@@ -82,9 +89,9 @@ void free_all(t_token *tokens, t_cmd *cmds)
     if (tokens)
       free_tokens(tokens);
     if (cmds)
-      free_cmds(cmds);
-}
+        free_cmds(cmds);
 
+}
 int	main(int ac, char **av, char **envp)
 {
 	t_env	*env;

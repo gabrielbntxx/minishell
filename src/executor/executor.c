@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:27 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 21:15:36 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/08 14:39:02 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,11 @@ void	free_array(char **array)
 	int	i;
 
 	i = 0;
-	while (array && array[i])
-		free(array[i++]);
+	while (array && array[i]) {
+		if (array[i])
+			free(array[i]);
+		i++;
+	}
 	free(array);
 }
 
@@ -67,7 +70,6 @@ static void	cmd_not_found(char **args, char **paths)
 {
 	if (args) {
 		write(2, args[0], ft_strlen(args[0]));
-		free_array(args);
 		if (paths)
 			free_array(paths);
 	}

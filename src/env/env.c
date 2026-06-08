@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:23 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:54:24 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/08 13:32:51 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void env_set(t_env **env, char *key, char *value)
         if (value)
           node->value = ft_strdup(value);
         else
-          node->value = NULL
+          node->value = NULL;
         return ;
     }
     current = *env;
@@ -81,6 +81,19 @@ void env_unset(t_env **env, char *key) {
   }
 }
 
+static void super_join(t_env *current,char  **array, int *i) {
+  char *tmp;
+
+   if (current->value) {
+      tmp = ft_strjoin( current->key, "=");
+      array[*i] = ft_strjoin(tmp, current->value);
+      free(tmp);
+   }
+    else
+      array[*i] = ft_strjoin(current->key, NULL);
+    i++;
+}
+
 char **env_to_array(t_env *env) {
   char **array;
   t_env *current;
@@ -99,11 +112,7 @@ char **env_to_array(t_env *env) {
   i = 0;
   current = env;
   while (current) {
-    if (current->value)
-      array[i] = ft_strjoin(ft_strjoin(current->key, "="), current->value); //leak
-    else
-      array[i] = ft_strjoin(current->key, NULL);
-    i++;
+    super_join(current, array, &i);
     current = current->next;
   }
   array[i] = NULL;
