@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:27 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/08 14:39:02 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/08 21:16:59 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,3 +110,5 @@ void	execute_cmd(t_cmd *cmd, char **envp)
 	return;
 }
 
+
+// greob beug sur les commande de base genre ls 
