@@ -10,6 +10,7 @@ SRCS	= src/main.c \
 		  src/parser/parser.c \
 		  src/parser/pipes.c \
 		  src/parser/redirections.c \
+		  src/env/envUtils.c \
 		  src/env/env.c \
 		  src/executor/executor.c \
 			src/builtins/builtins.c \
