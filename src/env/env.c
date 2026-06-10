@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:23 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/08 15:24:51 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/10 13:24:05 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,17 +18,17 @@
 
 
 
-static void super_join(t_env *current,char  **array, int *i) {
+static char *super_join(t_env *current, char  *array) {
   char *tmp;
 
    if (current->value) {
       tmp = ft_strjoin( current->key, "=");
-      array[*i] = ft_strjoin(tmp, current->value);
+      array = ft_strjoin(tmp, current->value);
       free(tmp);
    }
     else
-      array[*i] = ft_strjoin(current->key, NULL);
-    i++;
+      array = ft_strjoin(current->key, NULL);
+  return(array);
 }
 
 char **env_to_array(t_env *env) {
@@ -49,7 +49,8 @@ char **env_to_array(t_env *env) {
   i = 0;
   current = env;
   while (current) {
-    super_join(current, array, &i);
+    array[i] = super_join(current, array[i]);
+    i++;
     current = current->next;
   }
   array[i] = NULL;

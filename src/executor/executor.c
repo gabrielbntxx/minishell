@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:27 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/08 21:16:59 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/10 13:34:27 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,10 @@ char	*find_cmd(char **paths, char *cmd)
 	char *tmp;
 
 	i = 0;
-	if (!cmd || !*cmd || access(cmd, X_OK) == 0)
-		return (cmd);
+	if (!cmd || !*cmd || access(cmd, X_OK) == 0) {
+		tmp = ft_strdup(cmd);
+		return (tmp);
+	}
 	while (paths && paths[i])
 	{
 		tmp = ft_strjoin(paths[i++], "/");
