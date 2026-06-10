@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:27 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/10 13:34:27 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/10 17:22:12 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,12 +68,10 @@ char	*find_cmd(char **paths, char *cmd)
 }
 
 
-static void	cmd_not_found(char **args, char **paths)
+static void	cmd_not_found(char **args)
 {
 	if (args) {
 		write(2, args[0], ft_strlen(args[0]));
-		if (paths)
-			free_array(paths);
 	}
 	write(2, ": command not found\n", 20);
 	return;
@@ -95,7 +93,7 @@ void	execute_cmd(t_cmd *cmd, char **envp)
 	cmd_path = find_cmd(paths, cmd->args[0]);
 	if (!cmd_path)
 	{
-		cmd_not_found(cmd->args, paths);
+		cmd_not_found(cmd->args);
 		free_array(paths);
 		return;
 	}
