@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:30 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/11 14:55:32 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/11 15:44:58 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,8 @@ void handl_heredoc(t_cmd *cmd) {
     else if (pid == -1) return;
     if (waitpid(pid, NULL, 0) == -1) return;
     close(hd[1]);
-    if (dup2(hd[0], STDIN_FILENO) == -1) return;
+    if (cmd->args)
+      if (dup2(hd[0], STDIN_FILENO) == -1) return;
     close(hd[0]);
   }
   return;
@@ -154,6 +155,8 @@ void super_exec(t_cmd *cmd, t_env *env) {
     return;
   array = env_to_array(env);
     if (!cmd->args) {
+      if (cmd->heredoc)
+        handl_heredoc(cmd);
       free_array(array);
       return;
     }
