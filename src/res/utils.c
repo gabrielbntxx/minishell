@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:55:02 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:55:03 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/11 14:54:16 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 int     ft_strcmp(char *s1, char *s2)
 {
-   if (!*s1 || !*s2) return (0);
+   if (!*s1 || !*s2) return (1);
     while (*s1 || *s2)
     {
         if (*s1 != *s2)

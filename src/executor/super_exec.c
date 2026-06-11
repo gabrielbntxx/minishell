@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:30 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/08 13:15:50 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/11 14:55:32 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ void handl_heredoc(t_cmd *cmd) {
         free(str);
       }
       close(hd[1]);
+      free_cmds(cmd);
       exit(0);
     }
     else if (pid == -1) return;

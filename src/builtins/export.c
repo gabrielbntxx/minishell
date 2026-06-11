@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:13 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/11 13:18:14 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/11 13:23:42 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ char **env_to_export(t_env *env) {
     i++;
     current = current->next;
   }
-  array = malloc(sizeof(char *) * i + 1);
+  array = malloc(sizeof(char *) * i + 8);
   if (!array) return (NULL); 
   i = 0;
   current = env;
