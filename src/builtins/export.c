@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:13 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/08 15:31:53 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/11 13:18:14 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,8 @@ char **env_to_export(t_env *env) {
   while (current) {
     if (current->value)
       array[i] = super_join(current);
+    else 
+     array[i] = ft_strdup(current->key);
     i++;
     current = current->next;
   }
@@ -119,7 +121,8 @@ void builtin_export(char **cmd, t_env **nodenv) {
   env = sort_array(env);
   if (!cmd[1]) {
     print_export(env);
-    return; //need free env
+    free_array(env);
+    return;
   }
   while (cmd[++i]) {
     sep = ft_strchr(cmd[i], '=');

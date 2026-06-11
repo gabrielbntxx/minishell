@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:55:06 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/10 17:27:22 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/11 13:02:36 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void free_tokens(t_token *tok)
     t_token *tmp;
     while (tok)
     {
-        if (tmp)
+        //if (tmp)
             tmp = tok->next;
         if (tok->value)
         free(tok->value);

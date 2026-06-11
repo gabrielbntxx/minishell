@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 15:15:28 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/08 15:24:11 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/11 13:03:06 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,12 +46,14 @@ void env_set(t_env **env, char *key, char *value)
     if (node)
         return;
     current = *env;
-    while (current->next != NULL)
-        current = current->next;
-    current->next = malloc(sizeof(t_env));
-    if (!current->next) 
-     return;
-    current = current->next;
+    if (current) {
+      while (current->next != NULL)
+          current = current->next;
+      current->next = malloc(sizeof(t_env));
+      if (!current->next) 
+       return;
+      current = current->next;
+    }
     if (!key) 
         return;
       current->key = ft_strdup(key);
