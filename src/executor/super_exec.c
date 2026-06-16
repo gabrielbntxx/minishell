@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:30 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/11 15:44:58 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/02 22:03:21 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,14 +49,12 @@ void handl_heredoc(t_cmd *cmd) {
         free(str);
       }
       close(hd[1]);
-      free_cmds(cmd);
       exit(0);
     }
     else if (pid == -1) return;
     if (waitpid(pid, NULL, 0) == -1) return;
     close(hd[1]);
-    if (cmd->args)
-      if (dup2(hd[0], STDIN_FILENO) == -1) return;
+    if (dup2(hd[0], STDIN_FILENO) == -1) return;
     close(hd[0]);
   }
   return;
@@ -95,7 +93,7 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
   int last_fd = -1;
   int pid; 
   t_cmd *current;
-  int status = 0;
+  int status;
 
   current = cmd;
   while (current) {
@@ -117,7 +115,7 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
       apply_redir(current);
       if (dispatch(current, &env) == 1)
         execute_cmd(current, array);
-      exit(status);
+      exit(127);
     }
     if (current->next) {
       if (last_fd != -1) close(last_fd);
@@ -128,7 +126,7 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
 
     current = current->next;
   }
-  waitpid(pid, &status, 0);
+  while(wait(&status) > 0);
   update_exit(status);
 }
 
@@ -140,7 +138,7 @@ void base_cmd(t_cmd *cmd, char **array, t_env *env) {
   save[1] = dup(STDOUT_FILENO);
   apply_redir(cmd);
   g_exit_st = dispatch(cmd, &env);
-  if (g_exit_st == 1)
+  if (g_exit_st = 1)
     execute_cmd(cmd, array);
   dup2(save[0], STDIN_FILENO);
   dup2(save[1], STDOUT_FILENO);
@@ -155,8 +153,6 @@ void super_exec(t_cmd *cmd, t_env *env) {
     return;
   array = env_to_array(env);
     if (!cmd->args) {
-      if (cmd->heredoc)
-        handl_heredoc(cmd);
       free_array(array);
       return;
     }

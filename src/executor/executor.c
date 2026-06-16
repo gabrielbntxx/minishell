@@ -90,7 +90,7 @@ void	execute_cmd(t_cmd *cmd, char **envp)
 		free_array(paths);
 		return;
 	}
-	cmd_path = find_cmd(paths, cmd->args[0]);
+	cmd_path = find_cmd(paths, cmd->cmd->args[0]);
 	if (!cmd_path)
 	{
 		cmd_not_found(cmd->args);
@@ -100,6 +100,8 @@ void	execute_cmd(t_cmd *cmd, char **envp)
 	pid = fork();
 	if (pid == 0)
 	{
+    free(cmd_path);
+    free_array(paths);
 		execve(cmd_path, cmd->args, envp);
 		exit(127);
 	}

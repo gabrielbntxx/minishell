@@ -26,7 +26,10 @@ int dispatch(t_cmd *cmd, t_env **env) {
     else if (!ft_strcmp(this, "pwd")) builtin_pwd();
     else if (!ft_strcmp(this, "cd")) builtin_cd(*env, cmd->args); 
     else if (!ft_strcmp(this, "echo")) builtin_echo(cmd->args);
-    else if (!ft_strcmp(this, "exit")) update_exit(builtin_exit(cmd->args, g_exit_st));
+    else if (!ft_strcmp(this, "exit")) { 
+      free_array(envp); 
+       update_exit(builtin_exit(cmd->args, g_exit_st));
+    }
     else if (!ft_strcmp(this, "unset")) builtin_unset(cmd->args, *env);
     else {
         free_array(envp);
