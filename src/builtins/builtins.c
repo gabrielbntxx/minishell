@@ -29,6 +29,7 @@ int dispatch(t_cmd *cmd, t_env **env) {
     else if (!ft_strcmp(this, "exit")) { 
       free_array(envp); 
       g_exit_st = builtin_exit(cmd->args, g_exit_st);
+      return (g_exit_st);
     }
     else if (!ft_strcmp(this, "unset")) builtin_unset(cmd->args, *env);
     else {

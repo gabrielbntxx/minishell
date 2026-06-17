@@ -81,14 +81,12 @@ void	execute_cmd(t_cmd *cmd, char **envp)
 {
 	char	**paths;
 	char	*cmd_path;
-	int		pid;
-	int		status;
 
 	paths = find_path(envp);
 	if (!cmd->args || !cmd->args[0])
 	{
 		free_array(paths);
-		return;
+		exit(127);
 	}
 	cmd_path = find_cmd(paths, cmd->args[0]);
 	if (!cmd_path)
@@ -96,22 +94,13 @@ void	execute_cmd(t_cmd *cmd, char **envp)
 		g_exit_st = 127;
 		cmd_not_found(cmd->args);
 		free_array(paths);
-		return;
+		exit(127);
 	}
-	pid = fork();
-	if (pid == 0)
-	{
 		free_array(paths);
 		execve(cmd_path, cmd->args, envp);
 		perror("minishell");
 		free(cmd_path);
 		exit(127);
-	}
-	waitpid(pid, &status, 0);
-	free(cmd_path);
-	free_array(paths);
-  update_exit(status);
-	return;
 }
 
 

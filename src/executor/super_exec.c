@@ -132,18 +132,24 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
 
 void base_cmd(t_cmd *cmd, char **array, t_env *env) {
   int save[2];
+  int pid;
+  int status;
 
   expand(cmd, env);
   save[0] = dup(STDIN_FILENO);
   save[1] = dup(STDOUT_FILENO);
   apply_redir(cmd);
   g_exit_st = dispatch(cmd, &env);
-  if (g_exit_st == 1)
-    execute_cmd(cmd, array);
-  dup2(save[0], STDIN_FILENO);
-  dup2(save[1], STDOUT_FILENO);
-  close(save[0]);
-  close(save[1]);
+  pid = fork();
+    if (g_exit_st == 1)
+      if (pid == 0)
+        execute_cmd(cmd, array);
+    waitpid(pid, &status, 0);
+    update_exit(status);
+    dup2(save[0], STDIN_FILENO);
+    dup2(save[1], STDOUT_FILENO);
+    close(save[0]);
+    close(save[1]);
 }
 
 void super_exec(t_cmd *cmd, t_env *env) {
