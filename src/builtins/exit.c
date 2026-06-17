@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:26:55 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/11 14:00:46 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/17 12:43:46 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ int builtin_exit(char **args, int current_exit_status)
 {
     printf("exit\n");
     if (args[1] == NULL)
-        exit(current_exit_status);
+        return(current_exit_status);
     if (!is_numeric(args[1]))
     {
         printf("minishell: exit : %s: numeric argument required\n", args[1]);

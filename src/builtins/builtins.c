@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:26:35 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/11 14:00:14 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/17 13:02:44 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ int dispatch(t_cmd *cmd, t_env **env) {
     else if (!ft_strcmp(this, "exit")) { 
       free_array(envp); 
       g_exit_st = builtin_exit(cmd->args, g_exit_st);
+      return(-2);
     }
     else if (!ft_strcmp(this, "unset")) builtin_unset(cmd->args, *env);
     else {
