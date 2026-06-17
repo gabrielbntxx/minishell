@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   envUtils.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 15:15:28 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/11 13:03:06 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/18 00:48:48 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void *env_get(t_env *env, char *key, int option) {
     env = env->next;
   }
   if (option == 1) return(NULL);
-  return ("");
+  return (NULL);
 }
 
 static void exist_node(t_env *node, char *value) {
