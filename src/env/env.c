@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:23 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:54:24 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/11 14:08:32 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,70 +15,21 @@
 
 
 
-void *env_get(t_env *env, char *key, int option) {
-  while (env) {
-    if (ft_strcmp(env->key, key) == 0) {
-      if (option == 1) return(env);
-      return(env->value);
-    }
-    env = env->next;
-  }
-  if (option == 1) return(NULL);
-  return ("");
-}
 
-void env_set(t_env **env, char *key, char *value)
-{
-    t_env *current;
-    t_env *node;
 
-    node = env_get(*env, key, 1);
-    if (node)
-    {
-        free(node->value);
-        if (value)
-          node->value = ft_strdup(value);
-        else
-          node->value = NULL
-        return ;
-    }
-    current = *env;
-    while (current->next != NULL)
-        current = current->next;
-    current->next = malloc(sizeof(t_env));
-  if (!current->next) return;
-    current = current->next;
-    if (!key) return;
-      current->key = ft_strdup(key);
-    if (value)
-      current->value = ft_strdup(value);
+
+static char *super_join(t_env *current) {
+  char *tmp;
+  char *array;
+
+   if (current->value) {
+      tmp = ft_strjoin( current->key, "=");
+      array = ft_strjoin(tmp, current->value);
+      free(tmp);
+   }
     else
-      current->value = NULL;
-    current->next = NULL;
-}
-
-void env_unset(t_env **env, char *key) {
-  t_env *current;
-  t_env *prev;
-
-  current = *env;
-  prev = NULL;
-  while (current) {
-    if (ft_strcmp(current->key, key) == 0) {
-      if (prev)
-        prev->next = current->next;
-      else
-        *env = current->next;
-      free(current->key);
-      free(current->value);
-      free(current);
-      break;
-    }
-    else {
-    prev = current;
-    }
-    current = current->next;
-  }
+      array = ft_strjoin(current->key, NULL);
+  return(array);
 }
 
 char **env_to_array(t_env *env) {
@@ -92,17 +43,14 @@ char **env_to_array(t_env *env) {
     i++;
     current = current->next;
   }
-  array = malloc(sizeof(char *) * (i + 1));
+  array = malloc(sizeof(char **) * (i + 1));
   if (!array) {
     return (NULL);
   }
   i = 0;
   current = env;
   while (current) {
-    if (current->value)
-      array[i] = ft_strjoin(ft_strjoin(current->key, "="), current->value); //leak
-    else
-      array[i] = ft_strjoin(current->key, NULL);
+    array[i] = super_join(current);
     i++;
     current = current->next;
   }

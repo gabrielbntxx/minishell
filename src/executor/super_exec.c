@@ -115,7 +115,7 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
       apply_redir(current);
       if (dispatch(current, &env) == 1)
         execute_cmd(current, array);
-      exit(status);
+      exit(127);
     }
     if (current->next) {
       if (last_fd != -1) close(last_fd);
@@ -126,7 +126,7 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
 
     current = current->next;
   }
-  waitpid(pid, &status, 0);
+  while(wait(&status) > 0);
   update_exit(status);
 }
 
