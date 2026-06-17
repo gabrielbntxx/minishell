@@ -6,7 +6,7 @@
 /*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:26:35 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/17 17:10:07 by gabrielbene      ###   ########.fr       */
+/*   Updated: 2026/06/17 18:12:09 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 
 int dispatch(t_cmd *cmd, t_env **env) {
     char *this;
+    if (!cmd->args || !cmd->args[0]) 
+        return (1);
     this = cmd->args[0];
     char **envp = env_to_array(*env);
   
