@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   expand.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:34 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:54:35 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/17 18:25:17 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "../../Includes/expand.h"
 
 int	ft_isalnum(int c)
@@ -92,8 +93,11 @@ void	expand(t_cmd *cmd, t_env *env)
 	i = 0;
 	while (cmd->args && cmd->args[i])
 	{
-		if (expand_one_arg(&cmd->args[i], env))
-			return ;
+		if (!cmd->args_quote || cmd->args_quote[i] != SINGLE) 
+		{
+			if (expand_one_arg(&cmd->args[i], env))
+				return ;
+		}
 		i++;
 	}
 }

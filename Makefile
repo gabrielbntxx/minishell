@@ -1,7 +1,15 @@
 NAME	= minishell
 
 CC		= cc -g
-CFLAGS	= -Wall -Wextra 
+CFLAGS	= -Wall -Wextra
+
+UNAME	:= $(shell uname)
+ifeq ($(UNAME), Darwin)
+	CFLAGS	+= -I/opt/homebrew/opt/readline/include
+	LDFLAGS	= -L/opt/homebrew/opt/readline/lib -lreadline
+else
+	LDFLAGS	= -lreadline
+endif
 
 SRCS	= src/main.c \
 			src/res/ft_itoa.c \
@@ -31,7 +39,7 @@ OBJS	= $(SRCS:.c=.o)
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -lreadline -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -o $(NAME)
 
 clean:
 	rm -f $(OBJS)

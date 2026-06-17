@@ -22,7 +22,7 @@ void builtin_export(char **cmd, t_env **nodenv);
 /* pwd.c */
 int builtin_pwd(void);
 /* unset.c */
-void builtin_unset(char **args, t_env *env);
+void builtin_unset(char **args, t_env **env);
 
 
 #endif
