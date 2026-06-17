@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   super_exec.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:30 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/17 13:04:16 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/17 17:03:15 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,9 +137,12 @@ void base_cmd(t_cmd *cmd, char **array, t_env *env) {
   save[0] = dup(STDIN_FILENO);
   save[1] = dup(STDOUT_FILENO);
   apply_redir(cmd);
-  g_exit_st = dispatch(cmd, &env);
-  if (g_exit_st == 1)
-    execute_cmd(cmd, array);
+  int ret = dispatch(cmd, &env);
+  if (ret == 1)
+      execute_cmd(cmd, array);
+  if (ret == -2)
+      g_exit_st = -1;
+  execute_cmd(cmd, array);
   dup2(save[0], STDIN_FILENO);
   dup2(save[1], STDOUT_FILENO);
   close(save[0]);
