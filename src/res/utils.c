@@ -1,17 +1,27 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/02 20:55:02 by mguilber          #+#    #+#             */
+/*   Updated: 2026/06/11 14:54:16 by mguilber         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#include "res.h"
+
+#include "../../Includes/res.h"
 
 
 int     ft_strcmp(char *s1, char *s2)
 {
-    while (*s1 || *s2)
+    while (*s1 && *s2 && *s1 == *s2)
     {
-        if (*s1 != *s2)
-            return ((unsigned char)*s1 - (unsigned char)*s2);
         s1++;
         s2++;
     }
-    return (0);
+    return ((unsigned char)*s1 - (unsigned char)*s2);
 }
 
 char    *ft_strdup(const char *src)

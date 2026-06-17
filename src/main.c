@@ -1,10 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/02 20:55:06 by mguilber          #+#    #+#             */
+/*   Updated: 2026/06/11 13:02:36 by mguilber         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../Includes/minishell.h"
 #include "../Includes/lexer.h"
 #include "../Includes/parser.h"
 #include <readline/readline.h>
 #include <readline/history.h>
 
-static void    handler0(int sig)
+void    handler0(int sig)
 {
     (void) sig;
     printf("\n");
@@ -13,22 +25,91 @@ static void    handler0(int sig)
     rl_redisplay();
 }
 
+#include <stdlib.h>
+#include <string.h>
+
+int g_exit_st = 0;
+
+void update_exit(int status) {
+  if (WIFEXITED(status))
+      g_exit_st = WEXITSTATUS(status);
+  else if (WIFSIGNALED(status))
+      g_exit_st = 128 + WTERMSIG(status);
+}
+
+void free_tokens(t_token *tok)
+{
+    t_token *tmp;
+    while (tok)
+    {
+        //if (tmp)
+            tmp = tok->next;
+        if (tok->value)
+        free(tok->value);
+        free(tok);
+        tok = tmp;
+    }
+}
+
+void free_cmds(t_cmd *cmd)
+{
+    t_cmd *tmp;
+    while (cmd)
+    {
+        tmp = cmd->next;
+        if (cmd->args)
+            free_array(cmd->args);
+        if (cmd->redir_in)
+            free(cmd->redir_in);
+        if (cmd->redir_out)
+            free(cmd->redir_out);
+        if (cmd->heredoc)
+            free(cmd->heredoc);
+        free(cmd);
+        cmd = tmp;
+    }
+}
+
+void free_env(t_env *env)
+{
+    t_env *tmp;
+    while (env)
+    {
+        tmp = env->next;
+        free(env->key);
+        free(env->value);
+        free(env);
+        env = tmp;
+    }
+}
+
+void free_all(t_token *tokens, t_cmd *cmds)
+{
+    if (tokens)
+      free_tokens(tokens);
+    if (cmds)
+        free_cmds(cmds);
+
+}
 int	main(int ac, char **av, char **envp)
 {
 	t_env	*env;
 	t_token	*tokens;
 	char	*cmd;
-	char	**array;
   t_cmd *cmds;
+
+  tokens = NULL;
+  cmds = NULL;
 	(void)ac;
 	(void)av;
 	env = NULL;
 	init_env(envp, &env);
-	array = env_to_array(env);
 	while (1)
 	{
     signal(SIGINT, handler0);
     signal(SIGQUIT, SIG_IGN); 
+    cmds = NULL;
+    tokens = NULL;
 		cmd = readline("minishell> ");
 		if (!cmd)
 			break ;
@@ -36,14 +117,11 @@ int	main(int ac, char **av, char **envp)
 			add_history(cmd);
 		tokens = lexer(cmd);
     cmds = parser(tokens);
-    printf("---- LEXER ----\n");
-		print_tokens(tokens);
-		printf("---- command ----\n");
-    print_cmds(cmds); 
-    printf("---- EXEC ----\n");
-		if (dispatch(cmds, env) == 1) 
-			execute_cmd(cmds, array);
+		super_exec(cmds, env);
 		free(cmd);
+	  free_all(tokens, cmds);
+    if (g_exit_st == -1) break;
 	}
+	free_env(env);
 	return (0);
 }

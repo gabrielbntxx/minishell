@@ -1,27 +1,30 @@
 NAME	= minishell
 
 CC		= cc -g
-CFLAGS	= -Wall -Wextra -Werror
+CFLAGS	= -Wall -Wextra 
 
 SRCS	= src/main.c \
+			src/res/ft_itoa.c \
 		  src/lexer/lexer.c \
-		  src/lexer/operator.c \
+	  src/lexer/operator.c \
 		  src/parser/parser.c \
 		  src/parser/pipes.c \
 		  src/parser/redirections.c \
+		  src/env/envUtils.c \
 		  src/env/env.c \
 		  src/executor/executor.c \
-		  src/builtins/builtins.c \
-		  src/builtins/cd.c \
+			src/builtins/builtins.c \
+			src/builtins/cd.c \
 		  src/builtins/echo.c \
 		  src/builtins/env.c \
 		  src/builtins/export.c \
 		  src/builtins/pwd.c \
 		  src/builtins/unset.c \
-		  src/builtins/exit.c \
+			src/builtins/exit.c \
 		  src/expansion/expand.c \
 		  src/res/split.c \
-		  src/res/utils.c
+		  src/res/utils.c	\
+			src/executor/super_exec.c \
 
 OBJS	= $(SRCS:.c=.o)
 

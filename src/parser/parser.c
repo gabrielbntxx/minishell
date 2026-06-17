@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parser.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/02 20:54:52 by mguilber          #+#    #+#             */
+/*   Updated: 2026/06/08 13:15:09 by mguilber         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../Includes/parser.h"
 #include "../../Includes/minishell.h"
 #include "../../Includes/lexer.h"
@@ -71,22 +83,24 @@ void    handle_redir(t_token **token, t_cmd *cmd)
     if (((*token)->type) == REDIR_IN)
     {
         *token = (*token)->next;
-        cmd->redir_in = (*token)->value;
+        cmd->redir_in = ft_strdup((*token)->value);
     }
     else if (((*token)->type) == REDIR_OUT)
     {
         *token = (*token)->next;
-        cmd->redir_out = (*token)->value, cmd->append = 0;
+        cmd->redir_out = ft_strdup((*token)->value);
+        cmd->append = 0;
     }
     else if (((*token)->type) == APPEND)
     {
         *token = (*token)->next;
-        cmd->redir_out = (*token)->value, cmd->append = 1;
+        cmd->redir_out = ft_strdup((*token)->value);
+        cmd->append = 1;
     }
     else if (((*token)->type) == HEREDOC)
     {
         *token = (*token)->next;
-        cmd->heredoc = (*token)->value;
+        cmd->heredoc = ft_strdup((*token)->value);
     }
 }                                                                          
 

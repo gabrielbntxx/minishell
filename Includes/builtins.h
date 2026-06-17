@@ -2,9 +2,9 @@
 # define BUILTINS_H
 
 /* builtins.c */
-int dispatch(t_cmd *cmd, t_env *env);
+int dispatch(t_cmd *cmd, t_env **env);
 /* cd.c */
-int builtin_cd(char **args);
+int builtin_cd(t_env *env, char **args);
 /* echo.c */
 int is_n_flag(char *str);
 int builtin_echo(char **args);
