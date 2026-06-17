@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:26:35 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/17 13:02:44 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/17 17:10:07 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int dispatch(t_cmd *cmd, t_env **env) {
       g_exit_st = builtin_exit(cmd->args, g_exit_st);
       return(-2);
     }
-    else if (!ft_strcmp(this, "unset")) builtin_unset(cmd->args, *env);
+    else if (!ft_strcmp(this, "unset")) builtin_unset(cmd->args, env);
     else {
         free_array(envp);
         return (1);
