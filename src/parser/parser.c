@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:52 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:54:52 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/08 13:15:09 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,12 +88,14 @@ void    handle_redir(t_token **token, t_cmd *cmd)
     else if (((*token)->type) == REDIR_OUT)
     {
         *token = (*token)->next;
-        cmd->redir_out = ft_strdup((*token)->value, cmd->append = 0);
+        cmd->redir_out = ft_strdup((*token)->value);
+        cmd->append = 0;
     }
     else if (((*token)->type) == APPEND)
     {
         *token = (*token)->next;
-        cmd->redir_out = ft_strdup((*token)->value, cmd->append = 1);
+        cmd->redir_out = ft_strdup((*token)->value);
+        cmd->append = 1;
     }
     else if (((*token)->type) == HEREDOC)
     {

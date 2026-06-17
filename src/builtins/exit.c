@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:26:55 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:26:56 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/11 14:00:46 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,12 @@ int builtin_exit(char **args, int current_exit_status)
     if (!is_numeric(args[1]))
     {
         printf("minishell: exit : %s: numeric argument required\n", args[1]);
-        exit(2);
+        return(2);
     }
     if (args[2] != NULL)
     {
         printf("minishell: exit: too many arguments\n");
         return(1);
     }
-    exit(ft_atoi(args[1]) % 256);
+    return(ft_atoi(args[1]) % 256);
 }

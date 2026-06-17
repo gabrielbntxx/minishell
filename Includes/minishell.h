@@ -21,4 +21,6 @@
 
   void handler0(int sig);
   void update_exit(int status);
+  void free_cmds(t_cmd *cmd);
+
 #endif

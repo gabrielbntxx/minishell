@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:27 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 21:15:36 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/10 17:22:12 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,11 @@ void	free_array(char **array)
 	int	i;
 
 	i = 0;
-	while (array && array[i])
-		free(array[i++]);
+	while (array && array[i]) {
+		if (array[i])
+			free(array[i]);
+		i++;
+	}
 	free(array);
 }
 
@@ -46,8 +49,10 @@ char	*find_cmd(char **paths, char *cmd)
 	char *tmp;
 
 	i = 0;
-	if (!cmd || !*cmd || access(cmd, X_OK) == 0)
-		return (cmd);
+	if (!cmd || !*cmd || access(cmd, X_OK) == 0) {
+		tmp = ft_strdup(cmd);
+		return (tmp);
+	}
 	while (paths && paths[i])
 	{
 		tmp = ft_strjoin(paths[i++], "/");
@@ -63,13 +68,10 @@ char	*find_cmd(char **paths, char *cmd)
 }
 
 
-static void	cmd_not_found(char **args, char **paths)
+static void	cmd_not_found(char **args)
 {
 	if (args) {
 		write(2, args[0], ft_strlen(args[0]));
-		free_array(args);
-		if (paths)
-			free_array(paths);
 	}
 	write(2, ": command not found\n", 20);
 	return;
@@ -91,14 +93,18 @@ void	execute_cmd(t_cmd *cmd, char **envp)
 	cmd_path = find_cmd(paths, cmd->args[0]);
 	if (!cmd_path)
 	{
-		cmd_not_found(cmd->args, paths);
+		g_exit_st = 127;
+		cmd_not_found(cmd->args);
 		free_array(paths);
 		return;
 	}
 	pid = fork();
 	if (pid == 0)
 	{
+		free_array(paths);
 		execve(cmd_path, cmd->args, envp);
+		perror("minishell");
+		free(cmd_path);
 		exit(127);
 	}
 	waitpid(pid, &status, 0);
@@ -108,3 +114,5 @@ void	execute_cmd(t_cmd *cmd, char **envp)
 	return;
 }
 
+
+// greob beug sur les commande de base genre ls 
