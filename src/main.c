@@ -120,6 +120,7 @@ int	main(int ac, char **av, char **envp)
 		super_exec(cmds, env);
 		free(cmd);
 	  free_all(tokens, cmds);
+    if (g_exit_st == -1) break;
 	}
 	free_env(env);
 	return (0);

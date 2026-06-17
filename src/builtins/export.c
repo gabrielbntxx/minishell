@@ -131,16 +131,17 @@ void builtin_export(char **cmd, t_env **nodenv) {
       key = ft_substr(cmd[i], 0, sep);
       value = ft_substr(cmd[i], sep + 1, len - sep - 1);
       env_set(nodenv, key, value);
+      free(key);
+      free(value);
     }
     else {
       key = ft_strdup(cmd[i]);
-      value = NULL;
-      env_set(nodenv, key, value);
+      env_set(nodenv, key, NULL);
+      free(key);
     }
-    free(key);
-    free(env);
   }
-  return; // free env
+  free_array(env);
+  return;
 }
 
 

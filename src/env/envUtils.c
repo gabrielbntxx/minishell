@@ -40,28 +40,28 @@ void env_set(t_env **env, char *key, char *value)
     t_env *current;
     t_env *node;
 
+    if (!key)
+        return;
     node = env_get(*env, key, 1);
-    if (node)    
+    if (node) {   
         exist_node(node, value);
-    if (node)
         return;
-    current = *env;
-    if (current) {
-      while (current->next != NULL)
-          current = current->next;
-      current->next = malloc(sizeof(t_env));
-      if (!current->next) 
-       return;
-      current = current->next;
     }
-    if (!key) 
-        return;
-      current->key = ft_strdup(key);
+    current = malloc(sizeof(t_env));
+    if (!current) return;
+    current->key = ft_strdup(key);
     if (value)
       current->value = ft_strdup(value);
     else
       current->value = NULL;
     current->next = NULL;
+    if (*env) {
+        t_env *tmp = *env;
+        while (tmp->next)
+            tmp = tmp->next;
+        tmp->next = current;
+    } else
+        *env = current;
 }
 
 
