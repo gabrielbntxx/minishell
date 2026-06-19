@@ -67,6 +67,22 @@ run_test_no_crash() {
     fi
 }
 
+# run_test_stderr <desc> <input> <expected_substring>  — captures stderr too
+run_test_stderr() {
+    local desc="$1" input="$2" expected="$3"
+    TOTAL=$((TOTAL + 1))
+    actual=$(printf '%s\n' "$input" | "$MINISHELL" 2>&1)
+    if echo "$actual" | grep -qF -- "$expected"; then
+        echo -e "  ${GREEN}[PASS]${RESET} $desc"
+        PASS=$((PASS + 1))
+    else
+        echo -e "  ${RED}[FAIL]${RESET} $desc"
+        echo -e "         attendu : |$expected|"
+        echo -e "         obtenu  : |$(echo "$actual" | head -2)|"
+        FAIL=$((FAIL + 1))
+    fi
+}
+
 # run_test_exact <desc> <input> <expected_exact>
 run_test_exact() {
     local desc="$1" input="$2" expected="$3"
@@ -596,6 +612,119 @@ run_test_no_crash "beaucoup de pipes"               "echo a | cat | cat | cat | 
 run_test_no_crash "redir + pipe"                    "echo hi > /tmp/t_$$ | cat"
 run_test_no_crash "commande avec slash"             "echo hel/lo"
 rm -f /tmp/t_$$
+
+# ══════════════════════════════════════════
+section "27. ERREURS DE SYNTAXE — exit code 2"
+# ══════════════════════════════════════════
+run_test_exit   "> seul exit 2"                 ">"                             2
+run_test_exit   "< seul exit 2"                 "<"                             2
+run_test_exit   ">> seul exit 2"                ">>"                            2
+run_test_exit   "<< seul exit 2"                "<<"                            2
+run_test_exit   "| seul exit 2"                 "|"                             2
+run_test_exit   "|| exit 2"                     "||"                            2
+run_test_exit   "&& exit 2"                     "&&"                            2
+run_test_exit   "echo > < exit 2"               "echo > <"                      2
+run_test_exit   "echo | | exit 2"               "echo | |"                      2
+run_test_exit   "> > > > exit 2"                "> > > >"                       2
+run_test_exit   "| hola exit 2"                 "| hola"                        2
+run_test_exit   ">>>>> exit 2"                  ">>>>>"                         2
+run_test_exit   "<<<<< exit 2"                  "<<<<<"                         2
+run_test_exit   "|echo| exit 2"                 "|echo|"                        2
+run_test_exit   "|echo -n hola exit 2"          "|echo -n hola"                 2
+run_test_exit   ">echo> exit 2"                 ">echo>"                        2
+run_test_exit   "<echo< exit 2"                 "<echo<"                        2
+run_test_exit   ">>echo>> exit 2"               ">>echo>>"                      2
+
+# ══════════════════════════════════════════
+section "28. RÉPERTOIRES — exit code 126"
+# ══════════════════════════════════════════
+run_test_exit   "/ seul exit 126"               "/"                             126
+run_test_exit   "// exit 126"                   "//"                            126
+run_test_exit   "/. exit 126"                   "/."                            126
+run_test_stderr "/ message Is a directory"      "/"                             "directory"
+run_test_exit   "/tmp/.. exit 126"              "/tmp/.."                       126
+
+# ══════════════════════════════════════════
+section "29. CONCATÉNATION DE TOKENS"
+# ══════════════════════════════════════════
+run_test        'echo hola""bonjour = holabonjour'  'echo hola""bonjour'        "holabonjour"
+run_test        "echo ''hola'' = hola"          "echo ''hola''"                 "hola"
+run_test        "echo ''h'o'la'' = hola"        "echo ''h'o'la''"               "hola"
+run_test        'echo ""hola = hola'            'echo ""hola'                   "hola"
+run_test        'echo hola""'                   'echo hola""'                   "hola"
+run_test        'echo ""hola"" = hola'          'echo ""hola""'                 "hola"
+run_test        'echo ""$HOME = /...'           'echo ""$HOME'                  "/"
+run_test        "echo ''$HOME = /..."           "echo ''$HOME"                  "/"
+run_test        'echo hola""que tal'            'echo hola""que'                "holaque"
+
+# ══════════════════════════════════════════
+section "30. EXPANSION — cas du spreadsheet"
+# ══════════════════════════════════════════
+run_test        'echo $?$ = 0$'                 'echo $?$'                      '0$'
+run_test        'echo $:$= reste littéral'      'echo $:$='                     '$:$='
+run_test        'echo $HOME9 = vide'            'echo $HOME9'                   ""
+run_test        'echo $9HOME = HOME'            'echo $9HOME'                   "HOME"
+run_test        'echo $DONTEXIST Hola = Hola'   'echo $DONTEXIST Hola'          "Hola"
+run_test        'echo $HOME% garde le %'        'echo $HOME%'                   "%"
+run_test        'echo $UID$HOME concat vars'    'echo $UID$HOME'                "/"
+run_test        "echo '\$HOME' single noescape" "echo '\$HOME'"                 "\$HOME"
+run_test        'echo "$?" = 0'                 'echo "$?"'                     "0"
+
+# ══════════════════════════════════════════
+section "31. ECHO — cas avancés du spreadsheet"
+# ══════════════════════════════════════════
+run_test        "echo -nHola = -nHola avec newline" "echo -nHola"              "-nHola"
+run_test        "echo -n-nnn -nnnn = reste tel quel" "echo -n-nnn -nnnn"       "-n-nnn -nnnn"
+run_test        "echo -nnn --------n"           "echo -nnn --------n"           "--------n"
+run_test        "echo -nnn -----nn---nnnn"      "echo -nnn -----nn---nnnn"      "-----nn---nnnn"
+run_test        "echo -nnn --------nnnn"        "echo -nnn --------nnnn"        "--------nnnn"
+run_test        "echo -p flag invalide"         "echo -p"                       "-p"
+run_test        "echo --------n = pas un flag"  "echo --------n"                "--------n"
+run_test        "echo -n -nnn hola -nnnn"       "echo -n -nnn hola -nnnn"       "hola -nnnn"
+run_test        "echo Hola -n = -n en fin = arg" "echo Hola -n"                 "Hola -n"
+run_test        'echo $ seul'                   'echo $'                        '$'
+
+# ══════════════════════════════════════════
+section "32. COMMANDES SPÉCIALES"
+# ══════════════════════════════════════════
+run_test_exit   ": builtin exit 0"              ":"                             0
+run_test_exit   "commande inexistante exit 127" "hola"                          127
+run_test_exit   "hola que tal exit 127"         "hola que tal"                  127
+run_test_exit   "Makefile pas executable 127"   "Makefile"                      127
+run_test_stderr "cmd inexistante message"        "hola_inexistante_xyz"          "command not found"
+run_test_exit   '! exit 1 ou 127'               '!'                             127
+run_test_exit   "- command not found 127"       "-"                             127
+run_test_exit   'true exit 0'                   'true'                          0
+run_test_exit   'false exit 1'                  'false'                         1
+run_test_exit   '$? comme commande exit 127'    'echo ok
+$?'                                                                             127
+
+# ══════════════════════════════════════════
+section "33. REDIRECTIONS — comportements spreadsheet"
+# ══════════════════════════════════════════
+TMP4="/tmp/mini_sheet_$$"
+run_test          "redir > puis cat contenu"    "echo hello > $TMP4
+cat $TMP4"                                                                      "hello"
+run_test          "redir >> cumule correctement" "echo line1 > $TMP4
+echo line2 >> $TMP4
+cat $TMP4"                                                                      "line2"
+run_test_no_crash "redir > fichier inexistant dir" "echo x > /no_dir_xyz/file"
+run_test_no_crash "cat < inexistant"            "cat < /fichier_xyz_inexistant_test"
+run_test          "heredoc puis echo"           'cat << STOP
+hello
+STOP
+echo done'                                                                      "done"
+rm -f "$TMP4"
+
+# ══════════════════════════════════════════
+section "34. PIPES — comportements spreadsheet"
+# ══════════════════════════════════════════
+run_test          "echo $? pipe echo $?"        'echo $? | echo $?'             "0"
+run_test          "pipe | cat -e newline"        'echo | cat -e'                 "$"
+run_test          "echo espaces | cat -e"        'echo "         " | cat -e'     "$"
+run_test_no_crash "cat dans pipe"               'echo hello | cat'
+run_test          "echo hello | cat output"     'echo hello | cat'              "hello"
+run_test_no_crash "pipe triple"                 'echo a | cat | cat'
 
 # ══════════════════════════════════════════
 # RÉSULTATS FINAUX

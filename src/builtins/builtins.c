@@ -23,7 +23,9 @@ int dispatch(t_cmd *cmd, t_env **env) {
   
   
     g_exit_st = 0;
-    if (!ft_strcmp(this, "export"))
+    if (!ft_strcmp(this, ":"))
+        ;
+    else if (!ft_strcmp(this, "export"))
         builtin_export(cmd->args, env);
     else if (!ft_strcmp(this, "env")) builtin_env(envp);
     else if (!ft_strcmp(this, "pwd")) builtin_pwd();

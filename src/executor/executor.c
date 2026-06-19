@@ -12,6 +12,7 @@
 
 
 #include "../../Includes/executor.h"
+#include <sys/stat.h>
 
 void	free_array(char **array)
 {
@@ -77,31 +78,39 @@ static void	cmd_not_found(char **args)
 	return;
 }
 
+static int	get_cmd_path(t_cmd *cmd, char **envp, char **out)
+{
+	char		**paths;
+	struct stat	st;
+
+	paths = find_path(envp);
+	*out = find_cmd(paths, cmd->args[0]);
+	free_array(paths);
+	if (!*out)
+		return (g_exit_st = 127, cmd_not_found(cmd->args), -1);
+	if (stat(*out, &st) == 0 && S_ISDIR(st.st_mode))
+	{
+		write(2, "minishell: ", 11);
+		write(2, cmd->args[0], ft_strlen(cmd->args[0]));
+		write(2, ": Is a directory\n", 17);
+		return (g_exit_st = 126, free(*out), -1);
+	}
+	return (0);
+}
+
 void	execute_cmd(t_cmd *cmd, char **envp)
 {
-	char	**paths;
 	char	*cmd_path;
 	int		pid;
 	int		status;
 
-	paths = find_path(envp);
 	if (!cmd->args || !cmd->args[0])
-	{
-		free_array(paths);
-		return;
-	}
-	cmd_path = find_cmd(paths, cmd->args[0]);
-	if (!cmd_path)
-	{
-		g_exit_st = 127;
-		cmd_not_found(cmd->args);
-		free_array(paths);
-		return;
-	}
+		return ;
+	if (get_cmd_path(cmd, envp, &cmd_path))
+		return ;
 	pid = fork();
 	if (pid == 0)
 	{
-		free_array(paths);
 		execve(cmd_path, cmd->args, envp);
 		perror("minishell");
 		free(cmd_path);
@@ -109,9 +118,7 @@ void	execute_cmd(t_cmd *cmd, char **envp)
 	}
 	waitpid(pid, &status, 0);
 	free(cmd_path);
-	free_array(paths);
-  update_exit(status);
-	return;
+	update_exit(status);
 }
 
 

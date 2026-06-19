@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:55:06 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/11 13:02:36 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/19 18:10:15 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,40 @@ void free_all(t_token *tokens, t_cmd *cmds)
         free_cmds(cmds);
 
 }
+
+static int  syntax_error(char *token)
+{
+    write(2, "minishell: syntax error near unexpected token `", 47);
+    if (token)
+        write(2, token, ft_strlen(token));
+    else
+        write(2, "newline", 7);
+    write(2, "'\n", 2);
+    g_exit_st = 2;
+    return (1);
+}
+
+static int  validate_tokens(t_token *tokens)
+{
+    t_token *cur;
+
+    if (!tokens)
+        return (0);
+    if (tokens->type != WORD)
+        return (syntax_error(tokens->value));
+    cur = tokens;
+    while (cur)
+    {
+        if (cur->type != WORD && (!cur->next || cur->next->type != WORD))
+            return (syntax_error(cur->next ? cur->next->value : NULL));
+        if (cur->type == WORD
+            && (!ft_strcmp(cur->value, "&&") || !ft_strcmp(cur->value, "||")))
+            return (syntax_error(cur->value));
+        cur = cur->next;
+    }
+    return (0);
+}
+
 int	main(int ac, char **av, char **envp)
 {
 	t_env	*env;
@@ -118,6 +152,7 @@ int	main(int ac, char **av, char **envp)
 			add_history(cmd);
 		tokens = lexer(cmd);
     cmds = parser(tokens);
+    if(!validate_tokens(tokens))
 		super_exec(cmds, env);
 		free(cmd);
 	  free_all(tokens, cmds);
