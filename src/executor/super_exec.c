@@ -141,8 +141,7 @@ void base_cmd(t_cmd *cmd, char **array, t_env *env) {
   if (ret == 1)
       execute_cmd(cmd, array);
   if (ret == -2)
-      g_exit_st = -1;
-  execute_cmd(cmd, array);
+      g_should_exit = 1;
   dup2(save[0], STDIN_FILENO);
   dup2(save[1], STDOUT_FILENO);
   close(save[0]);

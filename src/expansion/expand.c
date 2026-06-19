@@ -6,7 +6,7 @@
 /*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:34 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/17 18:25:17 by gabrielbene      ###   ########.fr       */
+/*   Updated: 2026/06/18 00:46:00 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,4 +100,8 @@ void	expand(t_cmd *cmd, t_env *env)
 		}
 		i++;
 	}
+	if (cmd->redir_in)
+    	expand_one_arg(&cmd->redir_in, env);
+	if (cmd->redir_out)
+    	expand_one_arg(&cmd->redir_out, env);
 }

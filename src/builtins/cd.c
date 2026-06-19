@@ -39,12 +39,16 @@ int builtin_cd(t_env *env, char **args)
        }
       }
     }
+    char    buf[4096];
+    char    *cwd;
+
     if (chdir(path) == -1)
     {
         perror("minishell: cd");
         return(1);
     }
     env_set(&env, "OLDPWD", env_get(env, "PWD", 0));
-    env_set(&env, "PWD", path);
+    cwd = getcwd(buf, sizeof(buf));
+    env_set(&env, "PWD", cwd ? cwd : path);
     return(0);
 }

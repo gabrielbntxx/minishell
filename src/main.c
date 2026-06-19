@@ -29,6 +29,7 @@ void    handler0(int sig)
 #include <string.h>
 
 int g_exit_st = 0;
+int g_should_exit = 0;
 
 void update_exit(int status) {
   if (WIFEXITED(status))
@@ -120,8 +121,8 @@ int	main(int ac, char **av, char **envp)
 		super_exec(cmds, env);
 		free(cmd);
 	  free_all(tokens, cmds);
-    if (g_exit_st == -1) break;
+    if (g_should_exit) break;
 	}
 	free_env(env);
-	return (0);
+	return (g_exit_st);
 }

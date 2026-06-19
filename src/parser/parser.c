@@ -89,28 +89,26 @@ void    add_cmd(t_cmd **head, t_cmd *new)
 
 void    handle_redir(t_token **token, t_cmd *cmd)
 {
-    if (((*token)->type) == REDIR_IN)
-    {
-        *token = (*token)->next;
+    t_token_type type;
+
+    type = (*token)->type;
+    *token = (*token)->next;
+    if (!*token)
+        return ;
+    if (type == REDIR_IN)
         cmd->redir_in = ft_strdup((*token)->value);
-    }
-    else if (((*token)->type) == REDIR_OUT)
+    else if (type == REDIR_OUT)
     {
-        *token = (*token)->next;
         cmd->redir_out = ft_strdup((*token)->value);
         cmd->append = 0;
     }
-    else if (((*token)->type) == APPEND)
+    else if (type == APPEND)
     {
-        *token = (*token)->next;
         cmd->redir_out = ft_strdup((*token)->value);
         cmd->append = 1;
     }
-    else if (((*token)->type) == HEREDOC)
-    {
-        *token = (*token)->next;
+    else if (type == HEREDOC)
         cmd->heredoc = ft_strdup((*token)->value);
-    }
 }                                                                          
 
 
@@ -133,6 +131,8 @@ t_cmd   *parser(t_token *tokens)
         }
         else
             handle_redir(&tokens, cmd);
+        if (!tokens)
+            break ;
         tokens = tokens->next;
     }
     return(head);

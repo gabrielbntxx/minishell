@@ -18,6 +18,7 @@
   #include "builtins.h"
   #include "expand.h"
   extern int g_exit_st;
+  extern int g_should_exit;
 
   void handler0(int sig);
   void update_exit(int status);
