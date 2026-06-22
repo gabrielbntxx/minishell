@@ -109,30 +109,33 @@ void print_export(char **env) {
     }
     return;
 }
+int is_valid(char **cmd)
+{
+    int i;
+    int j;
 
-int is_valid(char **cmd) {
-  int i;
-  int j;
-  int valid;
-  
-  i = 0;
-  j = 0;
-  valid = 1;
-  while(cmd[i]) {
-    while (cmd[i][j]) {
-      if ((cmd[i][0] <= 'z' && cmd[i][0] >= 'a') || (cmd[i][0] <= 'Z' && cmd[i][0] >= 'A'))
-        valid = 1;
-      if ((cmd[i][j] >= 'z' && cmd[i][j] <= 'a') || (cmd[i][j] >= 'Z' && cmd[i][j] <= 'A') || ((cmd[i][j] >= 9 && cmd[i][j] <= 0)) || cmd[i][j] == '=')
-        valid = 0;
-      if (valid == 0) {
-        printf("not a valid identifier\n");
-        return (valid);
-      }
-      j++;
+    i = 0;
+    while (cmd[i])
+    {
+        j = 0;
+        if (!(cmd[i][j] == '_' || (cmd[i][j] >= 'A' && cmd[i][j] <= 'Z') || (cmd[i][j] >= 'a' && cmd[i][j] <= 'z')))
+        {
+            printf("not a valid identifier\n");
+            return 0;
+        }
+        j++;
+        while (cmd[i][j] && cmd[i][j] != '=')
+        {
+            if (!(cmd[i][j] == '_' || (cmd[i][j] >= 'A' && cmd[i][j] <= 'Z') || (cmd[i][j] >= 'a' && cmd[i][j] <= 'z') || (cmd[i][j] >= '0' && cmd[i][j] <= '9')))
+            {
+                printf("not a valid identifier\n");
+                return 0;
+            }
+            j++;
+        }
+        i++;
     }
-    i++;
-  }
-  return (valid);
+    return 1;
 }
 
 void builtin_export(char **cmd, t_env **nodenv) {
@@ -149,7 +152,7 @@ void builtin_export(char **cmd, t_env **nodenv) {
     free_array(env);
     return;
   }
-
+    if (is_valid(cmd) == 0) free_array(env);
     if (is_valid(cmd) == 0) return;
   while (cmd[++i]) {
     sep = ft_strchr(cmd[i], '=');

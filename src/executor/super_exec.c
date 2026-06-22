@@ -63,14 +63,14 @@ void handl_heredoc(t_cmd *cmd) {
 
 
 
-void apply_redir(t_cmd *cmd) {
+static int apply_redir(t_cmd *cmd) {
   int fd[2];
   
   handl_heredoc(cmd);
   if(cmd->redir_in) {
     fd[0] = open(cmd->redir_in, O_RDONLY);
-    if (fd[0] == -1) return; 
-    if (dup2(fd[0], STDIN_FILENO) == -1) return;
+    if (fd[0] == -1) return (1); 
+    if (dup2(fd[0], STDIN_FILENO) == -1) return (1);
     
 
     close(fd[0]);
@@ -80,27 +80,28 @@ void apply_redir(t_cmd *cmd) {
       fd[1] = open(cmd->redir_out, O_WRONLY | O_TRUNC | O_CREAT, 0644);
     else
       fd[1] = open(cmd->redir_out, O_WRONLY | O_APPEND | O_CREAT, 0644);
-    if (fd[1] == -1) return;
-    if (dup2(fd[1], STDOUT_FILENO) == -1) return;
+    if (fd[1] == -1) return (1);
+    if (dup2(fd[1], STDOUT_FILENO) == -1) return (1);
     close(fd[1]);
   }
-  return;
+  return (0);
 }
 
-void super_cmd(t_cmd *cmd, char **array, t_env *env) {
+int super_cmd(t_cmd *cmd, char **array, t_env **env) {
 
   int pipe_fd[2];
   int last_fd = -1;
   int pid; 
   t_cmd *current;
   int status;
+  int ret;
 
   current = cmd;
   while (current) {
       expand(current, env);
 
       if (current->next) 
-        if (pipe(pipe_fd) == -1) return;
+        if (pipe(pipe_fd) == -1) return (1);
       pid = fork();
     if (pid == 0) {
       if (last_fd != -1) { 
@@ -112,9 +113,12 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
         close(pipe_fd[0]);
         close(pipe_fd[1]);
       }
-      apply_redir(current);
-      if (dispatch(current, &env) == 1)
-        execute_cmd(current, array);
+      if (apply_redir(current)) return (1);
+      ret = dispatch(current, env);
+      if (ret == 1)
+        execute_cmd(current, array, 0);
+      if (ret == -2)
+        exit(ret);
       exit(127);
     }
     if (current->next) {
@@ -126,37 +130,48 @@ void super_cmd(t_cmd *cmd, char **array, t_env *env) {
 
     current = current->next;
   }
-  while(wait(&status) > 0);
+  waitpid(pid, &status, 0);
   update_exit(status);
+  return (status);
 }
 
-void base_cmd(t_cmd *cmd, char **array, t_env *env) {
+int base_cmd(t_cmd *cmd, char **array, t_env **env) {
   int save[2];
+  int ret;
 
   expand(cmd, env);
   save[0] = dup(STDIN_FILENO);
   save[1] = dup(STDOUT_FILENO);
-  apply_redir(cmd);
-  g_exit_st = dispatch(cmd, &env);
-  if (g_exit_st == 1)
-    execute_cmd(cmd, array);
+  if (apply_redir(cmd)) return (1);
+  ret = dispatch(cmd, env);
+  if (ret == 1)
+    execute_cmd(cmd, array, 1);
   dup2(save[0], STDIN_FILENO);
   dup2(save[1], STDOUT_FILENO);
   close(save[0]);
   close(save[1]);
+  if (ret == -2)
+    return (-2);
+  return (0);
 }
 
-void super_exec(t_cmd *cmd, t_env *env) {
+int super_exec(t_cmd *cmd, t_env **env) {
   char **array; 
+  int ret;
 
   if (!cmd) 
-    return;
-  array = env_to_array(env);
+    return(0);
+  array = env_to_array(*env);
     if (!cmd->args) {
       free_array(array);
-      return;
+      return(1);
     }
-  if (cmd->next) super_cmd(cmd, array, env);
-  else base_cmd(cmd, array, env);
+  if (cmd->next) 
+    ret = super_cmd(cmd, array, env);
+  else 
+    ret = base_cmd(cmd, array, env);
   free_array(array);
+  if (ret == -2)
+    return(-2);
+  return(0);
 }

@@ -50,6 +50,8 @@ char	*find_cmd(char **paths, char *cmd)
 
 	i = 0;
 	if (!cmd || !*cmd || access(cmd, X_OK) == 0) {
+    if (!cmd)
+      return (NULL);
 		tmp = ft_strdup(cmd);
 		return (tmp);
 	}
@@ -77,13 +79,14 @@ static void	cmd_not_found(char **args)
 	return;
 }
 
-void	execute_cmd(t_cmd *cmd, char **envp)
+void	execute_cmd(t_cmd *cmd, char **envp, int mod)
 {
 	char	**paths;
 	char	*cmd_path;
 	int		pid;
 	int		status;
 
+  pid = 2048;
 	paths = find_path(envp);
 	if (!cmd->args || !cmd->args[0])
 	{
@@ -98,8 +101,9 @@ void	execute_cmd(t_cmd *cmd, char **envp)
 		free_array(paths);
 		return;
 	}
-	pid = fork();
-	if (pid == 0)
+  if (mod == 1)
+	  pid = fork();
+	if (pid == 0 || mod == 0)
 	{
 		free_array(paths);
 		execve(cmd_path, cmd->args, envp);

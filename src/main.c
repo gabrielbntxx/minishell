@@ -65,6 +65,8 @@ void free_cmds(t_cmd *cmd)
             free(cmd->redir_out);
         if (cmd->heredoc)
             free(cmd->heredoc);
+        if (cmd->args_quote)
+            free(cmd->args_quote);
         free(cmd);
         cmd = tmp;
     }
@@ -91,11 +93,44 @@ void free_all(t_token *tokens, t_cmd *cmds)
         free_cmds(cmds);
 
 }
+
+
+static int  syntax_error(char *token)
+{
+    write(2, "minishell: syntax error near unexpected token `", 47);
+    if (token)
+        write(2, token, ft_strlen(token));
+    else
+        write(2, "newline", 7);
+    write(2, "'\n", 2);
+    g_exit_st = 2;
+    return (1);
+}
+
+static int  validate_tokens(t_token *tokens)
+{
+    t_token *cur;
+
+    if (!tokens)
+        return (0);
+    if (tokens->type != WORD)
+        return (syntax_error(tokens->value));
+    cur = tokens;
+    while (cur)
+    {
+        if (cur->type != WORD && (!cur->next || cur->next->type != WORD))
+            return (syntax_error(cur->next ? cur->next->value : NULL));
+        cur = cur->next;
+    }
+    return (0);
+}
+
 int	main(int ac, char **av, char **envp)
 {
 	t_env	*env;
 	t_token	*tokens;
 	char	*cmd;
+  int ret;
   t_cmd *cmds;
 
   tokens = NULL;
@@ -116,12 +151,15 @@ int	main(int ac, char **av, char **envp)
 		if (*cmd)
 			add_history(cmd);
 		tokens = lexer(cmd);
-    cmds = parser(tokens);
-		super_exec(cmds, env);
+    if (!validate_tokens(tokens)) {
+      cmds = parser(tokens);
+      if (cmds)
+		    ret = super_exec(cmds, &env);
+    }
 		free(cmd);
 	  free_all(tokens, cmds);
-    if (g_exit_st == -1) break;
+    if (ret == -2) break;
 	}
 	free_env(env);
-	return (0);
+	return (g_exit_st);
 }
