@@ -1,5 +1,5 @@
-#ifndef SPLIT_H
-# define SPLIT_H
+#ifndef EXECUTOR_H
+# define EXECUTOR_H
 
 #include "minishell.h"
 #include "parser.h"

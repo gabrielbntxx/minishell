@@ -132,7 +132,8 @@ int	main(int ac, char **av, char **envp)
 	char	*cmd;
   int ret;
   t_cmd *cmds;
-
+  
+  ret = 0;
   tokens = NULL;
   cmds = NULL;
 	(void)ac;

@@ -109,7 +109,7 @@ void print_export(char **env) {
     }
     return;
 }
-int is_valid(char **cmd)
+int is_valid(char *cmd)
 {
     int i;
     int j;
@@ -118,13 +118,13 @@ int is_valid(char **cmd)
     while (cmd[i])
     {
         j = 0;
-        if (!(cmd[i][j] == '_' || (cmd[i][j] >= 'A' && cmd[i][j] <= 'Z') || (cmd[i][j] >= 'a' && cmd[i][j] <= 'z')))
+        if (!(cmd[i] == '_' || (cmd[i] >= 'A' && cmd[i] <= 'Z') || (cmd[i] >= 'a' && cmd[i] <= 'z')))
         {
             printf("not a valid identifier\n");
-            return 0;
+            return 1;
         }
-        j++;
-        while (cmd[i][j] && cmd[i][j] != '=')
+        /*j++;
+        while (cmd[i] && cmd[i] != '=')
         {
             if (!(cmd[i][j] == '_' || (cmd[i][j] >= 'A' && cmd[i][j] <= 'Z') || (cmd[i][j] >= 'a' && cmd[i][j] <= 'z') || (cmd[i][j] >= '0' && cmd[i][j] <= '9')))
             {
@@ -132,10 +132,10 @@ int is_valid(char **cmd)
                 return 0;
             }
             j++;
-        }
+        }*/
         i++;
     }
-    return 1;
+    return 0;
 }
 
 void builtin_export(char **cmd, t_env **nodenv) {
@@ -152,13 +152,16 @@ void builtin_export(char **cmd, t_env **nodenv) {
     free_array(env);
     return;
   }
-    if (is_valid(cmd) == 0) free_array(env);
-    if (is_valid(cmd) == 0) return;
+   
   while (cmd[++i]) {
     sep = ft_strchr(cmd[i], '=');
     len = ft_strlen(cmd[i]);
     if (sep != -1) {
       key = ft_substr(cmd[i], 0, sep);
+      if (is_valid(key) == 1) { 
+        free_array(env);
+        return;
+      }
       value = ft_substr(cmd[i], sep + 1, len - sep - 1);
       env_set(nodenv, key, value);
       free(key);

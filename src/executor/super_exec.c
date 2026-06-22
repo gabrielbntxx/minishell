@@ -113,7 +113,7 @@ int super_cmd(t_cmd *cmd, char **array, t_env **env) {
         close(pipe_fd[0]);
         close(pipe_fd[1]);
       }
-      if (apply_redir(current)) return (1);
+      apply_redir(current);
       ret = dispatch(current, env);
       if (ret == 1)
         execute_cmd(current, array, 0);
@@ -142,7 +142,7 @@ int base_cmd(t_cmd *cmd, char **array, t_env **env) {
   expand(cmd, env);
   save[0] = dup(STDIN_FILENO);
   save[1] = dup(STDOUT_FILENO);
-  if (apply_redir(cmd)) return (1);
+  apply_redir(cmd);
   ret = dispatch(cmd, env);
   if (ret == 1)
     execute_cmd(cmd, array, 1);
