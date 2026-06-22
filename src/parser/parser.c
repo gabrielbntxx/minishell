@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:52 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/08 13:15:09 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/18 00:40:15 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ t_cmd   *new_cmd(void)
     cmd->append = 0;
     cmd->heredoc = NULL;
     cmd->next = NULL;
+    cmd->args_quote = NULL;
     return(cmd);
 }
 
@@ -36,31 +37,39 @@ void    init_first_arg(t_cmd *cmd, char *arg)
      cmd->args[1] = NULL;
 }
 
-void    add_arg(t_cmd *cmd, char *arg)
+   
+void    add_arg(t_cmd *cmd, char *arg, t_quote_type quote)
 {
-    int count;
-    int i;
-    char **new_args;
-    count = 0;
+    int     i;
+    char    **new_args;
+    int     *new_quotes;
+
     i = 0;
-    if (cmd->args == NULL)
-       init_first_arg(cmd, arg);                                                                          
-    else
+    while (cmd->args && cmd->args[i])
+        i++;
+    new_args = malloc(sizeof(char *) * (i + 2));
+    if (!new_args)
+        return ;
+    new_quotes = malloc(sizeof(int) * (i + 2));
+    if (!new_quotes)
     {
-        while (cmd->args[count] != NULL)
-            count++;
-        new_args = malloc(sizeof(char *) * (count + 2));
-        while (cmd->args[i] != NULL)
-        {
-            new_args[i] = cmd->args[i];
-            i++;
-        }
-        new_args[i] = ft_strdup(arg);
-        new_args[i + 1] = NULL;
-        free(cmd->args);
-        cmd->args = new_args;   
+        free(new_args);
+        return ;
     }
-}       
+    new_args[i] = ft_strdup(arg);
+    new_args[i + 1] = NULL;
+    new_quotes[i] = quote;
+    new_quotes[i + 1] = 0;
+    while (i-- > 0)
+    {
+        new_args[i] = cmd->args[i];
+        new_quotes[i] = cmd->args_quote[i];
+    }
+    free(cmd->args);
+    free(cmd->args_quote);
+    cmd->args = new_args;
+    cmd->args_quote = new_quotes;
+}
 
 
 void    add_cmd(t_cmd **head, t_cmd *new)
@@ -80,28 +89,26 @@ void    add_cmd(t_cmd **head, t_cmd *new)
 
 void    handle_redir(t_token **token, t_cmd *cmd)
 {
-    if (((*token)->type) == REDIR_IN)
-    {
-        *token = (*token)->next;
+    t_token_type type;
+
+    type = (*token)->type;
+    *token = (*token)->next;
+    if (!*token)
+        return ;
+    if (type == REDIR_IN)
         cmd->redir_in = ft_strdup((*token)->value);
-    }
-    else if (((*token)->type) == REDIR_OUT)
+    else if (type == REDIR_OUT)
     {
-        *token = (*token)->next;
         cmd->redir_out = ft_strdup((*token)->value);
         cmd->append = 0;
     }
-    else if (((*token)->type) == APPEND)
+    else if (type == APPEND)
     {
-        *token = (*token)->next;
         cmd->redir_out = ft_strdup((*token)->value);
         cmd->append = 1;
     }
-    else if (((*token)->type) == HEREDOC)
-    {
-        *token = (*token)->next;
+    else if (type == HEREDOC)
         cmd->heredoc = ft_strdup((*token)->value);
-    }
 }                                                                          
 
 
@@ -116,7 +123,7 @@ t_cmd   *parser(t_token *tokens)
     while (tokens != NULL)
     {
         if (((tokens)->type) == WORD)
-            add_arg(cmd, tokens->value);
+            add_arg(cmd, tokens->value, tokens->quote_type);
         else if (((tokens)->type) == PIPE)
         {
             cmd = new_cmd();
@@ -124,6 +131,8 @@ t_cmd   *parser(t_token *tokens)
         }
         else
             handle_redir(&tokens, cmd);
+        if (!tokens)
+            break ;
         tokens = tokens->next;
     }
     return(head);
