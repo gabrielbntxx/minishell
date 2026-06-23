@@ -86,7 +86,7 @@ void	execute_cmd(t_cmd *cmd, char **envp, int mod)
 	int		pid;
 	int		status;
 
-  pid = 2048;
+  //pid = 2048;
 	paths = find_path(envp);
 	if (!cmd->args || !cmd->args[0])
 	{
@@ -111,7 +111,8 @@ void	execute_cmd(t_cmd *cmd, char **envp, int mod)
 		free(cmd_path);
 		exit(127);
 	}
-	waitpid(pid, &status, 0);
+  if (mod == 1)
+	  waitpid(pid, &status, 0);
 	free(cmd_path);
 	free_array(paths);
   update_exit(status);
