@@ -113,12 +113,12 @@ static int  validate_tokens(t_token *tokens)
 
     if (!tokens)
         return (0);
-    if (tokens->type != WORD)
+    if (tokens->type != WORD && tokens->type != REDIR_IN && tokens->type != HEREDOC)
         return (syntax_error(tokens->value));
     cur = tokens;
     while (cur)
     {
-        if (cur->type != WORD && (!cur->next || cur->next->type != WORD))
+        if ((cur->type != WORD && cur->type != REDIR_IN && cur->type != HEREDOC ) && (!cur->next || cur->next->type != WORD && cur->next->type != REDIR_IN && cur->next->type != HEREDOC ))
             return (syntax_error(cur->next ? cur->next->value : NULL));
         cur = cur->next;
     }
