@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:26:48 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:26:49 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/25 13:47:11 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,11 @@ int builtin_echo(char **args)
     }
     while (args[i] != NULL)
     {
-        printf("%s", args[i]);
-        if (args[i + 1] != NULL)
-            printf(" ");
+        if (ft_strlen(args[i]) != 0) {
+            printf("%s", args[i]);
+            if (args[i + 1] != NULL && ft_strlen(args[i + 1]) != 0)
+                printf(" ");
+        }
         i++;
     }
     if (newline == 1)

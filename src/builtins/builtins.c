@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:26:35 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/17 13:02:44 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/25 13:39:12 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@ int dispatch(t_cmd *cmd, t_env **env) {
     else if (!ft_strcmp(this, "env")) builtin_env(envp);
     else if (!ft_strcmp(this, "pwd")) builtin_pwd();
     else if (!ft_strcmp(this, "cd")) builtin_cd(*env, cmd->args); 
-    else if (!ft_strcmp(this, "echo")) builtin_echo(cmd->args);
+    else if (!ft_strcmp(this, "echo")) 
+        builtin_echo(cmd->args);
     else if (!ft_strcmp(this, "exit")) { 
       free_array(envp); 
       g_exit_st = builtin_exit(cmd->args, g_exit_st);
