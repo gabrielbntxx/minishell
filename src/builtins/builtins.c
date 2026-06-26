@@ -16,27 +16,32 @@
 
 int dispatch(t_cmd *cmd, t_env **env) {
     char *this;
+    char **envp;
+    int ret;
+
+    if (!cmd->args || !cmd->args[0])
+        return (1);
     this = cmd->args[0];
-    char **envp = env_to_array(*env);
-  
-  
+    envp = env_to_array(*env);
+    ret = 0;
     if (!ft_strcmp(this, "export")) 
-        builtin_export(cmd->args, env);
-    else if (!ft_strcmp(this, "env")) builtin_env(envp);
-    else if (!ft_strcmp(this, "pwd")) builtin_pwd();
-    else if (!ft_strcmp(this, "cd")) builtin_cd(*env, cmd->args); 
+        ret = builtin_export(cmd->args, env);
+    else if (!ft_strcmp(this, "env")) ret = builtin_env(envp);
+    else if (!ft_strcmp(this, "pwd")) ret = builtin_pwd();
+    else if (!ft_strcmp(this, "cd")) ret = builtin_cd(*env, cmd->args); 
     else if (!ft_strcmp(this, "echo")) 
-        builtin_echo(cmd->args);
+        ret = builtin_echo(cmd->args);
     else if (!ft_strcmp(this, "exit")) { 
-      free_array(envp); 
       g_exit_st = builtin_exit(cmd->args, g_exit_st);
-      return(-2);
+      free_array(envp);
+      return (-2);
     }
-    else if (!ft_strcmp(this, "unset")) builtin_unset(cmd->args, env);
+    else if (!ft_strcmp(this, "unset")) { builtin_unset(cmd->args, env); ret = 0; }
     else {
         free_array(envp);
         return (1);
     }
     free_array(envp);
+    g_exit_st = ret;
     return (0);
 }

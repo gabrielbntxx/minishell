@@ -43,15 +43,18 @@ char **env_to_array(t_env *env) {
     i++;
     current = current->next;
   }
-  array = malloc(sizeof(char **) * (i + 1));
+  array = malloc(sizeof(char *) * (i + 1));
   if (!array) {
     return (NULL);
   }
   i = 0;
   current = env;
   while (current) {
-    array[i] = super_join(current);
-    i++;
+    if (current->value)
+    {
+      array[i] = super_join(current);
+      i++;
+    }
     current = current->next;
   }
   array[i] = NULL;

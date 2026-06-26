@@ -20,8 +20,7 @@ void *env_get(t_env *env, char *key, int option) {
     }
     env = env->next;
   }
-  if (option == 1) return(NULL);
-  return ("");
+  return (NULL);
 }
 
 static void exist_node(t_env *node, char *value) {

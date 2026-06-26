@@ -121,7 +121,9 @@ int is_valid( char *cmd)
     (cmd[0] >= 'a' && cmd[0] <= 'z') ||
     cmd[0] == '_'))
   {
-    write(1, "not a valide identifier\n", 25);
+    write(2, "minishell: export: `", 20);
+    write(2, cmd, ft_strlen(cmd));
+    write(2, "': not a valid identifier\n", 26);
       return 0;
   }
   i = 1;
