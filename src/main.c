@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:55:06 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/11 13:02:36 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/26 22:07:59 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ void free_env(t_env *env)
 void free_all(t_token *tokens, t_cmd *cmds)
 {
     if (tokens)
-      free_tokens(tokens);
+        free_tokens(tokens);
     if (cmds)
         free_cmds(cmds);
 

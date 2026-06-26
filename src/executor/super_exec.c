@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:30 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/17 13:04:16 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/06/26 22:53:15 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,14 +26,14 @@
     exit(0);
 }
 
-void handl_heredoc(t_cmd *cmd) {
+int  handl_heredoc(t_cmd *cmd) {
   int hd[2];
   int pid;
   char *str;
   
   str = NULL;
   if (cmd->heredoc) {
-    if(pipe(hd) == -1) return;
+    if(pipe(hd) == -1) return 0;
     pid = fork();
     if (pid == 0) {
       close(hd[0]);
@@ -54,13 +54,13 @@ void handl_heredoc(t_cmd *cmd) {
       close(hd[1]);
       exit(0);
     }
-    else if (pid == -1) return;
-    if (waitpid(pid, NULL, 0) == -1) return;
+    else if (pid == -1) return -1;
+    if (waitpid(pid, NULL, 0) == -1) return 0;
     close(hd[1]);
-    if (dup2(hd[0], STDIN_FILENO) == -1) return;
+    if (dup2(hd[0], STDIN_FILENO) == -1) return 0;
     close(hd[0]);
   }
-  return;
+  return 0;
 }
 
 
@@ -69,7 +69,8 @@ void handl_heredoc(t_cmd *cmd) {
 static int apply_redir(t_cmd *cmd) {
   int fd[2];
   
-  handl_heredoc(cmd);
+  if (handl_heredoc(cmd) == -2)
+    return -2;
   if(cmd->redir_in) {
     fd[0] = open(cmd->redir_in, O_RDONLY);
     if (fd[0] == -1) return (1); 
@@ -116,14 +117,14 @@ int super_cmd(t_cmd *cmd, char **array, t_env **env) {
         close(pipe_fd[0]);
         close(pipe_fd[1]);
       }
-      if (apply_redir(current))
-        exit(1);
+      if (apply_redir(current) == -2)
+        return(-2);
       ret = dispatch(current, env);
       if (ret == 1)
         execute_cmd(current, array, 0);
       if (ret == -2)
-        exit(ret);
-      exit(127);
+        return(ret);
+      return(127);
     }
     if (current->next) {
       if (last_fd != -1) close(last_fd);
@@ -142,17 +143,19 @@ int super_cmd(t_cmd *cmd, char **array, t_env **env) {
 int base_cmd(t_cmd *cmd, char **array, t_env **env) {
   int save[2];
   int ret;
+  int error;
 
   expand(cmd, env);
   save[0] = dup(STDIN_FILENO);
   save[1] = dup(STDOUT_FILENO);
-  if (apply_redir(cmd)) {
+  error = apply_redir(cmd);
+  if (error == 1 || error == -2) {
     dup2(save[0], STDIN_FILENO);
     dup2(save[1], STDOUT_FILENO);
     close(save[0]);
     close(save[1]);
     g_exit_st = 1;
-    return (1);
+    return (error);
   }
   if (!cmd->args || !cmd->args[0]) {
     dup2(save[0], STDIN_FILENO);
@@ -189,7 +192,5 @@ int super_exec(t_cmd *cmd, t_env **env) {
   else 
     ret = base_cmd(cmd, array, env);
   free_array(array);
-  if (ret == -2)
-    return(-2);
-  return(0);
+  return(ret);
 }
