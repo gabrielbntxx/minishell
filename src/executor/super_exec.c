@@ -43,7 +43,10 @@ void handl_heredoc(t_cmd *cmd) {
 
         str = readline(">");
         if (!str) break;
-        if (!ft_strcmp(str, cmd->heredoc)) break;
+        if (!ft_strcmp(str, cmd->heredoc)) {
+          free(str);
+          break;
+        }
         write(hd[1], str, ft_strlen(str));
         write(hd[1], "\n", 1);
         free(str);
@@ -113,7 +116,8 @@ int super_cmd(t_cmd *cmd, char **array, t_env **env) {
         close(pipe_fd[0]);
         close(pipe_fd[1]);
       }
-      apply_redir(current);
+      if (apply_redir(current))
+        exit(1);
       ret = dispatch(current, env);
       if (ret == 1)
         execute_cmd(current, array, 0);
@@ -142,7 +146,21 @@ int base_cmd(t_cmd *cmd, char **array, t_env **env) {
   expand(cmd, env);
   save[0] = dup(STDIN_FILENO);
   save[1] = dup(STDOUT_FILENO);
-  apply_redir(cmd);
+  if (apply_redir(cmd)) {
+    dup2(save[0], STDIN_FILENO);
+    dup2(save[1], STDOUT_FILENO);
+    close(save[0]);
+    close(save[1]);
+    g_exit_st = 1;
+    return (1);
+  }
+  if (!cmd->args || !cmd->args[0]) {
+    dup2(save[0], STDIN_FILENO);
+    dup2(save[1], STDOUT_FILENO);
+    close(save[0]);
+    close(save[1]);
+    return (0);
+  }
   ret = dispatch(cmd, env);
   if (ret == 1)
     execute_cmd(cmd, array, 1);

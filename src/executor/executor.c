@@ -51,10 +51,8 @@ char	*find_cmd(char **paths, char *cmd)
 	i = 0;
     if (!cmd || ft_strlen(cmd) < 1)
 		return (NULL);
-	if (!*cmd || access(cmd, X_OK) == 0) {
-		tmp = ft_strdup(cmd);
-		return (tmp);
-	}
+	if (!*cmd || access(cmd, X_OK) == 0)
+		return (ft_strdup(cmd));
 	while (paths && paths[i])
 	{
 		tmp = ft_strjoin(paths[i++], "/");
