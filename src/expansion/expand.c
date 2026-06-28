@@ -90,7 +90,12 @@ void	expand(t_cmd *cmd, t_env **env)
 	int	i;
 
 	i = 0;
-  
+	if (cmd->redir_in && ft_strchr(cmd->redir_in, '$'))
+		expand_one_arg(&cmd->redir_in, env);
+	if (cmd->redir_out && ft_strchr(cmd->redir_out, '$'))
+		expand_one_arg(&cmd->redir_out, env);
+	if (cmd->heredoc && ft_strchr(cmd->heredoc, '$'))
+		expand_one_arg(&cmd->heredoc, env);
 
 	while (cmd->args && cmd->args[i])
 	{

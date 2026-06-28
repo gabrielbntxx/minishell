@@ -16,7 +16,27 @@
 #include <stdio.h>
 
 
- static void    handler1(int sig)
+static void rm_args(t_cmd *cmd) {
+  int i;
+  int j;
+
+  if (!cmd->args || !cmd->args[0])
+    return;
+  i = 0;
+  j = 0;
+  while (cmd->args[i]) {
+    if (cmd->args[i][0] != '\0' || cmd->args_quote[i] != NONE) {
+      cmd->args[j] = cmd->args[i];
+      cmd->args_quote[j] = cmd->args_quote[i];
+      j++;
+    }
+    i++;
+  }
+  cmd->args[j] = NULL;
+  cmd->args_quote[j] = 0;
+}
+
+  static void    handler1(int sig)
 {
      (void) sig;
     // printf("\n");
@@ -102,7 +122,7 @@ int super_cmd(t_cmd *cmd, char **array, t_env **env) {
   current = cmd;
   while (current) {
       expand(current, env);
-
+      rm_args(current);
       if (current->next) 
         if (pipe(pipe_fd) == -1) return (1);
       pid = fork();
@@ -144,6 +164,7 @@ int base_cmd(t_cmd *cmd, char **array, t_env **env) {
   int ret;
 
   expand(cmd, env);
+  rm_args(cmd);
   save[0] = dup(STDIN_FILENO);
   save[1] = dup(STDOUT_FILENO);
   if (apply_redir(cmd)) {
