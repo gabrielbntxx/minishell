@@ -144,6 +144,8 @@ int super_cmd(t_cmd *cmd, char **array, t_env **env) {
         execute_cmd(current, array, 0);
       if (ret == -2)
         exit(ret);
+      if (ret == 0)
+        exit(0);
       exit(127);
     }
     if (current->next) {
@@ -202,7 +204,7 @@ int super_exec(t_cmd *cmd, t_env **env) {
   if (!cmd) 
     return(0);
   array = env_to_array(*env);
-    if (!cmd->args) {
+    if (!cmd->args && !cmd->heredoc && !cmd->redir_in) {
       free_array(array);
       return(1);
     }

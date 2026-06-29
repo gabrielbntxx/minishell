@@ -55,7 +55,7 @@ int builtin_exit(char **args, int current_exit_status)
     if (args[2] != NULL)
     {
         write(2, "minishell: exit: too many arguments\n", 36);
-        return(1);
+        return(2);
     }
     return(ft_atoi(args[1]) % 256);
 }
