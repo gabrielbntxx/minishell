@@ -33,7 +33,7 @@ static char	*get_expand_value(char *arg, int y, int *end, t_env **env)
 	while (arg[*end] && ft_isalnum(arg[*end]))
 		(*end)++;
 	if (*end == y + 1)
-		return (NULL);
+	  return (NULL);
 	name = ft_substr(arg, y + 1, *end - (y + 1));
 	env_value = env_get(*env, name, 0);
 	if (env_value)
@@ -50,7 +50,6 @@ static int	replace_expand(char **arg, int y, int end, char *value)
 	char	*post;
 	char	*mid;
 	char	*old;
-
 	tmp = ft_substr(*arg, 0, y);
 	post = ft_substr(*arg, end, ft_strlen(*arg) - end);
 	mid = ft_strjoin(tmp, value);

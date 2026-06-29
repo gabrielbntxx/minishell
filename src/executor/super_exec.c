@@ -55,9 +55,10 @@ void handl_heredoc(t_cmd *cmd) {
   if (cmd->heredoc) {
     if(pipe(hd) == -1) return;
     pid = fork();
-    if (pid == 0) {
-      close(hd[0]);
-      while (1) {
+	if (pid == 0) {
+		close(hd[0]);
+		dup2(2, 1);
+		while (1) {
         signal(SIGINT, handler1);
         signal(SIGQUIT, SIG_IGN); 
 

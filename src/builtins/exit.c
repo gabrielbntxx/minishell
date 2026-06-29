@@ -49,12 +49,12 @@ int builtin_exit(char **args, int current_exit_status)
         return(current_exit_status);
     if (!is_numeric(args[1]))
     {
-        printf("minishell: exit : %s: numeric argument required\n", args[1]);
+        write(2, "minishell: exit: numeric argument required\n", 43);
         return(2);
     }
     if (args[2] != NULL)
     {
-        printf("minishell: exit: too many arguments\n");
+        write(2, "minishell: exit: too many arguments\n", 36);
         return(1);
     }
     return(ft_atoi(args[1]) % 256);

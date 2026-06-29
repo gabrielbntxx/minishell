@@ -173,6 +173,8 @@ int builtin_export(char **cmd, t_env **nodenv) {
     }
     else {
       key = ft_strdup(cmd[i]);
+      if (env_get(*nodenv, key, 0))
+        return 1;
       if (is_valid(key) == 0) {
         free(key);
         free_array(env);
