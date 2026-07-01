@@ -20,7 +20,7 @@ int dispatch(t_cmd *cmd, t_env **env) {
     int ret;
 
     if (!cmd->args || !cmd->args[0])
-        return (1);
+        return (0);
     this = cmd->args[0];
     envp = env_to_array(*env);
     ret = 0;

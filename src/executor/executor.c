@@ -51,7 +51,7 @@ char	*find_cmd(char **paths, char *cmd)
 	i = 0;
     if (!cmd || ft_strlen(cmd) < 1)
 		return (NULL);
-	if (!*cmd || access(cmd, X_OK) == 0)
+	if (!*cmd || access(cmd, F_OK) == 0)
 		return (ft_strdup(cmd));
 	while (paths && paths[i])
 	{
@@ -60,7 +60,7 @@ char	*find_cmd(char **paths, char *cmd)
     free(tmp);
 		if (!path)
 			return (NULL);
-		if (access(path, X_OK) == 0)
+		if (access(path, F_OK) == 0)
 			return (path);
 		free(path);
 	}
@@ -85,6 +85,7 @@ void	execute_cmd(t_cmd *cmd, char **envp, int mod)
 	int		status;
 
   pid = -1;
+  status = 0;
 	paths = find_path(envp);
 	if (!cmd->args || !cmd->args[0])
 	{
@@ -107,7 +108,7 @@ void	execute_cmd(t_cmd *cmd, char **envp, int mod)
 		execve(cmd_path, cmd->args, envp);
 		perror("minishell");
 		free(cmd_path);
-		exit(127);
+		exit(126);
 	}
   if (mod == 1)
 	  waitpid(pid, &status, 0);

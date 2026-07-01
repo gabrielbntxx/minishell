@@ -94,6 +94,13 @@ void free_all(t_token *tokens, t_cmd *cmds)
 
 }
 
+static int	is_redir(int type)
+{
+	if (type == REDIR_IN || type == REDIR_OUT
+		|| type == HEREDOC || type == APPEND)
+		return (1);
+	return (0);
+}
 
 static int  syntax_error(char *token)
 {
@@ -107,22 +114,46 @@ static int  syntax_error(char *token)
     return (1);
 }
 
-static int  validate_tokens(t_token *tokens)
+static int	token_value_error(t_token *token)
 {
-    t_token *cur;
+	if (token)
+		return (syntax_error(token->value));
+	return (syntax_error(NULL));
+}
 
-    if (!tokens)
-        return (0);
-    if (tokens->type != WORD && tokens->type != REDIR_IN && tokens->type != HEREDOC)
-        return (syntax_error(tokens->value));
-    cur = tokens;
-    while (cur)
-    {
-        if ((cur->type != WORD && cur->type != REDIR_IN && cur->type != HEREDOC ) && (!cur->next || cur->next->type != WORD && cur->next->type != REDIR_IN && cur->next->type != HEREDOC ))
-            return (syntax_error(cur->next ? cur->next->value : NULL));
-        cur = cur->next;
-    }
-    return (0);
+static int	check_pipe(t_token *cur)
+{
+	if (cur->type == PIPE && (!cur->next || cur->next->type == PIPE))
+		return (token_value_error(cur->next));
+	return (0);
+}
+
+static int	check_redir(t_token *cur)
+{
+	if (is_redir(cur->type)
+		&& (!cur->next || cur->next->type != WORD))
+		return (token_value_error(cur->next));
+	return (0);
+}
+
+static int	validate_tokens(t_token *tokens)
+{
+	t_token	*cur;
+
+	if (!tokens)
+		return (0);
+	if (tokens->type == PIPE)
+		return (syntax_error(tokens->value));
+	cur = tokens;
+	while (cur)
+	{
+		if (check_pipe(cur))
+			return (1);
+		if (check_redir(cur))
+			return (1);
+		cur = cur->next;
+	}
+	return (0);
 }
 
 int	main(int ac, char **av, char **envp)

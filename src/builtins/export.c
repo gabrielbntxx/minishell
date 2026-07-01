@@ -78,7 +78,7 @@ char **env_to_export(t_env *env) {
     i++;
     current = current->next;
   }
-  array = malloc(sizeof(char *) * i + 8);
+  array = malloc(sizeof(char *) * (i + 8));
   if (!array) return (NULL); 
   i = 0;
   current = env;
@@ -154,7 +154,7 @@ int builtin_export(char **cmd, t_env **nodenv) {
   if (!cmd[1]) {
     print_export(env);
     free_array(env);
-    return 1;
+    return 0;
   }
    
   while (cmd[++i]) {
