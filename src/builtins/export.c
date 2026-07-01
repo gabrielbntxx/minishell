@@ -164,6 +164,7 @@ int builtin_export(char **cmd, t_env **nodenv) {
       key = ft_substr(cmd[i], 0, sep);
       if (is_valid(key) == 0) { 
         free_array(env);
+        free(key);
         return 1;
       }
       value = ft_substr(cmd[i], sep + 1, len - sep - 1);
@@ -173,9 +174,7 @@ int builtin_export(char **cmd, t_env **nodenv) {
     }
     else {
       key = ft_strdup(cmd[i]);
-      if (env_get(*nodenv, key, 0))
-        return 1;
-      if (is_valid(key) == 0) {
+      if (env_get(*nodenv, key, 0) || is_valid(key) == 0) {
         free(key);
         free_array(env);
         return 1;

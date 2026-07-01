@@ -78,8 +78,10 @@ static int	expand_one_arg(char **arg, t_env **env)
       value = get_expand_value(*arg, y, &end, env);
       if (!value)
         break ;
-      if (replace_expand(arg, y, end, value))
+      if (replace_expand(arg, y, end, value)) {
+        free(*arg);
         return (1);
+    }
 	}
 	return (0);
 }

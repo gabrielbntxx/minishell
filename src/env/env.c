@@ -91,6 +91,8 @@ void init_env(char **envp, t_env **first) {
     node->next = NULL;
       if (sep != -1) {
         node->key = ft_substr(envp[i], 0, sep);
+        if (!node->key)
+        env_free(*first);
         node->value = ft_substr(envp[i], sep + 1, len - sep - 1);
       }
       else {

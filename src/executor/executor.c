@@ -84,7 +84,7 @@ void	execute_cmd(t_cmd *cmd, char **envp, int mod)
 	int		pid;
 	int		status;
 
-  //pid = 2048;
+  pid = -1;
 	paths = find_path(envp);
 	if (!cmd->args || !cmd->args[0])
 	{

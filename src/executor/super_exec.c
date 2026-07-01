@@ -30,6 +30,8 @@ static void rm_args(t_cmd *cmd) {
       cmd->args_quote[j] = cmd->args_quote[i];
       j++;
     }
+    else
+      free(cmd->args[i]);
     i++;
   }
   cmd->args[j] = NULL;
@@ -75,10 +77,20 @@ void handl_heredoc(t_cmd *cmd) {
       close(hd[1]);
       exit(0);
     }
-    else if (pid == -1) return;
-    if (waitpid(pid, NULL, 0) == -1) return;
+    else if (pid == -1) {
+      close(hd[0]); 
+      close(hd[1]); 
+      return;
+    }
+    if (waitpid(pid, NULL, 0) == -1) {
+      close(hd[1]); 
+      return;
+    }
     close(hd[1]);
-    if (dup2(hd[0], STDIN_FILENO) == -1) return;
+    if (dup2(hd[0], STDIN_FILENO) == -1) { 
+      close(hd[0]);
+      return;
+    }
     close(hd[0]);
   }
   return;
@@ -94,8 +106,10 @@ static int apply_redir(t_cmd *cmd) {
   if(cmd->redir_in) {
     fd[0] = open(cmd->redir_in, O_RDONLY);
     if (fd[0] == -1) return (1); 
-    if (dup2(fd[0], STDIN_FILENO) == -1) return (1);
-    
+    if (dup2(fd[0], STDIN_FILENO) == -1) { 
+      close(fd[0]);
+      return (1);
+    }
 
     close(fd[0]);
   } 
@@ -105,7 +119,10 @@ static int apply_redir(t_cmd *cmd) {
     else
       fd[1] = open(cmd->redir_out, O_WRONLY | O_APPEND | O_CREAT, 0644);
     if (fd[1] == -1) return (1);
-    if (dup2(fd[1], STDOUT_FILENO) == -1) return (1);
+    if (dup2(fd[1], STDOUT_FILENO) == -1) { 
+      close(fd[1]);
+      return (1);
+    }
     close(fd[1]);
   }
   return (0);
