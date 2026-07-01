@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   lexer.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/02 20:54:43 by mguilber          #+#    #+#             */
+/*   Updated: 2026/06/02 20:54:43 by mguilber         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../Includes/lexer.h"
 #include "../../Includes/minishell.h"
 
@@ -29,10 +41,40 @@ void  add_token(t_token **head, t_token *new)
     current->next = new;  
 }                             
 
+static char	*scan_word(char *input, int *i)
+{
+    char    buf[4096];
+    int     j;
+
+    j = 0;
+    while (input[*i] && input[*i] != ' ' && !is_operator(input[*i]))
+    {
+        if (input[*i] == '"')
+        {
+            (*i)++;
+            while (input[*i] && input[*i] != '"')
+                buf[j++] = input[(*i)++];
+            if (input[*i] == '"')
+                (*i)++;
+        }
+        else if (input[*i] == '\'')
+        {
+            (*i)++;
+            while (input[*i] && input[*i] != '\'')
+                buf[j++] = input[(*i)++];
+            if (input[*i] == '\'')
+                (*i)++;
+        }
+        else
+            buf[j++] = input[(*i)++];
+    }
+    buf[j] = '\0';
+    return (ft_strdup(buf));
+}
+
 t_token *lexer(char *input)
 {
     t_token *head = NULL;
-    int start;
     int no_space;
     char *word;
     int i;
@@ -42,25 +84,22 @@ t_token *lexer(char *input)
     {
         while (input[i] == ' ')
             i++;
-        
+
         if (input[i] == '\0')
             break;
         if (input[i] == '\'')
             handle_single_quote(input, &i, &head);
-        else if (input[i] == '"')                                                                           
+        else if (input[i] == '"')
             handle_double_quote(input, &i, &head);
         else if (is_operator(input[i]))
             i += get_operator_token(input, &i, &head);
         else
-        { 
-            start = i;
-            while (input[i] != '\0' && input[i] != ' ' && !is_operator(input[i]))
-                i++;
+        {
+            word = scan_word(input, &i);
             no_space = (input[i] != ' ' && input[i] != '\0' && !is_operator(input[i]));
-            word = ft_substr(input, start, i - start);   // 5. Extraire            
-            add_token(&head, new_token(WORD, word, NONE, no_space));  // 6. Ajouter       
-            free(word);  
-        }           
+            add_token(&head, new_token(WORD, word, NONE, no_space));
+            free(word);
+        }
     }
     return(head);
 }

@@ -4,6 +4,7 @@
   # include <stdlib.h>
   # include <unistd.h>
   #include <sys/wait.h>
+  #include <fcntl.h>
   #include <stdio.h>
   #include <readline/readline.h>
 # include <signal.h>
@@ -15,5 +16,11 @@
   #include "parser.h"
   #include "lexer.h"
   #include "builtins.h"
+  #include "expand.h"
+  extern int g_exit_st;
+
+  void handler0(int sig);
+  void update_exit(int status);
+  void free_cmds(t_cmd *cmd);
 
 #endif

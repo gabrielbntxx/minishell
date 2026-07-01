@@ -1,67 +1,35 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/02 20:54:23 by mguilber          #+#    #+#             */
+/*   Updated: 2026/06/11 14:08:32 by mguilber         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 
 #include "../../Includes/minishell.h"
 
 
 
-void *env_get(t_env *env, char *key, int option) {
-  while (env) {
-    if (ft_strcmp(env->key, key) == 0) {
-      if (option == 1) return(env);
-      return(env->value);
-    }
-    env = env->next;
-  }
-  if (option == 1) return(NULL);
-  return ("dont exist\n");
-}
 
-void env_set(t_env **env, char *key, char *value)
-{
-    t_env *current;
-    t_env *node;
 
-    node = env_get(*env, key, 1);
-    if (node)
-    {
-        free(node->value);
-        if (value)
-          node->value = ft_strdup(value);
-        return ;
-    }
-    current = *env;
-    while (current->next != NULL)
-        current = current->next;
-    current->next = malloc(sizeof(t_env));
-    current = current->next;
-    if (!key) return;
-      current->key = ft_strdup(key);
-    if (value)
-      current->value = ft_strdup(value);
-    current->next = NULL;
-}
 
-void env_unset(t_env **env, char *key) {
-  t_env *current;
-  t_env *prev;
+static char *super_join(t_env *current) {
+  char *tmp;
+  char *array;
 
-  current = *env;
-  prev = NULL;
-  while (current) {
-    if (ft_strcmp(current->key, key) == 0) {
-      if (prev)
-        prev->next = current->next;
-      else
-        *env = current->next;
-      free(current->key);
-      free(current->value);
-      free(current);
-      break;
-    }
-    else {
-    prev = current;
-    }
-    current = current->next;
-  }
+   if (current->value) {
+      tmp = ft_strjoin( current->key, "=");
+      array = ft_strjoin(tmp, current->value);
+      free(tmp);
+   }
+    else
+      array = ft_strjoin(current->key, NULL);
+  return(array);
 }
 
 char **env_to_array(t_env *env) {
@@ -83,10 +51,10 @@ char **env_to_array(t_env *env) {
   current = env;
   while (current) {
     if (current->value)
-      array[i] = ft_strjoin(ft_strjoin(current->key, "="), current->value);
-    else
-      array[i] = ft_strjoin(current->key, NULL);
-    i++;
+    {
+      array[i] = super_join(current);
+      i++;
+    }
     current = current->next;
   }
   array[i] = NULL;
@@ -123,6 +91,8 @@ void init_env(char **envp, t_env **first) {
     node->next = NULL;
       if (sep != -1) {
         node->key = ft_substr(envp[i], 0, sep);
+        if (!node->key)
+        env_free(*first);
         node->value = ft_substr(envp[i], sep + 1, len - sep - 1);
       }
       else {
