@@ -1,5 +1,5 @@
-#ifndef SPLIT_H
-# define SPLIT_H
+#ifndef EXECUTOR_H
+# define EXECUTOR_H
 
 #include "minishell.h"
 #include "parser.h"
@@ -12,8 +12,13 @@ char	*ft_strjoin(const char *s1, const char *s2);
 void	free_array(char **a);
 char	**find_path(char **envp);
 char	*find_cmd(char **p, char *c);
-void	execute_cmd(t_cmd *cmd, char **envp);
+void	execute_cmd(t_cmd *cmd, char **envp, int mod);
 
-void super_exec(t_cmd *cmd, t_env *env);
+int super_exec(t_cmd *cmd, t_env **env);
+int apply_redir(t_cmd *cmd);
+void rm_args(t_cmd *cmd);
+int base_cmd(t_cmd *cmd, t_env **env);
+
+int super_cmd(t_cmd *cmd, t_env **env);
 
 #endif

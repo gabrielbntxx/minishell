@@ -13,13 +13,13 @@
 
 int	ft_isalnum(int c)
 {
-	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
-		|| (c >= '0' && c <= '9') || c == '_')
+	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0'
+			&& c <= '9') || c == '_')
 		return (8);
 	return (0);
 }
 
-static char	*get_expand_value(char *arg, int y, int *end, t_env *env)
+static char	*get_expand_value(char *arg, int y, int *end, t_env **env)
 {
 	char	*name;
 	char	*env_value;
@@ -35,7 +35,7 @@ static char	*get_expand_value(char *arg, int y, int *end, t_env *env)
 	if (*end == y + 1)
 		return (NULL);
 	name = ft_substr(arg, y + 1, *end - (y + 1));
-	env_value = env_get(env, name, 0);
+	env_value = env_get(*env, name, 0);
 	if (env_value)
 		value = ft_strdup(env_value);
 	else
@@ -66,7 +66,7 @@ static int	replace_expand(char **arg, int y, int end, char *value)
 	return (0);
 }
 
-static int	expand_one_arg(char **arg, t_env *env)
+static int	expand_one_arg(char **arg, t_env **env)
 {
 	int		y;
 	int		end;
@@ -80,20 +80,30 @@ static int	expand_one_arg(char **arg, t_env *env)
 		if (!value)
 			break ;
 		if (replace_expand(arg, y, end, value))
+		{
+			free(*arg);
 			return (1);
+		}
 	}
 	return (0);
 }
 
-void	expand(t_cmd *cmd, t_env *env)
+void	expand(t_cmd *cmd, t_env **env)
 {
 	int	i;
 
 	i = 0;
+	if (cmd->redir_in && ft_strchr(cmd->redir_in, '$'))
+		expand_one_arg(&cmd->redir_in, env);
+	if (cmd->redir_out && ft_strchr(cmd->redir_out, '$'))
+		expand_one_arg(&cmd->redir_out, env);
+	if (cmd->heredoc && ft_strchr(cmd->heredoc, '$'))
+		expand_one_arg(&cmd->heredoc, env);
 	while (cmd->args && cmd->args[i])
 	{
-		if (expand_one_arg(&cmd->args[i], env))
-			return ;
+		if (!(cmd->args_quote[i] == SINGLE))
+			if (expand_one_arg(&cmd->args[i], env))
+				return ;
 		i++;
 	}
 }

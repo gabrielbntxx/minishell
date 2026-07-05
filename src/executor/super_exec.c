@@ -15,148 +15,144 @@
 #include "../../Includes/minishell.h"
 #include <stdio.h>
 
-
- static void    handler1(int sig)
+void	rm_args(t_cmd *cmd)
 {
-     (void) sig;
-    // printf("\n");
-    // rl_on_new_line();
-    // rl_replace_line("", 0);
-    // rl_redisplay();
-    exit(0);
+	int	i;
+	int	j;
+
+	if (!cmd->args || !cmd->args[0])
+		return ;
+	i = 0;
+	j = 0;
+	while (cmd->args[i])
+	{
+		if (cmd->args[i][0] != '\0' || cmd->args_quote[i] != NONE)
+		{
+			cmd->args[j] = cmd->args[i];
+			cmd->args_quote[j] = cmd->args_quote[i];
+			j++;
+		}
+		else
+			free(cmd->args[i]);
+		i++;
+	}
+	cmd->args[j] = NULL;
+	cmd->args_quote[j] = 0;
 }
 
-void handl_heredoc(t_cmd *cmd) {
-  int hd[2];
-  int pid;
-  char *str;
-  
-  str = NULL;
-  if (cmd->heredoc) {
-    if(pipe(hd) == -1) return;
-    pid = fork();
-    if (pid == 0) {
-      close(hd[0]);
-      while (1) {
-        signal(SIGINT, handler1);
-        signal(SIGQUIT, SIG_IGN); 
-
-        str = readline(">");
-        if (!str) break;
-        if (!ft_strcmp(str, cmd->heredoc)) break;
-        write(hd[1], str, ft_strlen(str));
-        write(hd[1], "\n", 1);
-        free(str);
-      }
-      close(hd[1]);
-      exit(0);
-    }
-    else if (pid == -1) return;
-    if (waitpid(pid, NULL, 0) == -1) return;
-    close(hd[1]);
-    if (dup2(hd[0], STDIN_FILENO) == -1) return;
-    close(hd[0]);
-  }
-  return;
+static void	handler1(int sig)
+{
+	(void)sig;
+	// printf("\n");
+	// rl_on_new_line();
+	// rl_replace_line("", 0);
+	// rl_redisplay();
+	exit(0);
 }
 
+static void	heredoc_read(int fd, char *del)
+{
+	char	*str;
 
-
-
-void apply_redir(t_cmd *cmd) {
-  int fd[2];
-  
-  handl_heredoc(cmd);
-  if(cmd->redir_in) {
-    fd[0] = open(cmd->redir_in, O_RDONLY);
-    if (fd[0] == -1) return; 
-    if (dup2(fd[0], STDIN_FILENO) == -1) return;
-    
-
-    close(fd[0]);
-  } 
-  if(cmd->redir_out) {
-    if (cmd->append == 0)
-      fd[1] = open(cmd->redir_out, O_WRONLY | O_TRUNC | O_CREAT, 0644);
-    else
-      fd[1] = open(cmd->redir_out, O_WRONLY | O_APPEND | O_CREAT, 0644);
-    if (fd[1] == -1) return;
-    if (dup2(fd[1], STDOUT_FILENO) == -1) return;
-    close(fd[1]);
-  }
-  return;
+	signal(SIGINT, handler1);
+	signal(SIGQUIT, SIG_IGN);
+	while (1)
+	{
+		str = readline(">");
+		if (!str)
+			break ;
+		if (!ft_strcmp(str, del))
+		{
+			free(str);
+			break ;
+		}
+		write(fd, str, ft_strlen(str));
+		write(fd, "\n", 1);
+		free(str);
+	}
 }
 
-void super_cmd(t_cmd *cmd, char **array, t_env *env) {
+void	handl_heredoc(t_cmd *cmd)
+{
+	int	hd[2];
+	int	pid;
 
-  int pipe_fd[2];
-  int last_fd = -1;
-  int pid; 
-  t_cmd *current;
-  int status;
-
-  current = cmd;
-  while (current) {
-      expand(current, env);
-
-      if (current->next) 
-        if (pipe(pipe_fd) == -1) return;
-      pid = fork();
-    if (pid == 0) {
-      if (last_fd != -1) { 
-        dup2(last_fd, STDIN_FILENO);
-        close(last_fd);
-      } 
-      if (current->next) { 
-        dup2(pipe_fd[1], STDOUT_FILENO);
-        close(pipe_fd[0]);
-        close(pipe_fd[1]);
-      }
-      apply_redir(current);
-      if (dispatch(current, &env) == 1)
-        execute_cmd(current, array);
-      exit(127);
-    }
-    if (current->next) {
-      if (last_fd != -1) close(last_fd);
-      close(pipe_fd[1]);
-      last_fd = pipe_fd[0];
-    }
-    else if (last_fd != -1) close(last_fd);
-
-    current = current->next;
-  }
-  while(wait(&status) > 0);
-  update_exit(status);
+	if (!cmd->heredoc)
+		return ;
+	if (pipe(hd) == -1)
+		return ;
+	pid = fork();
+	if (pid == 0)
+	{
+		close(hd[0]);
+		dup2(2, 1);
+		heredoc_read(hd[1], cmd->heredoc);
+		close(hd[1]);
+		exit(0);
+	}
+	if (pid == -1)
+	{
+		close(hd[0]);
+		close(hd[1]);
+		return ;
+	}
+	waitpid(pid, NULL, 0);
+	close(hd[1]);
+	dup2(hd[0], STDIN_FILENO);
+	close(hd[0]);
 }
 
-void base_cmd(t_cmd *cmd, char **array, t_env *env) {
-  int save[2];
+int	apply_redir(t_cmd *cmd)
+{
+	int	fd[2];
 
-  expand(cmd, env);
-  save[0] = dup(STDIN_FILENO);
-  save[1] = dup(STDOUT_FILENO);
-  apply_redir(cmd);
-  g_exit_st = dispatch(cmd, &env);
-  if (g_exit_st == 1)
-    execute_cmd(cmd, array);
-  dup2(save[0], STDIN_FILENO);
-  dup2(save[1], STDOUT_FILENO);
-  close(save[0]);
-  close(save[1]);
+	handl_heredoc(cmd);
+	if (cmd->redir_in)
+	{
+		fd[0] = open(cmd->redir_in, O_RDONLY);
+		if (fd[0] == -1)
+			return (1);
+		if (dup2(fd[0], STDIN_FILENO) == -1)
+		{
+			close(fd[0]);
+			return (1);
+		}
+		close(fd[0]);
+	}
+	if (cmd->redir_out)
+	{
+		if (cmd->append == 0)
+			fd[1] = open(cmd->redir_out, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+		else
+			fd[1] = open(cmd->redir_out, O_WRONLY | O_APPEND | O_CREAT, 0644);
+		if (fd[1] == -1)
+			return (1);
+		if (dup2(fd[1], STDOUT_FILENO) == -1)
+		{
+			close(fd[1]);
+			return (1);
+		}
+		close(fd[1]);
+	}
+	return (0);
 }
 
-void super_exec(t_cmd *cmd, t_env *env) {
-  char **array; 
+int	super_exec(t_cmd *cmd, t_env **env)
+{
+	int	ret;
 
-  if (!cmd) 
-    return;
-  array = env_to_array(env);
-    if (!cmd->args) {
-      free_array(array);
-      return;
-    }
-  if (cmd->next) super_cmd(cmd, array, env);
-  else base_cmd(cmd, array, env);
-  free_array(array);
+	// char **array;
+	if (!cmd)
+		return (0);
+	if (!cmd->args && !cmd->heredoc && !cmd->redir_in && !cmd->redir_out)
+		return (1);
+	if (cmd->next)
+		ret = super_cmd(cmd, env);
+	else
+		ret = base_cmd(cmd, env);
+	if (ret == -2)
+		return (-2);
+	if (ret != 0)
+		g_exit_st = ret;
+	return (0);
 }

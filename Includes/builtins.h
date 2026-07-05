@@ -18,11 +18,11 @@ int builtin_exit(char **args, int current_exit_status);
 char **sort_array(char **env);
 char **env_to_export(t_env *env);
 void print_export(char **env);
-void builtin_export(char **cmd, t_env **nodenv);
+int builtin_export(char **cmd, t_env **nodenv);
 /* pwd.c */
 int builtin_pwd(void);
 /* unset.c */
-void builtin_unset(char **args, t_env *env);
+void builtin_unset(char **args, t_env **env);
 
 
 #endif
