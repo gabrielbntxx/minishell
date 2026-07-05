@@ -1,49 +1,106 @@
-#include "../Includes/minishell.h"
-#include "../Includes/lexer.h"
-#include "../Includes/parser.h"
-#include <readline/readline.h>
-#include <readline/history.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/02 20:55:06 by mguilber          #+#    #+#             */
+/*   Updated: 2026/06/11 13:02:36 by mguilber         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-static void    handler0(int sig)
+#include "../Includes/lexer.h"
+#include "../Includes/minishell.h"
+#include "../Includes/parser.h"
+#include <readline/history.h>
+#include <readline/readline.h>
+#include <stdlib.h>
+#include <string.h>
+
+int			g_exit_st = 0;
+
+void	handler0(int sig)
 {
-    (void) sig;
-    printf("\n");
-    rl_on_new_line();
-    rl_replace_line("", 0);
-    rl_redisplay();
+	(void)sig;
+	printf("\n");
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 }
 
-int	main(int ac, char **av, char **envp)
+void	update_exit(int status)
 {
-	t_env	*env;
+	if (WIFEXITED(status))
+		g_exit_st = WEXITSTATUS(status);
+	else if (WIFSIGNALED(status))
+		g_exit_st = 128 + WTERMSIG(status);
+}
+
+static int	validate_tokens(t_token *tokens)
+{
+	t_token	*cur;
+
+	if (!tokens)
+		return (0);
+	if (tokens->type == PIPE)
+		return (syntax_error(tokens->value));
+	cur = tokens;
+	while (cur)
+	{
+		if (check_pipe(cur))
+			return (1);
+		if (check_redir(cur))
+			return (1);
+		cur = cur->next;
+	}
+	return (0);
+}
+
+static int	mini_loop(t_env **env)
+{
 	t_token	*tokens;
+	t_cmd	*cmds;
 	char	*cmd;
-	char	**array;
-  t_cmd *cmds;
-	(void)ac;
-	(void)av;
-	env = NULL;
-	init_env(envp, &env);
-	array = env_to_array(env);
+	int		ret;
+
+	ret = 0;
 	while (1)
 	{
-    signal(SIGINT, handler0);
-    signal(SIGQUIT, SIG_IGN); 
+		signal(SIGINT, handler0);
+		signal(SIGQUIT, SIG_IGN);
+		cmds = NULL;
+		tokens = NULL;
 		cmd = readline("minishell> ");
 		if (!cmd)
 			break ;
 		if (*cmd)
 			add_history(cmd);
 		tokens = lexer(cmd);
-    cmds = parser(tokens);
-    printf("---- LEXER ----\n");
-		print_tokens(tokens);
-		printf("---- command ----\n");
-    print_cmds(cmds); 
-    printf("---- EXEC ----\n");
-		if (dispatch(cmds, env) == 1) 
-			execute_cmd(cmds, array);
+		if (!validate_tokens(tokens))
+		{
+			cmds = parser(tokens);
+			if (cmds)
+				ret = super_exec(cmds, env);
+		}
 		free(cmd);
+		free_all(tokens, cmds);
+		if (ret == -2)
+			break ;
 	}
-	return (0);
+	return (ret);
+}
+
+int	main(int ac, char **av, char **envp)
+{
+	t_env	*env;
+	int		ret;
+
+	(void)ac;
+	(void)av;
+	env = NULL;
+	init_env(envp, &env);
+	ret = mini_loop(&env);
+	free_env(env);
+	return (g_exit_st);
 }
