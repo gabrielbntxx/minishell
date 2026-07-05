@@ -10,16 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "../../Includes/res.h"
-
 
 size_t	ft_strlen(const char *str)
 {
 	int	i;
 
 	i = 0;
-  if (!str) return (0);
+	if (!str)
+		return (0);
 	while (str[i])
 		i++;
 	return (i);
@@ -43,7 +42,6 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 	return (len);
 }
 
-
 int	ft_strncmp(const char *s1, const char *s2, unsigned int n)
 {
 	unsigned int	i;
@@ -66,7 +64,7 @@ char	*ft_strjoin(const char *s1, const char *s2)
 	int		i;
 	int		j;
 
-	 if (!s1 && !s2)
+	if (!s1 && !s2)
 		return (NULL);
 	s3 = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
 	if (!s3)
@@ -87,9 +85,7 @@ char	*ft_strjoin(const char *s1, const char *s2)
 	return (s3);
 }
 
-
 /*############################*/
-
 
 static size_t	ft_count_words(char const *s, char c)
 {

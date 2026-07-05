@@ -4,6 +4,8 @@ CC		= cc -g
 CFLAGS	= -Wall -Wextra 
 
 SRCS	= src/main.c \
+				src/douane.c \
+				src/cleaner.c \
 			src/res/ft_itoa.c \
 		  src/lexer/lexer.c \
 	  src/lexer/operator.c \
