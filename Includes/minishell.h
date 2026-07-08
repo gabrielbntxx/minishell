@@ -7,7 +7,7 @@
   #include <fcntl.h>
   #include <stdio.h>
   #include <readline/readline.h>
-# include <signal.h>
+  #include <signal.h>
 
 
   #include "res.h"

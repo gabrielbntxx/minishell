@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:30 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/17 13:04:16 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/07/08 19:18:16 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	rm_args(t_cmd *cmd)
 static void	handler1(int sig)
 {
 	(void)sig;
-	write(1, "\n", 1);
+	write(1, "\n", 2);
 	exit(130);
 }
 

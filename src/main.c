@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:55:06 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/11 13:02:36 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/07/08 19:38:21 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,5 +102,6 @@ int	main(int ac, char **av, char **envp)
 	init_env(envp, &env);
 	ret = mini_loop(&env);
 	free_env(env);
+	rl_clear_history();
 	return (g_exit_st);
 }

@@ -6,11 +6,12 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:27 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/25 14:09:31 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/07/08 18:02:45 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../Includes/executor.h"
+#include <signal.h>
 
 void	free_array(char **array)
 {
@@ -104,6 +105,7 @@ void	execute_cmd(t_cmd *cmd, char **envp, int mod)
 		pid = fork();
 	if (pid == 0 || mod == 0)
 	{
+		signal(SIGINT, SIG_IGN);
 		free_array(paths);
 		execve(cmd_path, cmd->args, envp);
 		perror("minishell");
@@ -112,6 +114,7 @@ void	execute_cmd(t_cmd *cmd, char **envp, int mod)
 	}
 	if (mod == 1)
 		waitpid(pid, &status, 0);
+	signal(SIGINT, handler0);
 	free(cmd_path);
 	free_array(paths);
 	update_exit(status);
