@@ -5,7 +5,6 @@ int	super_child(int last_fd, int *pipe_fd, t_env **env, t_cmd *current)
 	int		ret;
 	char	**array;
 
-	array = env_to_array(*env);
 	if (last_fd != -1)
 	{
 		dup2(last_fd, STDIN_FILENO);
@@ -20,8 +19,11 @@ int	super_child(int last_fd, int *pipe_fd, t_env **env, t_cmd *current)
 	if (apply_redir(current))
 		exit(1);
 	ret = dispatch(current, env);
-	if (ret == 1)
+	if (ret == 1) {
+    array = env_to_array(*env);
 		execute_cmd(current, array, 0);
+    free_array(array);
+  }
 	if (ret == -2)
 		exit(ret);
 	if (ret == 0)

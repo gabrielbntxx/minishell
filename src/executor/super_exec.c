@@ -43,11 +43,8 @@ void	rm_args(t_cmd *cmd)
 static void	handler1(int sig)
 {
 	(void)sig;
-	// printf("\n");
-	// rl_on_new_line();
-	// rl_replace_line("", 0);
-	// rl_redisplay();
-	exit(0);
+	write(1, "\n", 1);
+	exit(130);
 }
 
 static void	heredoc_read(int fd, char *del)

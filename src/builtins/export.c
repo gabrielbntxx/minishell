@@ -190,13 +190,14 @@ int	builtin_export(char **cmd, t_env **nodenv)
 		else
 		{
 			key = ft_strdup(cmd[i]);
-			if (env_get(*nodenv, key, 0) || is_valid(key) == 0)
+			if (is_valid(key) == 0)
 			{
 				free(key);
 				free_array(env);
 				return (1);
 			}
-			env_set(nodenv, key, NULL);
+      if (!env_get(*nodenv, key, 0))
+			  env_set(nodenv, key, NULL);
 			free(key);
 		}
 	}
