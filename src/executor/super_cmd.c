@@ -1,14 +1,20 @@
 #include "../../Includes/executor.h"
 
-int	super_child(int last_fd, int *pipe_fd, t_env **env, t_cmd *current)
+void exit_child(t_env **env, t_cmd *cmd, int ret) {
+    free_cmds(cmd);
+    free_env(*env);
+    exit(ret);
+}
+
+int	super_child(int *pipe_fd, t_env **env, t_cmd *head, t_cmd *current)
 {
 	int		ret;
 	char	**array;
 
-	if (last_fd != -1)
+	if (pipe_fd[4] != -1)
 	{
-		dup2(last_fd, STDIN_FILENO);
-		close(last_fd);
+		dup2(pipe_fd[4], STDIN_FILENO);
+		close(pipe_fd[4]);
 	}
 	if (current->next)
 	{
@@ -17,7 +23,7 @@ int	super_child(int last_fd, int *pipe_fd, t_env **env, t_cmd *current)
 		close(pipe_fd[1]);
 	}
 	if (apply_redir(current))
-		exit(1);
+		exit_child(env, head, 1);
 	ret = dispatch(current, env);
 	if (ret == 1)
 	{
@@ -26,21 +32,20 @@ int	super_child(int last_fd, int *pipe_fd, t_env **env, t_cmd *current)
     	free_array(array);
   	}
 	if (ret == -2)
-		exit(ret);
+		exit_child(env, head, ret);
 	if (ret == 0)
-		exit(0);
-	exit(127);
+		exit_child(env, head, 0);
+	exit_child(env, head, 127);
 }
 
 int	super_cmd(t_cmd *cmd, t_env **env)
 {
-	int		pipe_fd[2];
-	int		last_fd;
+	int		pipe_fd[4];
 	int		pid;
 	t_cmd	*current;
 	int		status;
 
-	last_fd = -1;
+	pipe_fd[4] = -1;
 	current = cmd;
 	while (current)
 	{
@@ -52,17 +57,17 @@ int	super_cmd(t_cmd *cmd, t_env **env)
 		pid = fork();
 		if (pid == 0)
 		{
-			super_child(last_fd, pipe_fd, env, current);
+			super_child(pipe_fd, env, cmd, current);
 		}
 		if (current->next)
 		{
-			if (last_fd != -1)
-				close(last_fd);
+			if (pipe_fd[4] != -1)
+				close(pipe_fd[4]);
 			close(pipe_fd[1]);
-			last_fd = pipe_fd[0];
+			pipe_fd[4] = pipe_fd[0];
 		}
-		else if (last_fd != -1)
-			close(last_fd);
+		else if (pipe_fd[4] != -1)
+			close(pipe_fd[4]);
 		current = current->next;
 	}
 	waitpid(pid, &status, 0);
@@ -107,7 +112,6 @@ int	base_cmd(t_cmd *cmd, t_env **env)
 
 	expand(cmd, env);
 	rm_args(cmd);
-	array = env_to_array(*env);
 	save[0] = dup(STDIN_FILENO);
 	save[1] = dup(STDOUT_FILENO);
 	if (apply_redir(cmd))
@@ -121,6 +125,7 @@ int	base_cmd(t_cmd *cmd, t_env **env)
 		return (0);
 	}
 	ret = dispatch(cmd, env);
+	array = env_to_array(*env);
 	if (ret == 1)
 		execute_cmd(cmd, array, 1);
 	ult_dup(save, 3);

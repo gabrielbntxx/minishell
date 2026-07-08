@@ -78,7 +78,7 @@ static void	cmd_not_found(char **args)
 	return ;
 }
 
-void	execute_cmd(t_cmd *cmd, char **envp, int mod)
+int	execute_cmd(t_cmd *cmd, char **envp, int mod)
 {
 	char	**paths;
 	char	*cmd_path;
@@ -91,7 +91,7 @@ void	execute_cmd(t_cmd *cmd, char **envp, int mod)
 	if (!cmd->args || !cmd->args[0])
 	{
 		free_array(paths);
-		return ;
+		return (0);
 	}
 	cmd_path = find_cmd(paths, cmd->args[0]);
 	if (!cmd_path)
@@ -99,7 +99,7 @@ void	execute_cmd(t_cmd *cmd, char **envp, int mod)
 		g_exit_st = 127;
 		cmd_not_found(cmd->args);
 		free_array(paths);
-		return ;
+		return (0);
 	}
 	if (mod == 1)
 		pid = fork();
@@ -110,6 +110,8 @@ void	execute_cmd(t_cmd *cmd, char **envp, int mod)
 		execve(cmd_path, cmd->args, envp);
 		perror("minishell");
 		free(cmd_path);
+		if (mod == 0)
+			return (126);
 		exit(126);
 	}
 	if (mod == 1)
@@ -118,7 +120,7 @@ void	execute_cmd(t_cmd *cmd, char **envp, int mod)
 	free(cmd_path);
 	free_array(paths);
 	update_exit(status);
-	return ;
+	return (0);
 }
 
 // greob beug sur les commande de base genre ls

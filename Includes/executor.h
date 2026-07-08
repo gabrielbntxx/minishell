@@ -12,7 +12,7 @@ char	*ft_strjoin(const char *s1, const char *s2);
 void	free_array(char **a);
 char	**find_path(char **envp);
 char	*find_cmd(char **p, char *c);
-void	execute_cmd(t_cmd *cmd, char **envp, int mod);
+int	execute_cmd(t_cmd *cmd, char **envp, int mod);
 
 int super_exec(t_cmd *cmd, t_env **env);
 int apply_redir(t_cmd *cmd);

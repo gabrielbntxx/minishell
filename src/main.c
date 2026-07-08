@@ -80,11 +80,14 @@ static int	mini_loop(t_env **env)
 		if (!validate_tokens(tokens))
 		{
 			cmds = parser(tokens);
+			free_tokens(tokens);
 			if (cmds)
 				ret = super_exec(cmds, env);
 		}
+    else 
+      free_tokens(tokens);
 		free(cmd);
-		free_all(tokens, cmds);
+		free_cmds(cmds);
 		if (ret == -2)
 			break ;
 	}

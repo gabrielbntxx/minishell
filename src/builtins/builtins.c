@@ -33,20 +33,19 @@ static int	handle_builtin(t_cmd *cmd, t_env **env, char **envp)
 		builtin_unset(cmd->args, env);
 	else
 		return (1);
-	g_exit_st = ret;
 	return (0);
 }
 
 int	dispatch(t_cmd *cmd, t_env **env)
 {
 	char	**envp;
-
+  int ret;
 	if (!cmd->args || !cmd->args[0])
 		return (0);
 	envp = env_to_array(*env);
 	if (!ft_strcmp(cmd->args[0], "exit"))
 	{
-		g_exit_st = builtin_exit(cmd->args, g_exit_st);
+		ret = builtin_exit(cmd->args, g_exit_st);
 		free_array(envp);
 		return (-2);
 	}
