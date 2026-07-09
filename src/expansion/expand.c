@@ -19,7 +19,7 @@ int	ft_isalnum(int c)
 	return (0);
 }
 
-static char	*get_expand_value(char *arg, int y, int *end, t_env **env)
+static char	*get_expand_value(char *arg, int y, int *end, t_shell *sh)
 {
 	char	*name;
 	char	*env_value;
@@ -28,14 +28,14 @@ static char	*get_expand_value(char *arg, int y, int *end, t_env **env)
 	if (arg[y + 1] == '?')
 	{
 		*end = y + 2;
-		return (ft_itoa(g_exit_st));
+		return (ft_itoa(sh->last_status));
 	}
 	while (arg[*end] && ft_isalnum(arg[*end]))
 		(*end)++;
 	if (*end == y + 1)
 		return (NULL);
 	name = ft_substr(arg, y + 1, *end - (y + 1));
-	env_value = env_get(*env, name, 0);
+	env_value = env_get(*sh->env, name, 0);
 	if (env_value)
 		value = ft_strdup(env_value);
 	else
@@ -66,7 +66,7 @@ static int	replace_expand(char **arg, int y, int end, char *value)
 	return (0);
 }
 
-static int	expand_one_arg(char **arg, t_env **env)
+static int	expand_one_arg(char **arg, t_shell *sh)
 {
 	int		y;
 	int		end;
@@ -76,7 +76,7 @@ static int	expand_one_arg(char **arg, t_env **env)
 	{
 		y = ft_strchr(*arg, '$');
 		end = y + 1;
-		value = get_expand_value(*arg, y, &end, env);
+		value = get_expand_value(*arg, y, &end, sh);
 		if (!value)
 			break ;
 		if (replace_expand(arg, y, end, value))
@@ -88,21 +88,21 @@ static int	expand_one_arg(char **arg, t_env **env)
 	return (0);
 }
 
-void	expand(t_cmd *cmd, t_env **env)
+void	expand(t_cmd *cmd, t_shell *sh)
 {
 	int	i;
 
 	i = 0;
 	if (cmd->redir_in && ft_strchr(cmd->redir_in, '$'))
-		expand_one_arg(&cmd->redir_in, env);
+		expand_one_arg(&cmd->redir_in, sh);
 	if (cmd->redir_out && ft_strchr(cmd->redir_out, '$'))
-		expand_one_arg(&cmd->redir_out, env);
+		expand_one_arg(&cmd->redir_out, sh);
 	if (cmd->heredoc && ft_strchr(cmd->heredoc, '$'))
-		expand_one_arg(&cmd->heredoc, env);
+		expand_one_arg(&cmd->heredoc, sh);
 	while (cmd->args && cmd->args[i])
 	{
 		if (!(cmd->args_quote[i] == SINGLE))
-			if (expand_one_arg(&cmd->args[i], env))
+			if (expand_one_arg(&cmd->args[i], sh))
 				return ;
 		i++;
 	}

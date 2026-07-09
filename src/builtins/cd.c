@@ -35,7 +35,6 @@ int	builtin_cd(t_env *env, char **args)
 		if (!path || !path[0])
 		{
 			write(2, "minishell: cd: OLDPWD not set\n", 30);
-			g_exit_st = 1;
 			return (1);
 		}
 	}

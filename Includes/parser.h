@@ -11,7 +11,8 @@ typedef struct s_cmd
     char    *redir_in;   // fichier pour < 
     char    *redir_out;    // fichier pour > ou >>                                                    
     int     append;      // 1 si >>, 0 si >
-    char    *heredoc;     // délimiteur pour <<  
+    char    *heredoc; // délimiteur pour <<  
+    struct s_cmd    *head;
     struct s_cmd    *next;   // commande suivante (après |)
 }   t_cmd;
 
