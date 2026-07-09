@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:30 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/17 13:04:16 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/07/08 19:18:16 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,8 @@ void	rm_args(t_cmd *cmd)
 static void	handler1(int sig)
 {
 	(void)sig;
-	// printf("\n");
-	// rl_on_new_line();
-	// rl_replace_line("", 0);
-	// rl_redisplay();
-	exit(0);
+	write(1, "\n", 2);
+	exit(130);
 }
 
 static void	heredoc_read(int fd, char *del)
@@ -137,7 +134,7 @@ int	apply_redir(t_cmd *cmd)
 	return (0);
 }
 
-int	super_exec(t_cmd *cmd, t_env **env)
+int	super_exec(t_cmd *cmd, t_shell *sh)
 {
 	int	ret;
 
@@ -147,12 +144,12 @@ int	super_exec(t_cmd *cmd, t_env **env)
 	if (!cmd->args && !cmd->heredoc && !cmd->redir_in && !cmd->redir_out)
 		return (1);
 	if (cmd->next)
-		ret = super_cmd(cmd, env);
+		ret = super_cmd(cmd, sh);
 	else
-		ret = base_cmd(cmd, env);
+		ret = base_cmd(cmd, sh);
 	if (ret == -2)
 		return (-2);
 	if (ret != 0)
-		g_exit_st = ret;
+		 return(ret);
 	return (0);
 }

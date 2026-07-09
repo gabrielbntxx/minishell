@@ -12,13 +12,13 @@ char	*ft_strjoin(const char *s1, const char *s2);
 void	free_array(char **a);
 char	**find_path(char **envp);
 char	*find_cmd(char **p, char *c);
-void	execute_cmd(t_cmd *cmd, char **envp, int mod);
+int	execute_cmd(t_cmd *cmd, char **envp, int mod, t_shell *sh);
 
-int super_exec(t_cmd *cmd, t_env **env);
+int super_exec(t_cmd *cmd, t_shell *sh);
 int apply_redir(t_cmd *cmd);
 void rm_args(t_cmd *cmd);
-int base_cmd(t_cmd *cmd, t_env **env);
+int base_cmd(t_cmd *cmd, t_shell *sh);
 
-int super_cmd(t_cmd *cmd, t_env **env);
+int super_cmd(t_cmd *cmd, t_shell *sh);
 
 #endif

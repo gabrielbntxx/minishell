@@ -1,8 +1,9 @@
 #ifndef BUILTINS_H
 # define BUILTINS_H
+#include "minishell.h"
 
 /* builtins.c */
-int dispatch(t_cmd *cmd, t_env **env);
+int dispatch(t_cmd *cmd, t_shell *sh);
 /* cd.c */
 int builtin_cd(t_env *env, char **args);
 /* echo.c */
