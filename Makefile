@@ -28,6 +28,7 @@ SRCS	= src/main.c \
 		  src/res/utils.c	\
 			src/executor/super_cmd.c \
 			src/executor/super_exec.c \
+			src/lexer/lexer_util.c \
 
 OBJS	= $(SRCS:.c=.o)
 

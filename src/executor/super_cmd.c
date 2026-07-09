@@ -41,7 +41,6 @@ int	super_cmd(t_cmd *cmd, t_env **env)
 	current = cmd;
 	while (current)
 	{
-		expand(current, env);
 		rm_args(current);
 		if (current->next)
 			if (pipe(pipe_fd) == -1)
@@ -102,7 +101,6 @@ int	base_cmd(t_cmd *cmd, t_env **env)
 	int		ret;
 	char	**array;
 
-	expand(cmd, env);
 	rm_args(cmd);
 	array = env_to_array(*env);
 	save[0] = dup(STDIN_FILENO);
