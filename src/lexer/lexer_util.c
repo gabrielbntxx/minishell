@@ -13,7 +13,7 @@
 #include "../../Includes/minishell.h"
 
 
-void	expand_tokens(t_token *tok, t_env **env)
+void	expand_tokens(t_token *tok, t_shell *sh)
 {
 	int	skip;
 
@@ -25,7 +25,7 @@ void	expand_tokens(t_token *tok, t_env **env)
 		else
 		{
 			if (!skip && tok->quote_type != SINGLE)
-				expand_one_arg(&tok->value, env);
+				expand_one_arg(&tok->value, sh);
 			skip = (skip && tok->no_space);
 		}
 		tok = tok->next;

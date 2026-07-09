@@ -85,7 +85,7 @@ static int	mini_loop(t_env **env)
 		tokens = lexer(cmd);
 		if (!validate_tokens(tokens))
 		{
-			expand_tokens(tokens, env);
+			expand_tokens(tokens, &sh);
 			merge_tokens(tokens);
 			cmds = parser(tokens);
 			free_tokens(tokens);
