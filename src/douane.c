@@ -16,7 +16,7 @@ int	syntax_error(char *token)
 	else
 		write(2, "newline", 7);
 	write(2, "'\n", 2);
-	g_exit_st = 2;
+  //sh->status = 2;
 	return (1);
 }
 

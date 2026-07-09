@@ -134,7 +134,7 @@ int	apply_redir(t_cmd *cmd)
 	return (0);
 }
 
-int	super_exec(t_cmd *cmd, t_env **env)
+int	super_exec(t_cmd *cmd, t_shell *sh)
 {
 	int	ret;
 
@@ -144,12 +144,12 @@ int	super_exec(t_cmd *cmd, t_env **env)
 	if (!cmd->args && !cmd->heredoc && !cmd->redir_in && !cmd->redir_out)
 		return (1);
 	if (cmd->next)
-		ret = super_cmd(cmd, env);
+		ret = super_cmd(cmd, sh);
 	else
-		ret = base_cmd(cmd, env);
+		ret = base_cmd(cmd, sh);
 	if (ret == -2)
 		return (-2);
 	if (ret != 0)
-		g_exit_st = ret;
+		 return(ret);
 	return (0);
 }

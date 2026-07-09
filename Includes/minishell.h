@@ -9,6 +9,14 @@
   #include <readline/readline.h>
   #include <signal.h>
 
+typedef struct s_env t_env;
+
+typedef struct s_shell
+{
+	t_env	**env;
+	int		last_status;
+  int status;
+}	t_shell;
 
   #include "res.h"
   #include "env.h"
@@ -20,7 +28,7 @@
   extern int g_exit_st;
 
   void handler0(int sig);
-  void update_exit(int status);
+  void update_exit(int status, t_shell *sh);
   void free_cmds(t_cmd *cmd);
   void free_tokens(t_token *tok);
   void free_cmds(t_cmd *cmd);

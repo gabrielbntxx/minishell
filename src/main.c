@@ -18,23 +18,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-int			g_exit_st = 0;
+int			g_signal = 0;
 
 void	handler0(int sig)
 {
 	(void)sig;
+	g_signal = 130;
 	write(1, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
 }
 
-void	update_exit(int status)
+void	update_exit(int status, t_shell *sh)
 {
 	if (WIFEXITED(status))
-		g_exit_st = WEXITSTATUS(status);
+		sh->status = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
-		g_exit_st = 128 + WTERMSIG(status);
+		sh->status = 128 + WTERMSIG(status);
 }
 
 static int	validate_tokens(t_token *tokens)
@@ -63,14 +64,19 @@ static int	mini_loop(t_env **env)
 	t_cmd	*cmds;
 	char	*cmd;
 	int		ret;
+  t_shell sh;
 
 	ret = 0;
+  sh.status = 0;
+  sh.last_status = 0;
+  sh.env = env;
 	while (1)
 	{
 		signal(SIGINT, handler0);
 		signal(SIGQUIT, SIG_IGN);
 		cmds = NULL;
 		tokens = NULL;
+    sh.last_status = sh.status;
 		cmd = readline("minishell> ");
 		if (!cmd)
 			break ;
@@ -82,16 +88,19 @@ static int	mini_loop(t_env **env)
 			cmds = parser(tokens);
 			free_tokens(tokens);
 			if (cmds)
-				ret = super_exec(cmds, env);
+				ret = super_exec(cmds, &sh);
 		}
-    else 
+    else
+    {
+      sh.status = 2;
       free_tokens(tokens);
+    }
 		free(cmd);
 		free_cmds(cmds);
 		if (ret == -2)
 			break ;
 	}
-	return (ret);
+	return (sh.status);
 }
 
 int	main(int ac, char **av, char **envp)
@@ -106,5 +115,5 @@ int	main(int ac, char **av, char **envp)
 	ret = mini_loop(&env);
 	free_env(env);
 	rl_clear_history();
-	return (g_exit_st);
+	return (ret);
 }

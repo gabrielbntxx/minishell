@@ -1,12 +1,12 @@
 #include "../../Includes/executor.h"
 
-void exit_child(t_env **env, t_cmd *cmd, int ret) {
+void exit_child(t_shell *sh, t_cmd *cmd, int ret) {
     free_cmds(cmd);
-    free_env(*env);
+    free_env(*sh->env);
     exit(ret);
 }
 
-int	super_child(int *pipe_fd, t_env **env, t_cmd *head, t_cmd *current)
+int	super_child(int *pipe_fd, t_shell *sh, t_cmd *head, t_cmd *current)
 {
 	int		ret;
 	char	**array;
@@ -23,22 +23,23 @@ int	super_child(int *pipe_fd, t_env **env, t_cmd *head, t_cmd *current)
 		close(pipe_fd[1]);
 	}
 	if (apply_redir(current))
-		exit_child(env, head, 1);
-	ret = dispatch(current, env);
+		exit_child(sh, head, 1);
+	ret = dispatch(current, sh);
 	if (ret == 1)
 	{
-    	array = env_to_array(*env);
-			execute_cmd(current, array, 0);
+    	array = env_to_array(*sh->env);
+			execute_cmd(current, array, 0, sh);
     	free_array(array);
   	}
 	if (ret == -2)
-		exit_child(env, head, ret);
+		exit_child(sh, head, sh->status);
 	if (ret == 0)
-		exit_child(env, head, 0);
-	exit_child(env, head, 127);
+		exit_child(sh, head, 0);
+	exit_child(sh, head, 127);
+	return (0);
 }
 
-int	super_cmd(t_cmd *cmd, t_env **env)
+int	super_cmd(t_cmd *cmd, t_shell *sh)
 {
 	int		pipe_fd[4];
 	int		pid;
@@ -49,7 +50,7 @@ int	super_cmd(t_cmd *cmd, t_env **env)
 	current = cmd;
 	while (current)
 	{
-		expand(current, env);
+		expand(current, sh);
 		rm_args(current);
 		if (current->next)
 			if (pipe(pipe_fd) == -1)
@@ -57,7 +58,7 @@ int	super_cmd(t_cmd *cmd, t_env **env)
 		pid = fork();
 		if (pid == 0)
 		{
-			super_child(pipe_fd, env, cmd, current);
+			super_child(pipe_fd, sh, cmd, current);
 		}
 		if (current->next)
 		{
@@ -71,7 +72,7 @@ int	super_cmd(t_cmd *cmd, t_env **env)
 		current = current->next;
 	}
 	waitpid(pid, &status, 0);
-	update_exit(status);
+	update_exit(status, sh);
 	return (status);
 }
 
@@ -83,7 +84,6 @@ void	ult_dup(int save[2], int mod)
 		dup2(save[1], STDOUT_FILENO);
 		close(save[0]);
 		close(save[1]);
-		g_exit_st = 1;
 		return ;
 	}
 	else if (mod == 2)
@@ -104,19 +104,20 @@ void	ult_dup(int save[2], int mod)
 	}
 }
 
-int	base_cmd(t_cmd *cmd, t_env **env)
+int	base_cmd(t_cmd *cmd, t_shell *sh)
 {
 	int		save[2];
 	int		ret;
 	char	**array;
 
-	expand(cmd, env);
+	expand(cmd, sh);
 	rm_args(cmd);
 	save[0] = dup(STDIN_FILENO);
 	save[1] = dup(STDOUT_FILENO);
 	if (apply_redir(cmd))
 	{
 		ult_dup(save, 3);
+    sh->status = 1;
 		return (1);
 	}
 	if (!cmd->args || !cmd->args[0])
@@ -124,10 +125,10 @@ int	base_cmd(t_cmd *cmd, t_env **env)
 		ult_dup(save, 2);
 		return (0);
 	}
-	ret = dispatch(cmd, env);
-	array = env_to_array(*env);
+	ret = dispatch(cmd, sh);
+	array = env_to_array(*sh->env);
 	if (ret == 1)
-		execute_cmd(cmd, array, 1);
+		execute_cmd(cmd, array, 1, sh);
 	ult_dup(save, 3);
 	free_array(array);
 	if (ret == -2)

@@ -78,7 +78,7 @@ static void	cmd_not_found(char **args)
 	return ;
 }
 
-int	execute_cmd(t_cmd *cmd, char **envp, int mod)
+int	execute_cmd(t_cmd *cmd, char **envp, int mod, t_shell *sh)
 {
 	char	**paths;
 	char	*cmd_path;
@@ -96,7 +96,7 @@ int	execute_cmd(t_cmd *cmd, char **envp, int mod)
 	cmd_path = find_cmd(paths, cmd->args[0]);
 	if (!cmd_path)
 	{
-		g_exit_st = 127;
+		sh->status = 127;
 		cmd_not_found(cmd->args);
 		free_array(paths);
 		return (0);
@@ -119,7 +119,7 @@ int	execute_cmd(t_cmd *cmd, char **envp, int mod)
 	signal(SIGINT, handler0);
 	free(cmd_path);
 	free_array(paths);
-	update_exit(status);
+	update_exit(status, sh);
 	return (0);
 }
 
