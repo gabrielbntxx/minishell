@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:55:06 by mguilber          #+#    #+#             */
-/*   Updated: 2026/07/08 19:38:21 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/07/08 21:57:00 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,8 @@ static int	mini_loop(t_env **env)
 		tokens = lexer(cmd);
 		if (!validate_tokens(tokens))
 		{
+			expand_tokens(tokens, env);
+			merge_tokens(tokens);
 			cmds = parser(tokens);
 			free_tokens(tokens);
 			if (cmds)

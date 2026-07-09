@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:43 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:54:43 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/07/08 21:50:42 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,33 +46,13 @@ void	add_token(t_token **head, t_token *new)
 
 static char	*scan_word(char *input, int *i)
 {
-	char	buf[4096];
-	int		j;
+	int	start;
 
-	j = 0;
-	while (input[*i] && input[*i] != ' ' && !is_operator(input[*i]))
-	{
-		if (input[*i] == '"')
-		{
-			(*i)++;
-			while (input[*i] && input[*i] != '"')
-				buf[j++] = input[(*i)++];
-			if (input[*i] == '"')
-				(*i)++;
-		}
-		else if (input[*i] == '\'')
-		{
-			(*i)++;
-			while (input[*i] && input[*i] != '\'')
-				buf[j++] = input[(*i)++];
-			if (input[*i] == '\'')
-				(*i)++;
-		}
-		else
-			buf[j++] = input[(*i)++];
-	}
-	buf[j] = '\0';
-	return (ft_strdup(buf));
+	start = *i;
+	while (input[*i] && input[*i] != ' ' && !is_operator(input[*i])
+		&& input[*i] != '\'' && input[*i] != '"')
+		(*i)++;
+	return (ft_substr(input, start, *i - start));
 }
 
 t_token	*lexer(char *input)

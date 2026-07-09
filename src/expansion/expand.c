@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   expand.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:34 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:54:35 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/07/08 22:04:35 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "../../Includes/expand.h"
 
 int	ft_isalnum(int c)
@@ -66,7 +67,7 @@ static int	replace_expand(char **arg, int y, int end, char *value)
 	return (0);
 }
 
-static int	expand_one_arg(char **arg, t_shell *sh)
+int	expand_one_arg(char **arg, t_shell *sh)
 {
 	int		y;
 	int		end;
@@ -86,24 +87,4 @@ static int	expand_one_arg(char **arg, t_shell *sh)
 		}
 	}
 	return (0);
-}
-
-void	expand(t_cmd *cmd, t_shell *sh)
-{
-	int	i;
-
-	i = 0;
-	if (cmd->redir_in && ft_strchr(cmd->redir_in, '$'))
-		expand_one_arg(&cmd->redir_in, sh);
-	if (cmd->redir_out && ft_strchr(cmd->redir_out, '$'))
-		expand_one_arg(&cmd->redir_out, sh);
-	if (cmd->heredoc && ft_strchr(cmd->heredoc, '$'))
-		expand_one_arg(&cmd->heredoc, sh);
-	while (cmd->args && cmd->args[i])
-	{
-		if (!(cmd->args_quote[i] == SINGLE))
-			if (expand_one_arg(&cmd->args[i], sh))
-				return ;
-		i++;
-	}
 }
