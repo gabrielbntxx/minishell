@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:13 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/11 13:23:42 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/07/08 19:59:41 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,13 +190,14 @@ int	builtin_export(char **cmd, t_env **nodenv)
 		else
 		{
 			key = ft_strdup(cmd[i]);
-			if (env_get(*nodenv, key, 0) || is_valid(key) == 0)
+			if (is_valid(key) == 0)
 			{
 				free(key);
 				free_array(env);
 				return (1);
 			}
-			env_set(nodenv, key, NULL);
+      if (!env_get(*nodenv, key, 0))
+			  env_set(nodenv, key, NULL);
 			free(key);
 		}
 	}

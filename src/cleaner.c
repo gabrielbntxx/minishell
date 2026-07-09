@@ -20,7 +20,7 @@ void	free_cmds(t_cmd *cmd)
 
 	while (cmd)
 	{
-		tmp = cmd->next;
+		  tmp = cmd->next;
 		if (cmd->args)
 			free_array(cmd->args);
 		if (cmd->redir_in)
@@ -31,7 +31,10 @@ void	free_cmds(t_cmd *cmd)
 			free(cmd->heredoc);
 		if (cmd->args_quote)
 			free(cmd->args_quote);
-		free(cmd);
+    //if (cmd->head)
+      //free(cmd->head);
+    if(cmd)
+		  free(cmd);
 		cmd = tmp;
 	}
 }
