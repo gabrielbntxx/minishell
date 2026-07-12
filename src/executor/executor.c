@@ -49,7 +49,7 @@ char	*find_cmd(char **paths, char *cmd)
 	i = 0;
 	if (!cmd || ft_strlen(cmd) < 1)
 		return (NULL);
-	if (!*cmd || access(cmd, F_OK) == 0)
+	if (ft_strchr(cmd, '/') != -1)
 		return (ft_strdup(cmd));
 	while (paths && paths[i])
 	{
