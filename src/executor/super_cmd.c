@@ -22,11 +22,7 @@ int	super_child(int last_fd, int *pipe_fd, t_env **env, t_cmd *current)
 	ret = dispatch(current, env);
 	if (ret == 1)
 		execute_cmd(current, array, 0);
-	if (ret == -2)
-		exit(ret);
-	if (ret == 0)
-		exit(0);
-	exit(127);
+	exit(g_exit_st);
 }
 
 int	super_cmd(t_cmd *cmd, t_env **env)
@@ -63,7 +59,9 @@ int	super_cmd(t_cmd *cmd, t_env **env)
 	}
 	waitpid(pid, &status, 0);
 	update_exit(status);
-	return (status);
+	while (wait(&status) > 0)
+		;
+	return (g_exit_st);
 }
 
 void	ult_dup(int save[2], int mod)
