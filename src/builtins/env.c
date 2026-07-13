@@ -21,7 +21,8 @@ int	builtin_env(char **envp)
 	i = 0;
 	while (envp[i] != NULL)
 	{
-		printf("%s\n", envp[i]);
+		ft_putstr_fd(envp[i], 1);
+		write(1, "\n", 1);
 		i++;
 	}
 	return (0);

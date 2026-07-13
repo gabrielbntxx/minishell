@@ -23,6 +23,7 @@ int	builtin_pwd(void)
 		perror("pwd");
 		return (1);
 	}
-	printf("%s\n", buff);
+	ft_putstr_fd(buff, 1);
+	write(1, "\n", 1);
 	return (0);
 }

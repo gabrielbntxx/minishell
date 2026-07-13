@@ -14,6 +14,13 @@
 #include "../../Includes/minishell.h"
 #include "../../Includes/parser.h"
 
+void	ft_putstr_fd(char *s, int fd)
+{
+	if (!s)
+		return ;
+	write(fd, s, ft_strlen(s));
+}
+
 int	is_n_flag(char *str)
 {
 	int	i;
@@ -46,12 +53,12 @@ int	builtin_echo(char **args)
 	}
 	while (args[i] != NULL)
 	{
-		printf("%s", args[i]);
+		ft_putstr_fd(args[i], 1);
 		if (args[i + 1] != NULL)
-			printf(" ");
+			write(1, " ", 1);
 		i++;
 	}
 	if (newline == 1)
-		printf("\n");
+		write(1, "\n", 1);
 	return (0);
 }
