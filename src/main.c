@@ -96,13 +96,12 @@ static int	mini_loop(t_env **env)
 int	main(int ac, char **av, char **envp)
 {
 	t_env	*env;
-	int		ret;
 
 	(void)ac;
 	(void)av;
 	env = NULL;
 	init_env(envp, &env);
-	ret = mini_loop(&env);
+	mini_loop(&env);
 	free_env(env);
 	return (g_exit_st);
 }
