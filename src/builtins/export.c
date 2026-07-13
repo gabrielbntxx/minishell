@@ -10,9 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "builtins.h"
-#include <stdio.h>
-#include <string.h>
+#include "../../Includes/minishell.h"
 
 char	**sort_array(char **env)
 {
@@ -113,93 +111,122 @@ void	print_export(char **env)
 	while (env[i])
 	{
 		tmp = ft_strjoin(decla, env[i]);
-		printf("%s\n", tmp);
+		ft_putstr_fd(tmp, 1);
+		write(1, "\n", 1);
 		free(tmp);
 		i++;
 	}
 	return ;
 }
 
+static int	invalid_msg(char *cmd)
+{
+	write(2, "minishell: export: `", 20);
+	write(2, cmd, ft_strlen(cmd));
+	write(2, "': not a valid identifier\n", 26);
+	return (0);
+}
+
 int	is_valid(char *cmd)
 {
 	int	i;
 
-	i = 0;
-	if (!cmd || !cmd[0])
+	if (!cmd)
 		return (0);
-	if (!((cmd[0] >= 'A' && cmd[0] <= 'Z')
-			|| (cmd[0] >= 'a' && cmd[0] <= 'z')
-			|| cmd[0] == '_'))
-	{
-		write(2, "minishell: export: `", 20);
-		write(2, cmd, ft_strlen(cmd));
-		write(2, "': not a valid identifier\n", 26);
-		return (0);
-	}
+	if (!cmd[0] || (!(cmd[0] >= 'A' && cmd[0] <= 'Z')
+			&& !(cmd[0] >= 'a' && cmd[0] <= 'z')
+			&& cmd[0] != '_'))
+		return (invalid_msg(cmd));
 	i = 1;
 	while (cmd[i])
 	{
 		if (!((cmd[i] >= 'A' && cmd[i] <= 'Z')
-				|| (cmd[i] >= 'a' && cmd[i] <= 'z') 
-				|| (cmd[i] >= '0' && cmd[i] <= '9') 
+				|| (cmd[i] >= 'a' && cmd[i] <= 'z')
+				|| (cmd[i] >= '0' && cmd[i] <= '9')
 				|| cmd[i] == '_'))
-		{
-			return (0);
-		}
+			return (invalid_msg(cmd));
 		i++;
 	}
 	return (1);
 }
 
+static int	export_append(char *arg, int sep, t_env **nodenv)
+{
+	char	*key;
+	char	*value;
+	char	*old;
+	char	*joined;
+
+	key = ft_substr(arg, 0, sep - 1);
+	if (is_valid(key) == 0)
+	{
+		free(key);
+		return (1);
+	}
+	value = ft_substr(arg, sep + 1, ft_strlen(arg) - sep - 1);
+	old = env_get(*nodenv, key, 0);
+	if (old)
+	{
+		joined = ft_strjoin(old, value);
+		env_set(nodenv, key, joined);
+		free(joined);
+	}
+	else
+		env_set(nodenv, key, value);
+	free(key);
+	free(value);
+	return (0);
+}
+
+static int	export_one(char *arg, t_env **nodenv)
+{
+	int		sep;
+	char	*key;
+	char	*value;
+
+	sep = ft_strchr(arg, '=');
+	if (sep > 0 && arg[sep - 1] == '+')
+		return (export_append(arg, sep, nodenv));
+	if (sep == -1)
+	{
+		if (is_valid(arg) == 0)
+			return (1);
+		if (!env_get(*nodenv, arg, 1))
+			env_set(nodenv, arg, NULL);
+		return (0);
+	}
+	key = ft_substr(arg, 0, sep);
+	if (is_valid(key) == 0)
+	{
+		free(key);
+		return (1);
+	}
+	value = ft_substr(arg, sep + 1, ft_strlen(arg) - sep - 1);
+	env_set(nodenv, key, value);
+	free(key);
+	free(value);
+	return (0);
+}
+
 int	builtin_export(char **cmd, t_env **nodenv)
 {
 	int		i;
+	int		ret;
 	char	**env;
-	char	*key;
-	char	*value;
-	int		sep;
-	int		len;
 
-	i = 0;
-	env = env_to_export(*nodenv);
-	env = sort_array(env);
 	if (!cmd[1])
 	{
+		env = sort_array(env_to_export(*nodenv));
 		print_export(env);
 		free_array(env);
 		return (0);
 	}
+	ret = 0;
+	i = 0;
 	while (cmd[++i])
 	{
-		sep = ft_strchr(cmd[i], '=');
-		len = ft_strlen(cmd[i]);
-		if (sep != -1)
-		{
-			key = ft_substr(cmd[i], 0, sep);
-			if (is_valid(key) == 0)
-			{
-				free_array(env);
-				free(key);
-				return (1);
-			}
-			value = ft_substr(cmd[i], sep + 1, len - sep - 1);
-			env_set(nodenv, key, value);
-			free(key);
-			free(value);
-		}
-		else
-		{
-			key = ft_strdup(cmd[i]);
-			if (env_get(*nodenv, key, 0) || is_valid(key) == 0)
-			{
-				free(key);
-				free_array(env);
-				return (1);
-			}
-			env_set(nodenv, key, NULL);
-			free(key);
-		}
+		if (export_one(cmd[i], nodenv))
+			ret = 1;
 	}
-	free_array(env);
-	return (0);
+	return (ret);
 }
