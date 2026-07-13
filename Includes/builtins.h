@@ -6,14 +6,13 @@ int dispatch(t_cmd *cmd, t_env **env);
 /* cd.c */
 int builtin_cd(t_env *env, char **args);
 /* echo.c */
+void ft_putstr_fd(char *s, int fd);
 int is_n_flag(char *str);
 int builtin_echo(char **args);
 /* env.c */
 int builtin_env(char **envp);
 /* exit.c */
-int ft_atoi(char *str);
-int is_numeric(char *str);
-int builtin_exit(char **args, int current_exit_status);
+int builtin_exit(char **args);
 /* export.c */
 char **sort_array(char **env);
 char **env_to_export(t_env *env);

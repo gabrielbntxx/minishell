@@ -46,9 +46,8 @@ int	dispatch(t_cmd *cmd, t_env **env)
 	envp = env_to_array(*env);
 	if (!ft_strcmp(cmd->args[0], "exit"))
 	{
-		g_exit_st = builtin_exit(cmd->args, g_exit_st);
 		free_array(envp);
-		return (-2);
+		return (builtin_exit(cmd->args));
 	}
 	if (handle_builtin(cmd, env, envp))
 	{
