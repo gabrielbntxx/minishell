@@ -71,7 +71,10 @@ static int	mini_loop(t_env **env)
 		signal(SIGQUIT, SIG_IGN);
 		cmds = NULL;
 		tokens = NULL;
-		cmd = readline("minishell> ");
+		if (isatty(STDIN_FILENO))
+			cmd = readline("minishell> ");
+		else
+			cmd = read_line_notty();
 		if (!cmd)
 			break ;
 		if (*cmd)
