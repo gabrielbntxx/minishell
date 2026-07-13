@@ -17,6 +17,7 @@ typedef struct s_cmd
     int     *args_quote;
     t_redir *redirs;      // toutes les redirections < > >>, dans l'ordre
     char    *heredoc;     // délimiteur pour <<
+    int     hd_fd;        // fd de lecture du heredoc deja lu (-1 sinon)
     struct s_cmd    *next;   // commande suivante (après |)
 }   t_cmd;
 

@@ -58,7 +58,10 @@ static void	heredoc_read(int fd, char *del)
 	signal(SIGQUIT, SIG_IGN);
 	while (1)
 	{
-		str = readline(">");
+		if (isatty(STDIN_FILENO))
+			str = readline(">");
+		else
+			str = read_line_notty();
 		if (!str)
 			break ;
 		if (!ft_strcmp(str, del))
@@ -98,8 +101,27 @@ void	handl_heredoc(t_cmd *cmd)
 	}
 	waitpid(pid, NULL, 0);
 	close(hd[1]);
-	dup2(hd[0], STDIN_FILENO);
-	close(hd[0]);
+	cmd->hd_fd = hd[0];
+}
+
+static void	prepare_heredocs(t_cmd *cmd)
+{
+	while (cmd)
+	{
+		handl_heredoc(cmd);
+		cmd = cmd->next;
+	}
+}
+
+static void	close_heredocs(t_cmd *cmd)
+{
+	while (cmd)
+	{
+		if (cmd->hd_fd != -1)
+			close(cmd->hd_fd);
+		cmd->hd_fd = -1;
+		cmd = cmd->next;
+	}
 }
 
 int	super_exec(t_cmd *cmd, t_env **env)
@@ -111,10 +133,12 @@ int	super_exec(t_cmd *cmd, t_env **env)
 		return (0);
 	if (!cmd->args && !cmd->heredoc && !cmd->redirs)
 		return (1);
+	prepare_heredocs(cmd);
 	if (cmd->next)
 		ret = super_cmd(cmd, env);
 	else
 		ret = base_cmd(cmd, env);
+	close_heredocs(cmd);
 	if (ret == -2)
 		return (-2);
 	if (ret != 0)

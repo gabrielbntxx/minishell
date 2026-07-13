@@ -65,7 +65,12 @@ int	apply_redir(t_cmd *cmd)
 {
 	t_redir	*redir;
 
-	handl_heredoc(cmd);
+	if (cmd->hd_fd != -1)
+	{
+		dup2(cmd->hd_fd, STDIN_FILENO);
+		close(cmd->hd_fd);
+		cmd->hd_fd = -1;
+	}
 	redir = cmd->redirs;
 	while (redir)
 	{
