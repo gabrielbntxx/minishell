@@ -13,6 +13,11 @@
 #include "../../Includes/lexer.h"
 #include "../../Includes/minishell.h"
 
+int	is_blank(char c)
+{
+	return (c == ' ' || c == '\t');
+}
+
 int	is_operator(char c)
 {
 	if (c != '<' && c != '>' && c != '|')
@@ -66,7 +71,7 @@ int	handle_single_quote(char *input, int *i, t_token **head)
 		return (-1);
 	word = ft_substr(input, start, *i - start); // 5. Extraire
 	(*i)++;
-	no_space = (input[*i] != ' ' && input[*i] != '\0');
+	no_space = (input[*i] != '\0' && !is_blank(input[*i]));
 	add_token(head, new_token(WORD, word, SINGLE, no_space)); // 6. Ajouter
 	free(word);
 	return (0);
@@ -86,7 +91,7 @@ int	handle_double_quote(char *input, int *i, t_token **head)
 		return (-1);
 	word = ft_substr(input, start, *i - start); // 5. Extraire
 	(*i)++;
-	no_space = (input[*i] != ' ' && input[*i] != '\0');
+	no_space = (input[*i] != '\0' && !is_blank(input[*i]));
 	add_token(head, new_token(WORD, word, DOUBLE, no_space)); // 6. Ajouter
 	free(word);
 	return (0);

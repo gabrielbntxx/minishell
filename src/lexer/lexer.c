@@ -49,7 +49,7 @@ static char	*scan_word(char *input, int *i)
 	int	start;
 
 	start = *i;
-	while (input[*i] && input[*i] != ' ' && !is_operator(input[*i])
+	while (input[*i] && !is_blank(input[*i]) && !is_operator(input[*i])
 		&& input[*i] != '\'' && input[*i] != '"')
 		(*i)++;
 	return (ft_substr(input, start, *i - start));
@@ -66,7 +66,7 @@ t_token	*lexer(char *input)
 	i = 0;
 	while (input[i] != '\0')
 	{
-		while (input[i] == ' ')
+		while (is_blank(input[i]))
 			i++;
 		if (input[i] == '\0')
 			break ;
@@ -79,7 +79,7 @@ t_token	*lexer(char *input)
 		else
 		{
 			word = scan_word(input, &i);
-			no_space = (input[i] != ' ' && input[i] != '\0'
+			no_space = (input[i] != '\0' && !is_blank(input[i])
 					&& !is_operator(input[i]));
 			add_token(&head, new_token(WORD, word, NONE, no_space));
 			free(word);

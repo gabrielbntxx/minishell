@@ -13,21 +13,52 @@
 #include "../../Includes/minishell.h"
 
 
+static void	word_fixups(t_token *tok, t_env **env, int start)
+{
+	char	*home;
+	char	*joined;
+	int		len;
+
+	len = ft_strlen(tok->value);
+	if (len > 0 && tok->value[len - 1] == '$' && tok->quote_type == NONE
+		&& tok->no_space && tok->next && tok->next->type == WORD
+		&& tok->next->quote_type != NONE)
+		tok->value[len - 1] = '\0';
+	if (!start || tok->quote_type != NONE || tok->value[0] != '~'
+		|| (tok->value[1] && tok->value[1] != '/'))
+		return ;
+	home = env_get(*env, "HOME", 0);
+	if (!home)
+		return ;
+	joined = ft_strjoin(home, tok->value + 1);
+	if (!joined)
+		return ;
+	free(tok->value);
+	tok->value = joined;
+}
+
 void	expand_tokens(t_token *tok, t_env **env)
 {
 	int	skip;
+	int	start;
 
 	skip = 0;
+	start = 1;
 	while (tok)
 	{
 		if (tok->type != WORD)
 			skip = (tok->type == HEREDOC);
 		else
 		{
+			if (!skip)
+				word_fixups(tok, env, start);
 			if (!skip && tok->quote_type != SINGLE)
 				expand_one_arg(&tok->value, env);
 			skip = (skip && tok->no_space);
+			start = !tok->no_space;
 		}
+		if (tok->type != WORD)
+			start = 1;
 		tok = tok->next;
 	}
 }
@@ -62,3 +93,24 @@ void	merge_tokens(t_token *tok)
 	}
 }
 
+
+char	*read_line_notty(void)
+{
+	char	buf[4096];
+	int		i;
+	int		r;
+
+	i = 0;
+	r = 1;
+	while (i < 4095)
+	{
+		r = read(STDIN_FILENO, buf + i, 1);
+		if (r <= 0 || buf[i] == '\n')
+			break ;
+		i++;
+	}
+	if (i == 0 && r <= 0)
+		return (NULL);
+	buf[i] = '\0';
+	return (ft_strdup(buf));
+}

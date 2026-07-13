@@ -35,6 +35,7 @@ typedef struct s_token
 //int	    ft_strlen(const char *str);
 int     get_operator_token(char *input, int *i, t_token **head);
 int    is_operator(char c);
+int    is_blank(char c);
 t_token *new_token(t_token_type type, char *value, t_quote_type quote, int no_space);                                                                     
 void    add_token(t_token **head, t_token *new);                               
 t_token *lexer(char *input);                                                   

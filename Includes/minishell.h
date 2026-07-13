@@ -21,6 +21,7 @@
 
   void handler0(int sig);
   void update_exit(int status);
+  char *read_line_notty(void);
   void free_cmds(t_cmd *cmd);
   void free_tokens(t_token *tok);
   void free_cmds(t_cmd *cmd);
