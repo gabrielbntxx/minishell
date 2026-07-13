@@ -14,6 +14,19 @@ void	free_tokens(t_token *tok)
 	}
 }
 
+static void	free_redirs(t_redir *redir)
+{
+	t_redir	*tmp;
+
+	while (redir)
+	{
+		tmp = redir->next;
+		free(redir->file);
+		free(redir);
+		redir = tmp;
+	}
+}
+
 void	free_cmds(t_cmd *cmd)
 {
 	t_cmd	*tmp;
@@ -23,10 +36,7 @@ void	free_cmds(t_cmd *cmd)
 		tmp = cmd->next;
 		if (cmd->args)
 			free_array(cmd->args);
-		if (cmd->redir_in)
-			free(cmd->redir_in);
-		if (cmd->redir_out)
-			free(cmd->redir_out);
+		free_redirs(cmd->redirs);
 		if (cmd->heredoc)
 			free(cmd->heredoc);
 		if (cmd->args_quote)

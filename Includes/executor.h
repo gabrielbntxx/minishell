@@ -16,6 +16,7 @@ void	execute_cmd(t_cmd *cmd, char **envp, int mod);
 
 int super_exec(t_cmd *cmd, t_env **env);
 int apply_redir(t_cmd *cmd);
+void handl_heredoc(t_cmd *cmd);
 void rm_args(t_cmd *cmd);
 int base_cmd(t_cmd *cmd, t_env **env);
 

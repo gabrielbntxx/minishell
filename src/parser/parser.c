@@ -22,9 +22,7 @@ t_cmd	*new_cmd(void)
 	if (cmd == NULL)
 		return (NULL);
 	cmd->args = NULL;
-	cmd->redir_in = NULL;
-	cmd->redir_out = NULL;
-	cmd->append = 0;
+	cmd->redirs = NULL;
 	cmd->heredoc = NULL;
 	cmd->next = NULL;
 	cmd->args_quote = NULL;
@@ -94,20 +92,13 @@ void	handle_redir(t_token **token, t_cmd *cmd)
 	*token = (*token)->next;
 	if (!*token)
 		return ;
-	if (type == REDIR_IN)
-		cmd->redir_in = ft_strdup((*token)->value);
-	else if (type == REDIR_OUT)
+	if (type == HEREDOC)
 	{
-		cmd->redir_out = ft_strdup((*token)->value);
-		cmd->append = 0;
-	}
-	else if (type == APPEND)
-	{
-		cmd->redir_out = ft_strdup((*token)->value);
-		cmd->append = 1;
-	}
-	else if (type == HEREDOC)
+		free(cmd->heredoc);
 		cmd->heredoc = ft_strdup((*token)->value);
+	}
+	else
+		add_redir(cmd, type, (*token)->value);
 }
 
 t_cmd	*parser(t_token *tokens)
@@ -138,8 +129,9 @@ t_cmd	*parser(t_token *tokens)
 
 void	print_cmds(t_cmd *head)
 {
-	int	i;
-	int	cmd_num;
+	int		i;
+	int		cmd_num;
+	t_redir	*r;
 
 	cmd_num = 1;
 	while (head)
@@ -153,9 +145,12 @@ void	print_cmds(t_cmd *head)
 				printf("%s ", head->args[i++]);
 		}
 		printf("\n");
-		printf("redir_in: %s\n", head->redir_in ? head->redir_in : "(null)");
-		printf("redir_out: %s\n", head->redir_out ? head->redir_out : "(null)");
-		printf("append: %d\n", head->append);
+		r = head->redirs;
+		while (r)
+		{
+			printf("redir type %d: %s\n", r->type, r->file);
+			r = r->next;
+		}
 		printf("heredoc: %s\n", head->heredoc ? head->heredoc : "(null)");
 		if (head->next)
 			printf("--- PIPE ---\n");
