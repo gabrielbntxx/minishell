@@ -22,7 +22,7 @@ static int	handle_builtin(t_cmd *cmd, t_env **env, char **envp)
 	if (!ft_strcmp(this, "export"))
 		ret = builtin_export(cmd->args, env);
 	else if (!ft_strcmp(this, "env"))
-		ret = builtin_env(envp);
+		ret = builtin_env(cmd->args, envp);
 	else if (!ft_strcmp(this, "pwd"))
 		ret = builtin_pwd();
 	else if (!ft_strcmp(this, "cd"))
@@ -30,7 +30,7 @@ static int	handle_builtin(t_cmd *cmd, t_env **env, char **envp)
 	else if (!ft_strcmp(this, "echo"))
 		ret = builtin_echo(cmd->args);
 	else if (!ft_strcmp(this, "unset"))
-		builtin_unset(cmd->args, env);
+		ret = builtin_unset(cmd->args, env);
 	else
 		return (1);
 	g_exit_st = ret;

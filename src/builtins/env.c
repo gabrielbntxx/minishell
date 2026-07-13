@@ -14,10 +14,17 @@
 #include "../../Includes/minishell.h"
 #include "../../Includes/parser.h"
 
-int	builtin_env(char **envp)
+int	builtin_env(char **args, char **envp)
 {
 	int	i;
 
+	if (args[1])
+	{
+		write(2, "env: ", 5);
+		write(2, args[1], ft_strlen(args[1]));
+		write(2, ": No such file or directory\n", 28);
+		return (127);
+	}
 	i = 0;
 	while (envp[i] != NULL)
 	{

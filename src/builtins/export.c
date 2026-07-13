@@ -184,6 +184,13 @@ static int	export_one(char *arg, t_env **nodenv)
 	char	*key;
 	char	*value;
 
+	if (arg[0] == '-' && arg[1])
+	{
+		write(2, "minishell: export: `", 20);
+		write(2, arg, ft_strlen(arg));
+		write(2, "': invalid option\n", 18);
+		return (2);
+	}
 	sep = ft_strchr(arg, '=');
 	if (sep > 0 && arg[sep - 1] == '+')
 		return (export_append(arg, sep, nodenv));
@@ -211,6 +218,7 @@ static int	export_one(char *arg, t_env **nodenv)
 int	builtin_export(char **cmd, t_env **nodenv)
 {
 	int		i;
+	int		r;
 	int		ret;
 	char	**env;
 
@@ -225,7 +233,10 @@ int	builtin_export(char **cmd, t_env **nodenv)
 	i = 0;
 	while (cmd[++i])
 	{
-		if (export_one(cmd[i], nodenv))
+		r = export_one(cmd[i], nodenv);
+		if (r == 2)
+			return (2);
+		if (r == 1)
 			ret = 1;
 	}
 	return (ret);

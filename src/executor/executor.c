@@ -104,7 +104,13 @@ void	execute_cmd(t_cmd *cmd, char **envp, int mod)
 	{
 		free_array(paths);
 		execve(cmd_path, cmd->args, envp);
-		perror("minishell");
+		write(2, "minishell: ", 11);
+		perror(cmd->args[0]);
+		if (access(cmd_path, F_OK) != 0)
+		{
+			free(cmd_path);
+			exit(127);
+		}
 		free(cmd_path);
 		exit(126);
 	}

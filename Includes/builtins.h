@@ -10,7 +10,7 @@ void ft_putstr_fd(char *s, int fd);
 int is_n_flag(char *str);
 int builtin_echo(char **args);
 /* env.c */
-int builtin_env(char **envp);
+int builtin_env(char **args, char **envp);
 /* exit.c */
 int builtin_exit(char **args);
 /* export.c */
@@ -21,7 +21,7 @@ int builtin_export(char **cmd, t_env **nodenv);
 /* pwd.c */
 int builtin_pwd(void);
 /* unset.c */
-void builtin_unset(char **args, t_env **env);
+int builtin_unset(char **args, t_env **env);
 
 
 #endif
