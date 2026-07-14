@@ -12,7 +12,6 @@
 
 #include "../../Includes/minishell.h"
 
-
 static void	word_fixups(t_token *tok, t_env **env, int start)
 {
 	char	*home;
@@ -63,7 +62,6 @@ void	expand_tokens(t_token *tok, t_env **env)
 	}
 }
 
-
 static void	merge_pair(t_token *tok)
 {
 	t_token	*next;
@@ -92,7 +90,6 @@ void	merge_tokens(t_token *tok)
 			tok = tok->next;
 	}
 }
-
 
 char	*read_line_notty(void)
 {

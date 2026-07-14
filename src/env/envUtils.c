@@ -37,9 +37,24 @@ static void	exist_node(t_env *node, char *value)
 	return ;
 }
 
+static t_env	*new_node(char *key, char *value)
+{
+	t_env	*node;
+
+	node = malloc(sizeof(t_env));
+	if (!node)
+		return (NULL);
+	node->key = ft_strdup(key);
+	if (value)
+		node->value = ft_strdup(value);
+	else
+		node->value = NULL;
+	node->next = NULL;
+	return (node);
+}
+
 void	env_set(t_env **env, char *key, char *value)
 {
-	t_env	*current;
 	t_env	*node;
 	t_env	*tmp;
 
@@ -51,24 +66,18 @@ void	env_set(t_env **env, char *key, char *value)
 		exist_node(node, value);
 		return ;
 	}
-	current = malloc(sizeof(t_env));
-	if (!current)
+	node = new_node(key, value);
+	if (!node)
 		return ;
-	current->key = ft_strdup(key);
-	if (value)
-		current->value = ft_strdup(value);
-	else
-		current->value = NULL;
-	current->next = NULL;
-	if (*env)
+	if (!*env)
 	{
-		tmp = *env;
-		while (tmp->next)
-			tmp = tmp->next;
-		tmp->next = current;
+		*env = node;
+		return ;
 	}
-	else
-		*env = current;
+	tmp = *env;
+	while (tmp->next)
+		tmp = tmp->next;
+	tmp->next = node;
 }
 
 void	env_unset(t_env **env, char *key)

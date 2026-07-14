@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:47 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/02 20:54:47 by mguilber         ###   ########.fr       */
+/*   Updated: 2026/07/14 00:00:00 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,72 +27,47 @@ int	is_operator(char c)
 	return (1);
 }
 
+static int	add_op(t_token **head, t_token_type type, char *val, int len)
+{
+	add_token(head, new_token(type, val, NONE, 0));
+	return (len);
+}
+
 int	get_operator_token(char *input, int *i, t_token **head)
 {
 	if (input[*i] == '|')
-	{
-		add_token(head, new_token(PIPE, "|", NONE, 0));
-		return (1);
-	}
-	else if (input[*i] == '>' && input[*i + 1] == '>')
-	{
-		add_token(head, new_token(APPEND, ">>", NONE, 0));
-		return (2);
-	}
-	else if (input[*i] == '<' && input[*i + 1] == '<')
-	{
-		add_token(head, new_token(HEREDOC, "<<", NONE, 0));
-		return (2);
-	}
-	else if (input[*i] == '>')
-	{
-		add_token(head, new_token(REDIR_OUT, ">", NONE, 0));
-		return (1);
-	}
-	else if (input[*i] == '<')
-	{
-		add_token(head, new_token(REDIR_IN, "<", NONE, 0));
-		return (1);
-	}
+		return (add_op(head, PIPE, "|", 1));
+	if (input[*i] == '>' && input[*i + 1] == '>')
+		return (add_op(head, APPEND, ">>", 2));
+	if (input[*i] == '<' && input[*i + 1] == '<')
+		return (add_op(head, HEREDOC, "<<", 2));
+	if (input[*i] == '>')
+		return (add_op(head, REDIR_OUT, ">", 1));
+	if (input[*i] == '<')
+		return (add_op(head, REDIR_IN, "<", 1));
 	return (0);
 }
 
-int	handle_single_quote(char *input, int *i, t_token **head)
+int	handle_quote(char *input, int *i, t_token **head, t_quote_type qt)
 {
 	int		start;
 	int		no_space;
 	char	*word;
+	char	q;
 
+	q = '\'';
+	if (qt == DOUBLE)
+		q = '"';
 	(*i)++;
 	start = *i;
-	while (input[*i] && input[*i] != '\'')
+	while (input[*i] && input[*i] != q)
 		(*i)++;
 	if (input[*i] == '\0')
 		return (-1);
-	word = ft_substr(input, start, *i - start); // 5. Extraire
+	word = ft_substr(input, start, *i - start);
 	(*i)++;
 	no_space = (input[*i] != '\0' && !is_blank(input[*i]));
-	add_token(head, new_token(WORD, word, SINGLE, no_space)); // 6. Ajouter
-	free(word);
-	return (0);
-}
-
-int	handle_double_quote(char *input, int *i, t_token **head)
-{
-	int		start;
-	int		no_space;
-	char	*word;
-
-	(*i)++;
-	start = *i;
-	while (input[*i] && input[*i] != '"')
-		(*i)++;
-	if (input[*i] == '\0')
-		return (-1);
-	word = ft_substr(input, start, *i - start); // 5. Extraire
-	(*i)++;
-	no_space = (input[*i] != '\0' && !is_blank(input[*i]));
-	add_token(head, new_token(WORD, word, DOUBLE, no_space)); // 6. Ajouter
+	add_token(head, new_token(WORD, word, qt, no_space));
 	free(word);
 	return (0);
 }

@@ -1,29 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env.h                                              :+:      :+:    :+:   */
+/*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/02 20:54:00 by mguilber          #+#    #+#             */
+/*   Created: 2026/07/14 00:00:00 by gabrielbene       #+#    #+#             */
 /*   Updated: 2026/07/14 00:00:00 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ENV_H
-# define ENV_H
+#include "../Includes/minishell.h"
 
-typedef struct s_env
+void	handler0(int sig)
 {
-	char			*key;
-	char			*value;
-	struct s_env	*next;
-}	t_env;
+	(void)sig;
+	printf("\n");
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
+}
 
-void	*env_get(t_env *env, char *key, int option);
-void	env_set(t_env **env, char *key, char *value);
-void	env_unset(t_env **env, char *key);
-char	**env_to_array(t_env *env);
-void	init_env(char **envp, t_env **first);
-
-#endif
+void	update_exit(int status)
+{
+	if (WIFEXITED(status))
+		g_exit_st = WEXITSTATUS(status);
+	else if (WIFSIGNALED(status))
+		g_exit_st = 128 + WTERMSIG(status);
+}

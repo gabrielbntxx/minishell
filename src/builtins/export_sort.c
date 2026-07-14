@@ -1,29 +1,51 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env.h                                              :+:      :+:    :+:   */
+/*   export_sort.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/02 20:54:00 by mguilber          #+#    #+#             */
+/*   Created: 2026/07/14 00:00:00 by gabrielbene       #+#    #+#             */
 /*   Updated: 2026/07/14 00:00:00 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ENV_H
-# define ENV_H
+#include "../../Includes/minishell.h"
 
-typedef struct s_env
+static int	bubble_pass(char **env, int limit)
 {
-	char			*key;
-	char			*value;
-	struct s_env	*next;
-}	t_env;
+	int		i;
+	int		swapped;
+	char	*tmp;
 
-void	*env_get(t_env *env, char *key, int option);
-void	env_set(t_env **env, char *key, char *value);
-void	env_unset(t_env **env, char *key);
-char	**env_to_array(t_env *env);
-void	init_env(char **envp, t_env **first);
+	i = 0;
+	swapped = 0;
+	while (i < limit - 1)
+	{
+		if (ft_strcmp(env[i], env[i + 1]) > 0)
+		{
+			tmp = env[i];
+			env[i] = env[i + 1];
+			env[i + 1] = tmp;
+			swapped = 1;
+		}
+		i++;
+	}
+	return (swapped);
+}
 
-#endif
+char	**sort_array(char **env)
+{
+	int	n;
+	int	pass;
+
+	if (!env)
+		return (env);
+	n = 0;
+	while (env[n])
+		n++;
+	pass = 0;
+	while (pass < n - 1 && bubble_pass(env, n - pass))
+		pass++;
+	return (env);
+}

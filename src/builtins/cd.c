@@ -45,6 +45,11 @@ int	builtin_cd(t_env *env, char **args)
 	char	*path;
 	char	buff[1024];
 
+	if (args[1] && args[2])
+	{
+		ft_putstr_fd("minishell: cd: too many arguments\n", 2);
+		return (1);
+	}
 	path = cd_target(env, args);
 	if (!path)
 		return (1);

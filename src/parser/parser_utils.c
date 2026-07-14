@@ -1,33 +1,47 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   unset.c                                            :+:      :+:    :+:   */
+/*   parser_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/02 20:54:20 by mguilber          #+#    #+#             */
+/*   Created: 2026/07/14 00:00:00 by gabrielbene       #+#    #+#             */
 /*   Updated: 2026/07/14 00:00:00 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../../Includes/lexer.h"
 #include "../../Includes/minishell.h"
+#include "../../Includes/parser.h"
 
-int	builtin_unset(char **args, t_env **env)
+void	add_cmd(t_cmd **head, t_cmd *new)
 {
-	int	i;
+	t_cmd	*current_cmd;
 
-	i = 1;
-	while (args[i])
+	if (*head == NULL)
 	{
-		if (args[i][0] == '-' && args[i][1])
-		{
-			write(2, "minishell: unset: `", 19);
-			write(2, args[i], ft_strlen(args[i]));
-			write(2, "': invalid option\n", 18);
-			return (2);
-		}
-		env_unset(env, args[i]);
-		i++;
+		*head = new;
+		return ;
 	}
-	return (0);
+	current_cmd = *head;
+	while (current_cmd->next != NULL)
+		current_cmd = current_cmd->next;
+	current_cmd->next = new;
+}
+
+void	handle_redir(t_token **token, t_cmd *cmd)
+{
+	t_token_type	type;
+
+	type = (*token)->type;
+	*token = (*token)->next;
+	if (!*token)
+		return ;
+	if (type == HEREDOC)
+	{
+		free(cmd->heredoc);
+		cmd->heredoc = ft_strdup((*token)->value);
+	}
+	else
+		add_redir(cmd, type, (*token)->value);
 }

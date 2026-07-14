@@ -55,11 +55,21 @@ static char	*scan_word(char *input, int *i)
 	return (ft_substr(input, start, *i - start));
 }
 
+static void	lex_word(char *input, int *i, t_token **head)
+{
+	char	*word;
+	int		no_space;
+
+	word = scan_word(input, i);
+	no_space = (input[*i] != '\0' && !is_blank(input[*i])
+			&& !is_operator(input[*i]));
+	add_token(head, new_token(WORD, word, NONE, no_space));
+	free(word);
+}
+
 t_token	*lexer(char *input)
 {
 	t_token	*head;
-	int		no_space;
-	char	*word;
 	int		i;
 
 	head = NULL;
@@ -71,32 +81,13 @@ t_token	*lexer(char *input)
 		if (input[i] == '\0')
 			break ;
 		if (input[i] == '\'')
-			handle_single_quote(input, &i, &head);
+			handle_quote(input, &i, &head, SINGLE);
 		else if (input[i] == '"')
-			handle_double_quote(input, &i, &head);
+			handle_quote(input, &i, &head, DOUBLE);
 		else if (is_operator(input[i]))
 			i += get_operator_token(input, &i, &head);
 		else
-		{
-			word = scan_word(input, &i);
-			no_space = (input[i] != '\0' && !is_blank(input[i])
-					&& !is_operator(input[i]));
-			add_token(&head, new_token(WORD, word, NONE, no_space));
-			free(word);
-		}
+			lex_word(input, &i, &head);
 	}
 	return (head);
-}
-
-void	print_tokens(t_token *head)
-{
-	t_token	*current;
-
-	current = head;
-	while (current != NULL)
-	{
-		printf("[%d] \"%s\" (no_space: %d)\n", current->type, current->value,
-				current->no_space);
-		current = current->next;
-	}
 }

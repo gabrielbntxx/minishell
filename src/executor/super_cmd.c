@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   super_cmd.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/02 20:54:00 by mguilber          #+#    #+#             */
+/*   Updated: 2026/07/14 00:00:00 by gabrielbene      ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../Includes/executor.h"
 
 int	super_child(int last_fd, int *pipe_fd, t_env **env, t_cmd *current)
@@ -25,6 +37,29 @@ int	super_child(int last_fd, int *pipe_fd, t_env **env, t_cmd *current)
 	exit(g_exit_st);
 }
 
+static int	fork_child(t_cmd *current, int last_fd, int *pipe_fd, t_env **env)
+{
+	int	pid;
+
+	pid = fork();
+	if (pid == 0)
+		super_child(last_fd, pipe_fd, env, current);
+	return (pid);
+}
+
+static void	link_pipe(t_cmd *current, int *last_fd, int *pipe_fd)
+{
+	if (current->next)
+	{
+		if (*last_fd != -1)
+			close(*last_fd);
+		close(pipe_fd[1]);
+		*last_fd = pipe_fd[0];
+	}
+	else if (*last_fd != -1)
+		close(*last_fd);
+}
+
 int	super_cmd(t_cmd *cmd, t_env **env)
 {
 	int		pipe_fd[2];
@@ -38,23 +73,10 @@ int	super_cmd(t_cmd *cmd, t_env **env)
 	while (current)
 	{
 		rm_args(current);
-		if (current->next)
-			if (pipe(pipe_fd) == -1)
-				return (1);
-		pid = fork();
-		if (pid == 0)
-		{
-			super_child(last_fd, pipe_fd, env, current);
-		}
-		if (current->next)
-		{
-			if (last_fd != -1)
-				close(last_fd);
-			close(pipe_fd[1]);
-			last_fd = pipe_fd[0];
-		}
-		else if (last_fd != -1)
-			close(last_fd);
+		if (current->next && pipe(pipe_fd) == -1)
+			return (1);
+		pid = fork_child(current, last_fd, pipe_fd, env);
+		link_pipe(current, &last_fd, pipe_fd);
 		current = current->next;
 	}
 	waitpid(pid, &status, 0);
@@ -62,63 +84,4 @@ int	super_cmd(t_cmd *cmd, t_env **env)
 	while (wait(&status) > 0)
 		;
 	return (g_exit_st);
-}
-
-void	ult_dup(int save[2], int mod)
-{
-	if (mod == 1)
-	{
-		dup2(save[0], STDIN_FILENO);
-		dup2(save[1], STDOUT_FILENO);
-		close(save[0]);
-		close(save[1]);
-		g_exit_st = 1;
-		return ;
-	}
-	else if (mod == 2)
-	{
-		dup2(save[0], STDIN_FILENO);
-		dup2(save[1], STDOUT_FILENO);
-		close(save[0]);
-		close(save[1]);
-		return ;
-	}
-	else if (mod == 3)
-	{
-		dup2(save[0], STDIN_FILENO);
-		dup2(save[1], STDOUT_FILENO);
-		close(save[0]);
-		close(save[1]);
-		return ;
-	}
-}
-
-int	base_cmd(t_cmd *cmd, t_env **env)
-{
-	int		save[2];
-	int		ret;
-	char	**array;
-
-	rm_args(cmd);
-	array = env_to_array(*env);
-	save[0] = dup(STDIN_FILENO);
-	save[1] = dup(STDOUT_FILENO);
-	if (apply_redir(cmd))
-	{
-		ult_dup(save, 3);
-		return (1);
-	}
-	if (!cmd->args || !cmd->args[0])
-	{
-		ult_dup(save, 2);
-		return (0);
-	}
-	ret = dispatch(cmd, env);
-	if (ret == 1)
-		execute_cmd(cmd, array, 1);
-	ult_dup(save, 3);
-	free_array(array);
-	if (ret == -2)
-		return (-2);
-	return (0);
 }

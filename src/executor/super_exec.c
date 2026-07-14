@@ -13,7 +13,6 @@
 #include "../../Includes/env.h"
 #include "../../Includes/executor.h"
 #include "../../Includes/minishell.h"
-#include <stdio.h>
 
 void	rm_args(t_cmd *cmd)
 {
@@ -40,70 +39,6 @@ void	rm_args(t_cmd *cmd)
 	cmd->args_quote[j] = 0;
 }
 
-static void	handler1(int sig)
-{
-	(void)sig;
-	// printf("\n");
-	// rl_on_new_line();
-	// rl_replace_line("", 0);
-	// rl_redisplay();
-	exit(0);
-}
-
-static void	heredoc_read(int fd, char *del)
-{
-	char	*str;
-
-	signal(SIGINT, handler1);
-	signal(SIGQUIT, SIG_IGN);
-	while (1)
-	{
-		if (isatty(STDIN_FILENO))
-			str = readline(">");
-		else
-			str = read_line_notty();
-		if (!str)
-			break ;
-		if (!ft_strcmp(str, del))
-		{
-			free(str);
-			break ;
-		}
-		write(fd, str, ft_strlen(str));
-		write(fd, "\n", 1);
-		free(str);
-	}
-}
-
-void	handl_heredoc(t_cmd *cmd)
-{
-	int	hd[2];
-	int	pid;
-
-	if (!cmd->heredoc)
-		return ;
-	if (pipe(hd) == -1)
-		return ;
-	pid = fork();
-	if (pid == 0)
-	{
-		close(hd[0]);
-		dup2(2, 1);
-		heredoc_read(hd[1], cmd->heredoc);
-		close(hd[1]);
-		exit(0);
-	}
-	if (pid == -1)
-	{
-		close(hd[0]);
-		close(hd[1]);
-		return ;
-	}
-	waitpid(pid, NULL, 0);
-	close(hd[1]);
-	cmd->hd_fd = hd[0];
-}
-
 static void	prepare_heredocs(t_cmd *cmd)
 {
 	while (cmd)
@@ -128,7 +63,6 @@ int	super_exec(t_cmd *cmd, t_env **env)
 {
 	int	ret;
 
-	// char **array;
 	if (!cmd)
 		return (0);
 	if (!cmd->args && !cmd->heredoc && !cmd->redirs)

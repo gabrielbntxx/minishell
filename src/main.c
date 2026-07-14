@@ -6,7 +6,7 @@
 /*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:55:06 by mguilber          #+#    #+#             */
-/*   Updated: 2026/07/08 21:57:00 by gabrielbene      ###   ########.fr       */
+/*   Updated: 2026/07/14 00:00:00 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,23 +19,6 @@
 #include <string.h>
 
 int			g_exit_st = 0;
-
-void	handler0(int sig)
-{
-	(void)sig;
-	printf("\n");
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
-}
-
-void	update_exit(int status)
-{
-	if (WIFEXITED(status))
-		g_exit_st = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status))
-		g_exit_st = 128 + WTERMSIG(status);
-}
 
 static int	validate_tokens(t_token *tokens)
 {
@@ -57,10 +40,29 @@ static int	validate_tokens(t_token *tokens)
 	return (0);
 }
 
-static int	mini_loop(t_env **env)
+static int	process_line(char *cmd, t_env **env)
 {
 	t_token	*tokens;
 	t_cmd	*cmds;
+	int		ret;
+
+	ret = 0;
+	cmds = NULL;
+	tokens = lexer(cmd);
+	if (!validate_tokens(tokens))
+	{
+		expand_tokens(tokens, env);
+		merge_tokens(tokens);
+		cmds = parser(tokens);
+		if (cmds)
+			ret = super_exec(cmds, env);
+	}
+	free_all(tokens, cmds);
+	return (ret);
+}
+
+static int	mini_loop(t_env **env)
+{
 	char	*cmd;
 	int		ret;
 
@@ -69,8 +71,6 @@ static int	mini_loop(t_env **env)
 	{
 		signal(SIGINT, handler0);
 		signal(SIGQUIT, SIG_IGN);
-		cmds = NULL;
-		tokens = NULL;
 		if (isatty(STDIN_FILENO))
 			cmd = readline("minishell> ");
 		else
@@ -79,17 +79,8 @@ static int	mini_loop(t_env **env)
 			break ;
 		if (*cmd)
 			add_history(cmd);
-		tokens = lexer(cmd);
-		if (!validate_tokens(tokens))
-		{
-			expand_tokens(tokens, env);
-			merge_tokens(tokens);
-			cmds = parser(tokens);
-			if (cmds)
-				ret = super_exec(cmds, env);
-		}
+		ret = process_line(cmd, env);
 		free(cmd);
-		free_all(tokens, cmds);
 		if (ret == -2)
 			break ;
 	}
