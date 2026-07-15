@@ -25,16 +25,17 @@ void	free_array(char **a);
 char	**find_path(char **envp);
 char	*find_cmd(char **p, char *c);
 void	cmd_not_found(char **args);
-void	execute_cmd(t_cmd *cmd, char **envp, int mod);
+void	execute_cmd(t_cmd *cmd, char **envp, int mod, t_shell *sh);
 
-int		super_exec(t_cmd *cmd, t_env **env);
+int		super_exec(t_cmd *cmd, t_shell *sh);
 int		apply_redir(t_cmd *cmd);
-void	handl_heredoc(t_cmd *cmd);
+void	handl_heredoc(t_cmd *cmd, t_shell *sh);
 void	rm_args(t_cmd *cmd);
-int		base_cmd(t_cmd *cmd, t_env **env);
+int		base_cmd(t_cmd *cmd, t_shell *sh);
 
-int		super_cmd(t_cmd *cmd, t_env **env);
-int		super_child(int last_fd, int *pipe_fd, t_env **env, t_cmd *current);
+int		super_cmd(t_cmd *cmd, t_shell *sh);
+int		super_child(int last_fd, int *pipe_fd, t_shell *sh, t_cmd *current);
 void	ult_dup(int save[2], int mod);
+void exit_child(t_shell *sh, int ret, char **array);
 
 #endif

@@ -12,7 +12,7 @@
 
 #include "../../Includes/minishell.h"
 
-static int	handle_builtin(t_cmd *cmd, t_env **env, char **envp)
+static int	handle_builtin(t_cmd *cmd, t_shell *sh, char **envp)
 {
 	char	*this;
 	int		ret;
@@ -20,36 +20,36 @@ static int	handle_builtin(t_cmd *cmd, t_env **env, char **envp)
 	this = cmd->args[0];
 	ret = 0;
 	if (!ft_strcmp(this, "export"))
-		ret = builtin_export(cmd->args, env);
+		ret = builtin_export(cmd->args, sh->env);
 	else if (!ft_strcmp(this, "env"))
 		ret = builtin_env(cmd->args, envp);
 	else if (!ft_strcmp(this, "pwd"))
 		ret = builtin_pwd();
 	else if (!ft_strcmp(this, "cd"))
-		ret = builtin_cd(*env, cmd->args);
+		ret = builtin_cd(*sh->env, cmd->args);
 	else if (!ft_strcmp(this, "echo"))
 		ret = builtin_echo(cmd->args);
 	else if (!ft_strcmp(this, "unset"))
-		ret = builtin_unset(cmd->args, env);
+		ret = builtin_unset(cmd->args, sh->env);
 	else
 		return (1);
-	g_exit_st = ret;
+	sh->status = ret;
 	return (0);
 }
 
-int	dispatch(t_cmd *cmd, t_env **env)
+int	dispatch(t_cmd *cmd, t_shell *sh)
 {
 	char	**envp;
 
 	if (!cmd->args || !cmd->args[0])
 		return (0);
-	envp = env_to_array(*env);
+	envp = env_to_array(*sh->env);
 	if (!ft_strcmp(cmd->args[0], "exit"))
 	{
 		free_array(envp);
-		return (builtin_exit(cmd->args));
+		return (builtin_exit(cmd->args, sh));
 	}
-	if (handle_builtin(cmd, env, envp))
+	if (handle_builtin(cmd, sh, envp))
 	{
 		free_array(envp);
 		return (1);

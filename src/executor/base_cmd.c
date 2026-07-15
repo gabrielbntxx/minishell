@@ -14,29 +14,28 @@
 
 void	ult_dup(int save[2], int mod)
 {
+	(void)mod;
 	dup2(save[0], STDIN_FILENO);
 	dup2(save[1], STDOUT_FILENO);
 	close(save[0]);
 	close(save[1]);
-	if (mod == 1)
-		g_exit_st = 1;
 }
 
-static int	finish_base(t_cmd *cmd, t_env **env, int save[2])
+static int	finish_base(t_cmd *cmd, t_shell *sh, int save[2])
 {
 	char	**array;
 	int		ret;
 
-	array = env_to_array(*env);
-	ret = dispatch(cmd, env);
+	array = env_to_array(*sh->env);
+	ret = dispatch(cmd, sh);
 	if (ret == 1)
-		execute_cmd(cmd, array, 1);
+		execute_cmd(cmd, array, 1, sh);
 	ult_dup(save, 3);
 	free_array(array);
 	return (ret);
 }
 
-int	base_cmd(t_cmd *cmd, t_env **env)
+int	base_cmd(t_cmd *cmd, t_shell *sh)
 {
 	int	save[2];
 	int	ret;
@@ -52,9 +51,9 @@ int	base_cmd(t_cmd *cmd, t_env **env)
 	if (!cmd->args || !cmd->args[0])
 	{
 		ult_dup(save, 2);
-		return (0);
+		return (sh->status);
 	}
-	ret = finish_base(cmd, env, save);
+	ret = finish_base(cmd, sh, save);
 	if (ret == -2)
 		return (-2);
 	return (0);

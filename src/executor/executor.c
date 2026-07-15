@@ -42,7 +42,7 @@ static void	exec_child(char *cmd_path, char **args, char **envp,
 	exit(126);
 }
 
-static char	*resolve_cmd(t_cmd *cmd, char **envp, char ***paths)
+static char	*resolve_cmd(t_cmd *cmd, char **envp, char ***paths, t_shell *sh)
 {
 	char	*cmd_path;
 
@@ -55,32 +55,37 @@ static char	*resolve_cmd(t_cmd *cmd, char **envp, char ***paths)
 	cmd_path = find_cmd(*paths, cmd->args[0]);
 	if (!cmd_path)
 	{
-		g_exit_st = 127;
+		sh->status = 127;
 		cmd_not_found(cmd->args);
 		free_array(*paths);
 	}
 	return (cmd_path);
 }
 
-void	execute_cmd(t_cmd *cmd, char **envp, int mod)
+void	execute_cmd(t_cmd *cmd, char **envp, int mod, t_shell *sh)
 {
 	char	**paths;
 	char	*cmd_path;
 	int		pid;
 	int		status;
 
+	(void)sh;
 	pid = -1;
 	status = 0;
-	cmd_path = resolve_cmd(cmd, envp, &paths);
+	cmd_path = resolve_cmd(cmd, envp, &paths, sh);
 	if (!cmd_path)
 		return ;
+	if (mod == 1)
+  signal(SIGINT, handler1);
 	if (mod == 1)
 		pid = fork();
 	if (pid == 0 || mod == 0)
 		exec_child(cmd_path, cmd->args, envp, paths);
 	if (mod == 1)
 		waitpid(pid, &status, 0);
+	if (mod == 1)
+  signal(SIGINT, handler0);
 	free(cmd_path);
 	free_array(paths);
-	update_exit(status);
+	update_exit(status, sh);
 }

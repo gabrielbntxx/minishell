@@ -14,6 +14,15 @@
 #include "../../Includes/executor.h"
 #include "../../Includes/minishell.h"
 
+void exit_child(t_shell *sh, int ret, char **array) {
+    (void)ret;
+    if(array)
+      free_array(array);
+    free_cmds(sh->head);
+    free_env(*sh->env);
+    exit(sh->status);
+}
+
 void	rm_args(t_cmd *cmd)
 {
 	int	i;
@@ -39,12 +48,14 @@ void	rm_args(t_cmd *cmd)
 	cmd->args_quote[j] = 0;
 }
 
-static void	prepare_heredocs(t_cmd *cmd)
+static void	prepare_heredocs(t_cmd *cmd, t_shell *sh)
 {
 	while (cmd)
 	{
-		handl_heredoc(cmd);
+    signal(SIGINT, handler1);
+		handl_heredoc(cmd, sh);
 		cmd = cmd->next;
+    signal(SIGINT, handler0);
 	}
 }
 
@@ -59,7 +70,7 @@ static void	close_heredocs(t_cmd *cmd)
 	}
 }
 
-int	super_exec(t_cmd *cmd, t_env **env)
+int	super_exec(t_cmd *cmd, t_shell *sh)
 {
 	int	ret;
 
@@ -67,15 +78,16 @@ int	super_exec(t_cmd *cmd, t_env **env)
 		return (0);
 	if (!cmd->args && !cmd->heredoc && !cmd->redirs)
 		return (1);
-	prepare_heredocs(cmd);
+  sh->head = cmd;
+	prepare_heredocs(cmd, sh);
 	if (cmd->next)
-		ret = super_cmd(cmd, env);
+		ret = super_cmd(cmd, sh);
 	else
-		ret = base_cmd(cmd, env);
+		ret = base_cmd(cmd, sh);
 	close_heredocs(cmd);
 	if (ret == -2)
 		return (-2);
 	if (ret != 0)
-		g_exit_st = ret;
+		sh->status = ret;
 	return (0);
 }

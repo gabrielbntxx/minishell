@@ -23,25 +23,38 @@
 
 # include "res.h"
 # include "env.h"
+
+typedef struct s_env t_env;
+typedef struct s_cmd t_cmd;
+
+typedef struct s_shell
+{
+  t_env **env;
+  int last_status;
+  int status;
+  t_cmd *head;
+} t_shell;
+
 # include "executor.h"
 # include "parser.h"
 # include "lexer.h"
 # include "builtins.h"
 # include "expand.h"
 
-extern int	g_exit_st;
+extern int	g_signal;
 
 void	handler0(int sig);
-void	update_exit(int status);
+void	handler1(int sig);
+void	update_exit(int status, t_shell *sh);
 char	*read_line_notty(void);
 void	free_cmds(t_cmd *cmd);
 void	free_tokens(t_token *tok);
 void	free_env(t_env *env);
 void	free_all(t_token *tokens, t_cmd *cmds);
 int		is_redir(int type);
-int		syntax_error(char *token);
-int		token_value_error(t_token *token);
-int		check_pipe(t_token *cur);
-int		check_redir(t_token *cur);
+int		syntax_error(char *token, t_shell *sh);
+int		token_value_error(t_token *token, t_shell *sh);
+int		check_pipe(t_token *cur, t_shell *sh);
+int		check_redir(t_token *cur, t_shell *sh);
 
 #endif
