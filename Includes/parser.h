@@ -28,6 +28,7 @@ typedef struct s_cmd
 	int				*args_quote;
 	t_redir			*redirs;
 	char			*heredoc;
+	int				heredoc_expand;
 	int				hd_fd;
 	struct s_cmd	*next;
 }	t_cmd;

@@ -31,6 +31,7 @@ SRCS	= src/main.c \
 		  src/builtins/unset.c \
 			src/builtins/exit.c \
 		  src/expansion/expand.c \
+		  src/expansion/field_split.c \
 		  src/res/split.c \
 		  src/res/utils.c	\
 		  src/res/strings.c \

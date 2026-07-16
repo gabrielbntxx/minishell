@@ -22,19 +22,27 @@ char	**ft_split(char const *s, char c);
 char	*ft_strjoin(const char *s1, const char *s2);
 
 void	free_array(char **a);
-char	**find_path(char **envp);
+char	**find_path(t_env *env);
 char	*find_cmd(char **p, char *c);
 void	cmd_not_found(char **args);
-void	execute_cmd(t_cmd *cmd, char **envp, int mod);
+char	*resolve_cmd(t_cmd *cmd, t_env **env, char ***paths);
+void	exit_child(int code, t_cmd *cmd, t_env **env);
+void	execute_cmd(t_cmd *cmd, t_env **env, int mod);
 
 int		super_exec(t_cmd *cmd, t_env **env);
 int		apply_redir(t_cmd *cmd);
-void	handl_heredoc(t_cmd *cmd);
+void	handl_heredoc(t_cmd *cmd, t_env **env);
 void	rm_args(t_cmd *cmd);
 int		base_cmd(t_cmd *cmd, t_env **env);
 
+typedef struct s_pipe_ctx
+{
+	int	last_fd;
+	int	pipe_fd[2];
+}	t_pipe_ctx;
+
 int		super_cmd(t_cmd *cmd, t_env **env);
-int		super_child(int last_fd, int *pipe_fd, t_env **env, t_cmd *current);
+int		super_child(t_cmd *current, t_env **env, t_pipe_ctx *ctx);
 void	ult_dup(int save[2], int mod);
 
 #endif

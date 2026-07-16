@@ -18,6 +18,7 @@
 int		ft_strlcat(char *dst, const char *src, int size);
 int		expand_one_arg(char **arg, t_env **env);
 void	expand_tokens(t_token *tok, t_env **env);
+void	field_split(t_token **head);
 void	merge_tokens(t_token *tok);
 
 #endif

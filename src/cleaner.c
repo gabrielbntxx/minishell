@@ -26,7 +26,7 @@ void	free_tokens(t_token *tok)
 	}
 }
 
-static void	free_redirs(t_redir *redir)
+void	free_redirs(t_redir *redir)
 {
 	t_redir	*tmp;
 
@@ -70,12 +70,4 @@ void	free_env(t_env *env)
 		free(env);
 		env = tmp;
 	}
-}
-
-void	free_all(t_token *tokens, t_cmd *cmds)
-{
-	if (tokens)
-		free_tokens(tokens);
-	if (cmds)
-		free_cmds(cmds);
 }

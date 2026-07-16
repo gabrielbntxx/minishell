@@ -49,15 +49,18 @@ static int	process_line(char *cmd, t_env **env)
 	ret = 0;
 	cmds = NULL;
 	tokens = lexer(cmd);
+	free(cmd);
 	if (!validate_tokens(tokens))
 	{
 		expand_tokens(tokens, env);
+		field_split(&tokens);
 		merge_tokens(tokens);
 		cmds = parser(tokens);
-		if (cmds)
-			ret = super_exec(cmds, env);
 	}
-	free_all(tokens, cmds);
+	free_tokens(tokens);
+	if (cmds)
+		ret = super_exec(cmds, env);
+	free_cmds(cmds);
 	return (ret);
 }
 
@@ -80,7 +83,6 @@ static int	mini_loop(t_env **env)
 		if (*cmd)
 			add_history(cmd);
 		ret = process_line(cmd, env);
-		free(cmd);
 		if (ret == -2)
 			break ;
 	}

@@ -39,11 +39,11 @@ void	rm_args(t_cmd *cmd)
 	cmd->args_quote[j] = 0;
 }
 
-static void	prepare_heredocs(t_cmd *cmd)
+static void	prepare_heredocs(t_cmd *cmd, t_env **env)
 {
 	while (cmd)
 	{
-		handl_heredoc(cmd);
+		handl_heredoc(cmd, env);
 		cmd = cmd->next;
 	}
 }
@@ -67,7 +67,7 @@ int	super_exec(t_cmd *cmd, t_env **env)
 		return (0);
 	if (!cmd->args && !cmd->heredoc && !cmd->redirs)
 		return (1);
-	prepare_heredocs(cmd);
+	prepare_heredocs(cmd, env);
 	if (cmd->next)
 		ret = super_cmd(cmd, env);
 	else

@@ -24,6 +24,7 @@ t_cmd	*new_cmd(void)
 	cmd->args = NULL;
 	cmd->redirs = NULL;
 	cmd->heredoc = NULL;
+	cmd->heredoc_expand = 1;
 	cmd->hd_fd = -1;
 	cmd->next = NULL;
 	cmd->args_quote = NULL;

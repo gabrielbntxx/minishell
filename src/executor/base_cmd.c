@@ -24,15 +24,12 @@ void	ult_dup(int save[2], int mod)
 
 static int	finish_base(t_cmd *cmd, t_env **env, int save[2])
 {
-	char	**array;
-	int		ret;
+	int	ret;
 
-	array = env_to_array(*env);
 	ret = dispatch(cmd, env);
 	if (ret == 1)
-		execute_cmd(cmd, array, 1);
+		execute_cmd(cmd, env, 1);
 	ult_dup(save, 3);
-	free_array(array);
 	return (ret);
 }
 

@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:27 by mguilber          #+#    #+#             */
-/*   Updated: 2026/07/14 00:00:00 by gabrielbene      ###   ########.fr       */
+/*   Updated: 2026/07/16 00:00:00 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,43 +26,32 @@ void	free_array(char **array)
 	free(array);
 }
 
-static void	exec_child(char *cmd_path, char **args, char **envp,
-		char **paths)
+void	exit_child(int code, t_cmd *cmd, t_env **env)
 {
+	free_cmds(cmd);
+	free_env(*env);
+	exit(code);
+}
+
+static void	exec_child(char *cmd_path, t_cmd *cmd, char **paths, t_env **env)
+{
+	char	**envp;
+	int		code;
+
+	envp = env_to_array(*env);
 	free_array(paths);
-	execve(cmd_path, args, envp);
+	execve(cmd_path, cmd->args, envp);
 	write(2, "minishell: ", 11);
-	perror(args[0]);
+	perror(cmd->args[0]);
+	code = 126;
 	if (access(cmd_path, F_OK) != 0)
-	{
-		free(cmd_path);
-		exit(127);
-	}
+		code = 127;
 	free(cmd_path);
-	exit(126);
+	free_array(envp);
+	exit_child(code, cmd, env);
 }
 
-static char	*resolve_cmd(t_cmd *cmd, char **envp, char ***paths)
-{
-	char	*cmd_path;
-
-	*paths = find_path(envp);
-	if (!cmd->args || !cmd->args[0])
-	{
-		free_array(*paths);
-		return (NULL);
-	}
-	cmd_path = find_cmd(*paths, cmd->args[0]);
-	if (!cmd_path)
-	{
-		g_exit_st = 127;
-		cmd_not_found(cmd->args);
-		free_array(*paths);
-	}
-	return (cmd_path);
-}
-
-void	execute_cmd(t_cmd *cmd, char **envp, int mod)
+void	execute_cmd(t_cmd *cmd, t_env **env, int mod)
 {
 	char	**paths;
 	char	*cmd_path;
@@ -71,13 +60,18 @@ void	execute_cmd(t_cmd *cmd, char **envp, int mod)
 
 	pid = -1;
 	status = 0;
-	cmd_path = resolve_cmd(cmd, envp, &paths);
+	cmd_path = resolve_cmd(cmd, env, &paths);
 	if (!cmd_path)
 		return ;
 	if (mod == 1)
 		pid = fork();
+	if (pid == 0)
+	{
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
+	}
 	if (pid == 0 || mod == 0)
-		exec_child(cmd_path, cmd->args, envp, paths);
+		exec_child(cmd_path, cmd, paths, env);
 	if (mod == 1)
 		waitpid(pid, &status, 0);
 	free(cmd_path);

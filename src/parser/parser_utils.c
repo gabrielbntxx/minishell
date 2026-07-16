@@ -41,6 +41,7 @@ void	handle_redir(t_token **token, t_cmd *cmd)
 	{
 		free(cmd->heredoc);
 		cmd->heredoc = ft_strdup((*token)->value);
+		cmd->heredoc_expand = ((*token)->quote_type == NONE);
 	}
 	else
 		add_redir(cmd, type, (*token)->value);

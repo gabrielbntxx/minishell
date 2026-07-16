@@ -11,19 +11,25 @@
 /* ************************************************************************** */
 
 #include "../../Includes/executor.h"
+#include <sys/stat.h>
 
-char	**find_path(char **envp)
+static int	is_dir(char *path)
 {
-	int	i;
+	struct stat	st;
 
-	i = 0;
-	while (envp[i])
-	{
-		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
-			return (ft_split(envp[i] + 5, ':'));
-		i++;
-	}
-	return (NULL);
+	if (stat(path, &st) != 0)
+		return (0);
+	return (S_ISDIR(st.st_mode));
+}
+
+char	**find_path(t_env *env)
+{
+	char	*path;
+
+	path = env_get(env, "PATH", 0);
+	if (!path)
+		return (NULL);
+	return (ft_split(path, ':'));
 }
 
 char	*find_cmd(char **paths, char *cmd)
@@ -44,7 +50,7 @@ char	*find_cmd(char **paths, char *cmd)
 		free(tmp);
 		if (!path)
 			return (NULL);
-		if (access(path, F_OK) == 0)
+		if (access(path, F_OK) == 0 && !is_dir(path))
 			return (path);
 		free(path);
 	}
@@ -59,4 +65,24 @@ void	cmd_not_found(char **args)
 	}
 	write(2, ": command not found\n", 20);
 	return ;
+}
+
+char	*resolve_cmd(t_cmd *cmd, t_env **env, char ***paths)
+{
+	char	*cmd_path;
+
+	*paths = find_path(*env);
+	if (!cmd->args || !cmd->args[0])
+	{
+		free_array(*paths);
+		return (NULL);
+	}
+	cmd_path = find_cmd(*paths, cmd->args[0]);
+	if (!cmd_path)
+	{
+		g_exit_st = 127;
+		cmd_not_found(cmd->args);
+		free_array(*paths);
+	}
+	return (cmd_path);
 }
