@@ -14,7 +14,7 @@
 # define BUILTINS_H
 
 /* builtins.c */
-int		dispatch(t_cmd *cmd, t_env **env);
+int		dispatch(t_cmd *cmd, t_shell *sh);
 /* cd.c */
 int		builtin_cd(t_env *env, char **args);
 /* echo.c */
@@ -24,7 +24,7 @@ int		builtin_echo(char **args);
 /* env.c */
 int		builtin_env(char **args, char **envp);
 /* exit.c */
-int		builtin_exit(char **args);
+int		builtin_exit(char **args, t_shell *sh);
 /* export.c */
 char	**sort_array(char **env);
 char	**env_to_export(t_env *env);

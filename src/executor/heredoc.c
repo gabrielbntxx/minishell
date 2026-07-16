@@ -13,12 +13,6 @@
 #include "../../Includes/executor.h"
 #include "../../Includes/minishell.h"
 
-static void	handler1(int sig)
-{
-	(void)sig;
-	exit(0);
-}
-
 static void	heredoc_read(int fd, char *del)
 {
 	char	*str;
@@ -44,7 +38,7 @@ static void	heredoc_read(int fd, char *del)
 	}
 }
 
-void	handl_heredoc(t_cmd *cmd)
+void	handl_heredoc(t_cmd *cmd, t_shell *sh)
 {
 	int	hd[2];
 	int	pid;
@@ -60,7 +54,7 @@ void	handl_heredoc(t_cmd *cmd)
 		dup2(2, 1);
 		heredoc_read(hd[1], cmd->heredoc);
 		close(hd[1]);
-		exit(0);
+		exit_child(sh, 0, NULL);
 	}
 	if (pid == -1)
 	{

@@ -55,7 +55,7 @@ static int	parse_exit_arg(char *str, long long *out)
 	return (1);
 }
 
-int	builtin_exit(char **args)
+int	builtin_exit(char **args, t_shell *sh)
 {
 	long long	code;
 
@@ -66,15 +66,15 @@ int	builtin_exit(char **args)
 		write(2, "minishell: exit: ", 17);
 		write(2, args[1], ft_strlen(args[1]));
 		write(2, ": numeric argument required\n", 28);
-		g_exit_st = 2;
+		sh->status = 2;
 		return (-2);
 	}
 	if (args[2] != NULL)
 	{
 		write(2, "minishell: exit: too many arguments\n", 36);
-		g_exit_st = 1;
+		sh->status = 2;
 		return (0);
 	}
-	g_exit_st = (unsigned char)code;
+	sh->status = (unsigned char)code;
 	return (-2);
 }

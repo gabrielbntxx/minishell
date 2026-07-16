@@ -36,7 +36,7 @@ static void	word_fixups(t_token *tok, t_env **env, int start)
 	tok->value = joined;
 }
 
-void	expand_tokens(t_token *tok, t_env **env)
+void	expand_tokens(t_token *tok, t_shell *sh)
 {
 	int	skip;
 	int	start;
@@ -50,9 +50,9 @@ void	expand_tokens(t_token *tok, t_env **env)
 		else
 		{
 			if (!skip)
-				word_fixups(tok, env, start);
+				word_fixups(tok, sh->env, start);
 			if (!skip && tok->quote_type != SINGLE)
-				expand_one_arg(&tok->value, env);
+        expand_one_arg(&tok->value, sh);
 			skip = (skip && tok->no_space);
 			start = !tok->no_space;
 		}

@@ -24,8 +24,8 @@ static int	export_flag(char *arg, t_env **nodenv)
 {
 	if (is_valid(arg) == 0)
 		return (1);
-	if (!env_get(*nodenv, arg, 1))
-		env_set(nodenv, arg, NULL);
+	env_get(*nodenv, arg, 1);
+		//env_set(nodenv, arg, NULL);
 	return (0);
 }
 

@@ -12,19 +12,27 @@
 
 #include "../Includes/minishell.h"
 
+void handler1(int sig)
+{
+  (void)sig;
+  g_signal = 130;
+  write(1, "\n", 1);
+}
+
 void	handler0(int sig)
 {
 	(void)sig;
-	printf("\n");
+	g_signal = 130;
+	write(1, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
 }
 
-void	update_exit(int status)
+void	update_exit(int status, t_shell *sh)
 {
 	if (WIFEXITED(status))
-		g_exit_st = WEXITSTATUS(status);
+		sh->status = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
-		g_exit_st = 128 + WTERMSIG(status);
+		sh->status = 128 + WTERMSIG(status);
 }
