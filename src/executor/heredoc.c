@@ -6,23 +6,17 @@
 /*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/14 00:00:00 by gabrielbene       #+#    #+#             */
-/*   Updated: 2026/07/14 00:00:00 by gabrielbene      ###   ########.fr       */
+/*   Updated: 2026/07/16 00:00:00 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../Includes/executor.h"
 #include "../../Includes/minishell.h"
 
-static void	handler1(int sig)
-{
-	(void)sig;
-	exit(0);
-}
-
-static void	write_line(int fd, char *str, int expand, t_env **env)
+static void	write_line(int fd, char *str, int expand, t_shell *sh)
 {
 	if (expand)
-		expand_one_arg(&str, env);
+		expand_one_arg(&str, sh);
 	if (str)
 	{
 		write(fd, str, ft_strlen(str));
@@ -31,11 +25,10 @@ static void	write_line(int fd, char *str, int expand, t_env **env)
 	}
 }
 
-static void	heredoc_read(int fd, char *del, int expand, t_env **env)
+static void	heredoc_read(int fd, char *del, int expand, t_shell *sh)
 {
 	char	*str;
 
-	signal(SIGINT, handler1);
 	signal(SIGQUIT, SIG_IGN);
 	while (1)
 	{
@@ -50,21 +43,20 @@ static void	heredoc_read(int fd, char *del, int expand, t_env **env)
 			free(str);
 			break ;
 		}
-		write_line(fd, str, expand, env);
+		write_line(fd, str, expand, sh);
 	}
 }
 
-static void	heredoc_child(int hd[2], t_cmd *cmd, t_env **env)
+static void	heredoc_child(int hd[2], t_cmd *cmd, t_shell *sh)
 {
 	close(hd[0]);
 	dup2(2, 1);
-	heredoc_read(hd[1], cmd->heredoc, cmd->heredoc_expand, env);
+	heredoc_read(hd[1], cmd->heredoc, cmd->heredoc_expand, sh);
 	close(hd[1]);
-	free_env(*env);
-	exit(0);
+	exit_child(sh, 0, NULL);
 }
 
-void	handl_heredoc(t_cmd *cmd, t_env **env)
+void	handl_heredoc(t_cmd *cmd, t_shell *sh)
 {
 	int	hd[2];
 	int	pid;
@@ -75,7 +67,7 @@ void	handl_heredoc(t_cmd *cmd, t_env **env)
 		return ;
 	pid = fork();
 	if (pid == 0)
-		heredoc_child(hd, cmd, env);
+		heredoc_child(hd, cmd, sh);
 	if (pid == -1)
 	{
 		close(hd[0]);

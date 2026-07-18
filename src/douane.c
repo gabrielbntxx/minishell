@@ -20,7 +20,7 @@ int	is_redir(int type)
 	return (0);
 }
 
-int	syntax_error(char *token)
+int	syntax_error(char *token, t_shell *sh)
 {
 	write(2, "minishell: syntax error near unexpected token `", 47);
 	if (token)
@@ -28,27 +28,27 @@ int	syntax_error(char *token)
 	else
 		write(2, "newline", 7);
 	write(2, "'\n", 2);
-	g_exit_st = 2;
+	sh->status = 2;
 	return (1);
 }
 
-int	token_value_error(t_token *token)
+int	token_value_error(t_token *token, t_shell *sh)
 {
 	if (token)
-		return (syntax_error(token->value));
-	return (syntax_error(NULL));
+		return (syntax_error(token->value, sh));
+	return (syntax_error(NULL, sh));
 }
 
-int	check_pipe(t_token *cur)
+int	check_pipe(t_token *cur, t_shell *sh)
 {
 	if (cur->type == PIPE && (!cur->next || cur->next->type == PIPE))
-		return (token_value_error(cur->next));
+		return (token_value_error(cur->next, sh));
 	return (0);
 }
 
-int	check_redir(t_token *cur)
+int	check_redir(t_token *cur, t_shell *sh)
 {
 	if (is_redir(cur->type) && (!cur->next || cur->next->type != WORD))
-		return (token_value_error(cur->next));
+		return (token_value_error(cur->next, sh));
 	return (0);
 }

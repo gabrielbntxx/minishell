@@ -6,7 +6,7 @@
 /*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:55:06 by mguilber          #+#    #+#             */
-/*   Updated: 2026/07/14 00:00:00 by gabrielbene      ###   ########.fr       */
+/*   Updated: 2026/07/16 00:00:00 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,29 +18,29 @@
 #include <stdlib.h>
 #include <string.h>
 
-int			g_exit_st = 0;
+int			g_signal = 0;
 
-static int	validate_tokens(t_token *tokens)
+static int	validate_tokens(t_token *tokens, t_shell *sh)
 {
 	t_token	*cur;
 
 	if (!tokens)
 		return (0);
 	if (tokens->type == PIPE)
-		return (syntax_error(tokens->value));
+		return (syntax_error(tokens->value, sh));
 	cur = tokens;
 	while (cur)
 	{
-		if (check_pipe(cur))
+		if (check_pipe(cur, sh))
 			return (1);
-		if (check_redir(cur))
+		if (check_redir(cur, sh))
 			return (1);
 		cur = cur->next;
 	}
 	return (0);
 }
 
-static int	process_line(char *cmd, t_env **env)
+static int	process_line(char *cmd, t_shell *sh)
 {
 	t_token	*tokens;
 	t_cmd	*cmds;
@@ -50,21 +50,21 @@ static int	process_line(char *cmd, t_env **env)
 	cmds = NULL;
 	tokens = lexer(cmd);
 	free(cmd);
-	if (!validate_tokens(tokens))
+	if (!validate_tokens(tokens, sh))
 	{
-		expand_tokens(tokens, env);
+		expand_tokens(tokens, sh);
 		field_split(&tokens);
 		merge_tokens(tokens);
 		cmds = parser(tokens);
 	}
 	free_tokens(tokens);
 	if (cmds)
-		ret = super_exec(cmds, env);
+		ret = super_exec(cmds, sh);
 	free_cmds(cmds);
 	return (ret);
 }
 
-static int	mini_loop(t_env **env)
+static int	mini_loop(t_shell *sh)
 {
 	char	*cmd;
 	int		ret;
@@ -74,15 +74,19 @@ static int	mini_loop(t_env **env)
 	{
 		signal(SIGINT, handler0);
 		signal(SIGQUIT, SIG_IGN);
+		sh->last_status = sh->status;
+		g_signal = 0;
 		if (isatty(STDIN_FILENO))
 			cmd = readline("minishell> ");
 		else
 			cmd = read_line_notty();
+		if (g_signal)
+			sh->status = g_signal;
 		if (!cmd)
 			break ;
 		if (*cmd)
 			add_history(cmd);
-		ret = process_line(cmd, env);
+		ret = process_line(cmd, sh);
 		if (ret == -2)
 			break ;
 	}
@@ -92,12 +96,17 @@ static int	mini_loop(t_env **env)
 int	main(int ac, char **av, char **envp)
 {
 	t_env	*env;
+	t_shell	sh;
 
 	(void)ac;
 	(void)av;
 	env = NULL;
 	init_env(envp, &env);
-	mini_loop(&env);
+	sh.status = 0;
+	sh.last_status = 0;
+	sh.env = &env;
+	sh.head = NULL;
+	mini_loop(&sh);
 	free_env(env);
-	return (g_exit_st);
+	return (sh.status);
 }

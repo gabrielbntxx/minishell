@@ -6,7 +6,7 @@
 /*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/14 00:00:00 by gabrielbene       #+#    #+#             */
-/*   Updated: 2026/07/14 00:00:00 by gabrielbene      ###   ########.fr       */
+/*   Updated: 2026/07/16 00:00:00 by gabrielbene      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,26 +14,25 @@
 
 void	ult_dup(int save[2], int mod)
 {
+	(void)mod;
 	dup2(save[0], STDIN_FILENO);
 	dup2(save[1], STDOUT_FILENO);
 	close(save[0]);
 	close(save[1]);
-	if (mod == 1)
-		g_exit_st = 1;
 }
 
-static int	finish_base(t_cmd *cmd, t_env **env, int save[2])
+static int	finish_base(t_cmd *cmd, t_shell *sh, int save[2])
 {
 	int	ret;
 
-	ret = dispatch(cmd, env);
+	ret = dispatch(cmd, sh);
 	if (ret == 1)
-		execute_cmd(cmd, env, 1);
+		execute_cmd(cmd, sh, 1);
 	ult_dup(save, 3);
 	return (ret);
 }
 
-int	base_cmd(t_cmd *cmd, t_env **env)
+int	base_cmd(t_cmd *cmd, t_shell *sh)
 {
 	int	save[2];
 	int	ret;
@@ -49,9 +48,10 @@ int	base_cmd(t_cmd *cmd, t_env **env)
 	if (!cmd->args || !cmd->args[0])
 	{
 		ult_dup(save, 2);
+		sh->status = 0;
 		return (0);
 	}
-	ret = finish_base(cmd, env, save);
+	ret = finish_base(cmd, sh, save);
 	if (ret == -2)
 		return (-2);
 	return (0);

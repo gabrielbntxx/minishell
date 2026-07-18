@@ -67,11 +67,11 @@ void	cmd_not_found(char **args)
 	return ;
 }
 
-char	*resolve_cmd(t_cmd *cmd, t_env **env, char ***paths)
+char	*resolve_cmd(t_cmd *cmd, t_shell *sh, char ***paths)
 {
 	char	*cmd_path;
 
-	*paths = find_path(*env);
+	*paths = find_path(*sh->env);
 	if (!cmd->args || !cmd->args[0])
 	{
 		free_array(*paths);
@@ -80,7 +80,7 @@ char	*resolve_cmd(t_cmd *cmd, t_env **env, char ***paths)
 	cmd_path = find_cmd(*paths, cmd->args[0]);
 	if (!cmd_path)
 	{
-		g_exit_st = 127;
+		sh->status = 127;
 		cmd_not_found(cmd->args);
 		free_array(*paths);
 	}

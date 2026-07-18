@@ -26,4 +26,14 @@ void	env_unset(t_env **env, char *key);
 char	**env_to_array(t_env *env);
 void	init_env(char **envp, t_env **first);
 
+typedef struct s_cmd	t_cmd;
+
+typedef struct s_shell
+{
+	t_env	**env;
+	int		last_status;
+	int		status;
+	t_cmd	*head;
+}	t_shell;
+
 #endif

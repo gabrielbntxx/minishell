@@ -12,11 +12,10 @@
 
 #include "../../Includes/executor.h"
 
-int	super_child(t_cmd *current, t_env **env, t_pipe_ctx *ctx)
+int	super_child(t_cmd *current, t_shell *sh, t_pipe_ctx *ctx)
 {
 	int	ret;
 
-	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
 	if (ctx->last_fd != -1)
 	{
@@ -30,21 +29,23 @@ int	super_child(t_cmd *current, t_env **env, t_pipe_ctx *ctx)
 		close(ctx->pipe_fd[1]);
 	}
 	if (apply_redir(current))
-		exit_child(1, current, env);
-	ret = dispatch(current, env);
+		exit_child(sh, 1, NULL);
+	ret = dispatch(current, sh);
 	if (ret == 1)
-		execute_cmd(current, env, 0);
-	exit_child(g_exit_st, current, env);
+		execute_cmd(current, sh, 0);
+	exit_child(sh, sh->status, NULL);
 	return (0);
 }
 
-static int	fork_child(t_cmd *current, t_env **env, t_pipe_ctx *ctx)
+static int	fork_child(t_cmd *current, t_shell *sh, t_pipe_ctx *ctx)
 {
 	int	pid;
 
+	signal(SIGINT, handler1);
 	pid = fork();
 	if (pid == 0)
-		super_child(current, env, ctx);
+		super_child(current, sh, ctx);
+	signal(SIGINT, handler0);
 	return (pid);
 }
 
@@ -61,7 +62,7 @@ static void	link_pipe(t_cmd *current, t_pipe_ctx *ctx)
 		close(ctx->last_fd);
 }
 
-int	super_cmd(t_cmd *cmd, t_env **env)
+int	super_cmd(t_cmd *cmd, t_shell *sh)
 {
 	t_pipe_ctx	ctx;
 	t_cmd		*current;
@@ -75,13 +76,13 @@ int	super_cmd(t_cmd *cmd, t_env **env)
 		rm_args(current);
 		if (current->next && pipe(ctx.pipe_fd) == -1)
 			return (1);
-		pid = fork_child(current, env, &ctx);
+		pid = fork_child(current, sh, &ctx);
 		link_pipe(current, &ctx);
 		current = current->next;
 	}
 	waitpid(pid, &status, 0);
-	update_exit(status);
-	while (wait(&status) > 0)
+	update_exit(status, sh);
+	while (waitpid(-1, &status, 0) > 0)
 		;
-	return (g_exit_st);
+	return (sh->status);
 }

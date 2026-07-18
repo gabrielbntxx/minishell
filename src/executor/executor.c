@@ -26,19 +26,21 @@ void	free_array(char **array)
 	free(array);
 }
 
-void	exit_child(int code, t_cmd *cmd, t_env **env)
+void	exit_child(t_shell *sh, int code, char **array)
 {
-	free_cmds(cmd);
-	free_env(*env);
+	if (array)
+		free_array(array);
+	free_cmds(sh->head);
+	free_env(*sh->env);
 	exit(code);
 }
 
-static void	exec_child(char *cmd_path, t_cmd *cmd, char **paths, t_env **env)
+static void	exec_child(char *cmd_path, t_cmd *cmd, char **paths, t_shell *sh)
 {
 	char	**envp;
 	int		code;
 
-	envp = env_to_array(*env);
+	envp = env_to_array(*sh->env);
 	free_array(paths);
 	execve(cmd_path, cmd->args, envp);
 	write(2, "minishell: ", 11);
@@ -47,34 +49,34 @@ static void	exec_child(char *cmd_path, t_cmd *cmd, char **paths, t_env **env)
 	if (access(cmd_path, F_OK) != 0)
 		code = 127;
 	free(cmd_path);
-	free_array(envp);
-	exit_child(code, cmd, env);
+	exit_child(sh, code, envp);
 }
 
-void	execute_cmd(t_cmd *cmd, t_env **env, int mod)
+void	execute_cmd(t_cmd *cmd, t_shell *sh, int mod)
 {
-	char	**paths;
 	char	*cmd_path;
+	char	**paths;
 	int		pid;
 	int		status;
 
 	pid = -1;
 	status = 0;
-	cmd_path = resolve_cmd(cmd, env, &paths);
+	cmd_path = resolve_cmd(cmd, sh, &paths);
 	if (!cmd_path)
 		return ;
 	if (mod == 1)
+		signal(SIGINT, handler1);
+	if (mod == 1)
 		pid = fork();
 	if (pid == 0)
-	{
-		signal(SIGINT, SIG_DFL);
 		signal(SIGQUIT, SIG_DFL);
-	}
 	if (pid == 0 || mod == 0)
-		exec_child(cmd_path, cmd, paths, env);
+		exec_child(cmd_path, cmd, paths, sh);
 	if (mod == 1)
 		waitpid(pid, &status, 0);
+	if (mod == 1)
+		signal(SIGINT, handler0);
 	free(cmd_path);
 	free_array(paths);
-	update_exit(status);
+	update_exit(status, sh);
 }
