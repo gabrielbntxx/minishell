@@ -53,7 +53,7 @@ void					free_all(t_token *tokens, t_cmd *cmds);
 void					free_shell(t_shell *sh);
 void					close_heredocs(t_cmd *cmd);
 void					wait_all(t_shell *sh, int *last_fd);
-void					register_pid(t_shell *sh, int pid);
+void					save_pid(t_shell *sh, int pid);
 int						is_redir(int type);
 int						syntax_error(char *token, t_shell *sh);
 int						token_value_error(t_token *token, t_shell *sh);
