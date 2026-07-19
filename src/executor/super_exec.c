@@ -50,7 +50,7 @@ static void	prepare_heredocs(t_cmd *cmd, t_shell *sh)
 	}
 }
 
-static void	close_heredocs(t_cmd *cmd)
+void	close_heredocs(t_cmd *cmd)
 {
 	while (cmd)
 	{

@@ -14,12 +14,6 @@
 # define EXECUTOR_H
 
 # include "minishell.h"
-# include "parser.h"
-
-size_t	ft_strlen(const char *s);
-int		ft_strncmp(const char *s1, const char *s2, unsigned int n);
-char	**ft_split(char const *s, char c);
-char	*ft_strjoin(const char *s1, const char *s2);
 
 void	free_array(char **a);
 char	**find_path(t_env *env);
@@ -33,6 +27,7 @@ int		super_exec(t_cmd *cmd, t_shell *sh);
 int		apply_redir(t_cmd *cmd);
 void	handl_heredoc(t_cmd *cmd, t_shell *sh);
 void	rm_args(t_cmd *cmd);
+void	close_heredocs(t_cmd *cmd);
 int		base_cmd(t_cmd *cmd, t_shell *sh);
 
 typedef struct s_pipe_ctx

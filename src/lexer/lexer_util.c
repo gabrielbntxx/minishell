@@ -83,8 +83,8 @@ void	merge_tokens(t_token *tok)
 {
 	while (tok)
 	{
-		if (tok->type == WORD && tok->no_space
-			&& tok->next && tok->next->type == WORD)
+		if (tok->type == WORD && tok->no_space && tok->next
+			&& tok->next->type == WORD)
 			merge_pair(tok);
 		else
 			tok = tok->next;

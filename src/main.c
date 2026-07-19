@@ -20,6 +20,18 @@
 
 int			g_signal = 0;
 
+void	free_shell(t_shell *sh)
+{
+	if (sh->head)
+	{
+		close_heredocs(sh->head);
+		free_cmds(sh->head);
+		sh->head = NULL;
+	}
+	if (sh->env && *sh->env)
+		free_env(*sh->env);
+}
+
 static int	validate_tokens(t_token *tokens, t_shell *sh)
 {
 	t_token	*cur;
@@ -56,11 +68,14 @@ static int	process_line(char *cmd, t_shell *sh)
 		field_split(&tokens);
 		merge_tokens(tokens);
 		cmds = parser(tokens);
+		free_tokens(tokens);
+		if (cmds)
+			ret = super_exec(cmds, sh);
+		free_cmds(cmds);
+		sh->head = NULL;
 	}
-	free_tokens(tokens);
-	if (cmds)
-		ret = super_exec(cmds, sh);
-	free_cmds(cmds);
+	else
+		free_tokens(tokens);
 	return (ret);
 }
 
@@ -107,6 +122,6 @@ int	main(int ac, char **av, char **envp)
 	sh.env = &env;
 	sh.head = NULL;
 	mini_loop(&sh);
-	free_env(env);
+	free_shell(&sh);
 	return (sh.status);
 }

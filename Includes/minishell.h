@@ -13,14 +13,13 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include <stdlib.h>
-# include <unistd.h>
-# include <sys/wait.h>
 # include <fcntl.h>
-# include <stdio.h>
-# include <readline/readline.h>
 # include <signal.h>
-
+# include <stdio.h>
+# include <stdlib.h>
+# include <sys/wait.h>
+# include <unistd.h>
+# include <readline/readline.h>
 # include "res.h"
 # include "env.h"
 # include "executor.h"
@@ -35,6 +34,7 @@ void	handler0(int sig);
 void	handler1(int sig);
 void	update_exit(int status, t_shell *sh);
 char	*read_line_notty(void);
+void	free_shell(t_shell *sh);
 void	free_cmds(t_cmd *cmd);
 void	free_tokens(t_token *tok);
 void	free_redirs(t_redir *redir);
