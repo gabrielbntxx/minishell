@@ -12,11 +12,11 @@
 
 #include "../Includes/minishell.h"
 
-void handler1(int sig)
+void	handler1(int sig)
 {
-  (void)sig;
-  g_signal = 130;
-  write(1, "\n", 1);
+	(void)sig;
+	g_signal = 130;
+	write(1, "\n", 1);
 }
 
 void	handler0(int sig)

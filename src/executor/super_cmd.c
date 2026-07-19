@@ -42,11 +42,11 @@ static int	fork_child(t_cmd *current, int last_fd, int *pipe_fd, t_shell *sh)
 {
 	int	pid;
 
-  signal(SIGINT, handler1);
+	signal(SIGINT, handler1);
 	pid = fork();
 	if (pid == 0)
 		super_child(last_fd, pipe_fd, sh, current);
-  signal(SIGINT, handler0);
+	signal(SIGINT, handler0);
 	return (pid);
 }
 
@@ -69,7 +69,6 @@ int	super_cmd(t_cmd *cmd, t_shell *sh)
 	int		last_fd;
 	int		pid;
 	t_cmd	*current;
-	int		status;
 
 	last_fd = -1;
 	current = cmd;
@@ -77,14 +76,14 @@ int	super_cmd(t_cmd *cmd, t_shell *sh)
 	{
 		rm_args(current);
 		if (current->next && pipe(pipe_fd) == -1)
-			return (1);
+			return (wait_all(sh, &last_fd), 1);
 		pid = fork_child(current, last_fd, pipe_fd, sh);
+		if (pid == -1)
+			return (wait_all(sh, &last_fd), 1);
+		save_pid(sh, pid);
 		link_pipe(current, &last_fd, pipe_fd);
 		current = current->next;
 	}
-	waitpid(pid, &status, 0);
-	update_exit(status, sh);
-	while (waitpid(-1, &status, 0) > 0)
-		;
+	wait_all(sh, &last_fd);
 	return (sh->status);
 }

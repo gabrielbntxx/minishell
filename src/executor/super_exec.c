@@ -14,13 +14,18 @@
 #include "../../Includes/executor.h"
 #include "../../Includes/minishell.h"
 
-void exit_child(t_shell *sh, int ret, char **array) {
-    (void)ret;
-    if(array)
-      free_array(array);
-    free_cmds(sh->head);
-    free_env(*sh->env);
-    exit(sh->status);
+void	exit_child(t_shell *sh, int ret, char **array)
+{
+	(void)ret;
+	if (array)
+		free_array(array);
+	free_cmds(sh->head);
+	free_env(*sh->env);
+	if (sh->pids)
+		free(sh->pids);
+  if (sh->paths)
+     free_array(sh->paths);
+	exit(sh->status);
 }
 
 void	rm_args(t_cmd *cmd)
@@ -52,14 +57,14 @@ static void	prepare_heredocs(t_cmd *cmd, t_shell *sh)
 {
 	while (cmd)
 	{
-    signal(SIGINT, handler1);
+		signal(SIGINT, handler1);
 		handl_heredoc(cmd, sh);
 		cmd = cmd->next;
-    signal(SIGINT, handler0);
+		signal(SIGINT, handler0);
 	}
 }
 
-static void	close_heredocs(t_cmd *cmd)
+void	close_heredocs(t_cmd *cmd)
 {
 	while (cmd)
 	{
@@ -78,7 +83,7 @@ int	super_exec(t_cmd *cmd, t_shell *sh)
 		return (0);
 	if (!cmd->args && !cmd->heredoc && !cmd->redirs)
 		return (1);
-  sh->head = cmd;
+	sh->head = cmd;
 	prepare_heredocs(cmd, sh);
 	if (cmd->next)
 		ret = super_cmd(cmd, sh);

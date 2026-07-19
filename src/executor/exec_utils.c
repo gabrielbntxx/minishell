@@ -12,6 +12,47 @@
 
 #include "../../Includes/executor.h"
 
+void	save_pid(t_shell *sh, int pid)
+{
+	int		*new;
+	int		i;
+
+	new = malloc(sizeof(int) * (sh->pid_count + 1));
+	if (!new)
+		return ;
+	i = 0;
+	while (i < sh->pid_count)
+	{
+		new[i] = sh->pids[i];
+		i++;
+	}
+	new[i] = pid;
+	if (sh->pids)
+		free(sh->pids);
+	sh->pids = new;
+	sh->pid_count++;
+}
+
+void	wait_all(t_shell *sh, int *last_fd)
+{
+	int	i;
+	int	status;
+
+	if (last_fd && *last_fd != -1)
+		close(*last_fd);
+	i = 0;
+	while (i < sh->pid_count)
+	{
+		waitpid(sh->pids[i], &status, 0);
+		i++;
+	}
+	if (sh->pid_count > 0)
+		update_exit(status, sh);
+	free(sh->pids);
+	sh->pids = NULL;
+	sh->pid_count = 0;
+}
+
 char	**find_path(char **envp)
 {
 	int	i;

@@ -14,12 +14,6 @@
 # define EXECUTOR_H
 
 # include "minishell.h"
-# include "parser.h"
-
-size_t	ft_strlen(const char *s);
-int		ft_strncmp(const char *s1, const char *s2, unsigned int n);
-char	**ft_split(char const *s, char c);
-char	*ft_strjoin(const char *s1, const char *s2);
 
 void	free_array(char **a);
 char	**find_path(char **envp);
@@ -36,6 +30,6 @@ int		base_cmd(t_cmd *cmd, t_shell *sh);
 int		super_cmd(t_cmd *cmd, t_shell *sh);
 int		super_child(int last_fd, int *pipe_fd, t_shell *sh, t_cmd *current);
 void	ult_dup(int save[2], int mod);
-void exit_child(t_shell *sh, int ret, char **array);
+void	exit_child(t_shell *sh, int ret, char **array);
 
 #endif

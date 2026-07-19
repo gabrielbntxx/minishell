@@ -13,7 +13,8 @@
 #ifndef RES_H
 # define RES_H
 
-# include "minishell.h"
+# include <stddef.h>
+# include <stdlib.h>
 
 char	*ft_itoa(int n);
 size_t	ft_strlen(const char *str);
