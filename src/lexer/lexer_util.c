@@ -52,7 +52,7 @@ void	expand_tokens(t_token *tok, t_shell *sh)
 			if (!skip)
 				word_fixups(tok, sh->env, start);
 			if (!skip && tok->quote_type != SINGLE)
-        expand_one_arg(&tok->value, sh);
+				expand_one_arg(&tok->value, sh);
 			skip = (skip && tok->no_space);
 			start = !tok->no_space;
 		}
@@ -83,8 +83,8 @@ void	merge_tokens(t_token *tok)
 {
 	while (tok)
 	{
-		if (tok->type == WORD && tok->no_space
-			&& tok->next && tok->next->type == WORD)
+		if (tok->type == WORD && tok->no_space && tok->next
+			&& tok->next->type == WORD)
 			merge_pair(tok);
 		else
 			tok = tok->next;

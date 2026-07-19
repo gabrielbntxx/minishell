@@ -20,6 +20,23 @@
 
 int			g_signal = 0;
 
+void	free_shell(t_shell *sh)
+{
+	if (sh->head)
+	{
+		close_heredocs(sh->head);
+		free_cmds(sh->head);
+		sh->head = NULL;
+	}
+	if (sh->env && *sh->env)
+		free_env(*sh->env);
+	if (sh->pids)
+		free(sh->pids);
+  if (sh->paths)
+    free_array(sh->paths);
+	sh->pids = NULL;
+}
+
 static int	validate_tokens(t_token *tokens, t_shell *sh)
 {
 	t_token	*cur;
@@ -54,14 +71,15 @@ static int	process_line(char *cmd, t_shell *sh)
 		expand_tokens(tokens, sh);
 		merge_tokens(tokens);
 		cmds = parser(tokens);
-    free_tokens(tokens);
+		free_tokens(tokens);
 		if (cmds)
 			ret = super_exec(cmds, sh);
-    free_cmds(cmds);
+		free_cmds(cmds);
+		sh->head = NULL;
 	}
-  else
-    free_tokens(tokens);
-	return(ret);
+	else
+		free_tokens(tokens);
+	return (ret);
 }
 
 static int	mini_loop(t_shell *sh)
@@ -78,12 +96,12 @@ static int	mini_loop(t_shell *sh)
 			cmd = readline("minishell> ");
 		else
 			cmd = read_line_notty();
-    sh->last_status = sh->status;
+		sh->last_status = sh->status;
 		if (!cmd)
 			break ;
 		if (*cmd)
 			add_history(cmd);
-    ret = process_line(cmd, sh);
+		ret = process_line(cmd, sh);
 		free(cmd);
 		if (ret == -2)
 			break ;
@@ -94,17 +112,20 @@ static int	mini_loop(t_shell *sh)
 int	main(int ac, char **av, char **envp)
 {
 	t_env	*env;
-  t_shell sh;
+	t_shell	sh;
 
 	(void)ac;
 	(void)av;
 	env = NULL;
 	init_env(envp, &env);
-  sh.status = 0;
-  sh.last_status = 0;
-  sh.env = &env;
-  sh.head = NULL;
+	sh.status = 0;
+	sh.last_status = 0;
+	sh.env = &env;
+	sh.head = NULL;
+	sh.pids = NULL;
+	sh.pid_count = 0;
+	sh.paths = NULL;
 	mini_loop(&sh);
-	free_env(env);
+	free_shell(&sh);
 	return (sh.status);
 }
