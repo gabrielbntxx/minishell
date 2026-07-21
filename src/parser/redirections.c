@@ -61,15 +61,31 @@ static int	open_redir(t_redir *redir)
 	return (0);
 }
 
+static int	take_heredoc_fd(t_cmd *cmd)
+{
+	t_heredoc	*node;
+	int			fd;
+
+	node = cmd->heredocs;
+	if (!node)
+		return (-1);
+	while (node->next)
+		node = node->next;
+	fd = node->fd;
+	node->fd = -1;
+	return (fd);
+}
+
 int	apply_redir(t_cmd *cmd)
 {
 	t_redir	*redir;
+	int		hd_fd;
 
-	if (cmd->hd_fd != -1)
+	hd_fd = take_heredoc_fd(cmd);
+	if (hd_fd != -1)
 	{
-		dup2(cmd->hd_fd, STDIN_FILENO);
-		close(cmd->hd_fd);
-		cmd->hd_fd = -1;
+		dup2(hd_fd, STDIN_FILENO);
+		close(hd_fd);
 	}
 	redir = cmd->redirs;
 	while (redir)

@@ -39,6 +39,19 @@ void	free_redirs(t_redir *redir)
 	}
 }
 
+static void	free_heredocs(t_heredoc *hd)
+{
+	t_heredoc	*tmp;
+
+	while (hd)
+	{
+		tmp = hd->next;
+		free(hd->delim);
+		free(hd);
+		hd = tmp;
+	}
+}
+
 void	free_cmds(t_cmd *cmd)
 {
 	t_cmd	*tmp;
@@ -49,8 +62,7 @@ void	free_cmds(t_cmd *cmd)
 		if (cmd->args)
 			free_array(cmd->args);
 		free_redirs(cmd->redirs);
-		if (cmd->heredoc)
-			free(cmd->heredoc);
+		free_heredocs(cmd->heredocs);
 		if (cmd->args_quote)
 			free(cmd->args_quote);
 		free(cmd);

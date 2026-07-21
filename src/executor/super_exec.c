@@ -52,11 +52,18 @@ static void	prepare_heredocs(t_cmd *cmd, t_shell *sh)
 
 void	close_heredocs(t_cmd *cmd)
 {
+	t_heredoc	*node;
+
 	while (cmd)
 	{
-		if (cmd->hd_fd != -1)
-			close(cmd->hd_fd);
-		cmd->hd_fd = -1;
+		node = cmd->heredocs;
+		while (node)
+		{
+			if (node->fd != -1)
+				close(node->fd);
+			node->fd = -1;
+			node = node->next;
+		}
 		cmd = cmd->next;
 	}
 }
@@ -67,7 +74,7 @@ int	super_exec(t_cmd *cmd, t_shell *sh)
 
 	if (!cmd)
 		return (0);
-	if (!cmd->args && !cmd->heredoc && !cmd->redirs)
+	if (!cmd->args && !cmd->heredocs && !cmd->redirs)
 		return (1);
 	sh->head = cmd;
 	prepare_heredocs(cmd, sh);

@@ -22,14 +22,20 @@ typedef struct s_redir
 	struct s_redir	*next;
 }	t_redir;
 
+typedef struct s_heredoc
+{
+	char				*delim;
+	int					expand;
+	int					fd;
+	struct s_heredoc	*next;
+}	t_heredoc;
+
 typedef struct s_cmd
 {
 	char			**args;
 	int				*args_quote;
 	t_redir			*redirs;
-	char			*heredoc;
-	int				heredoc_expand;
-	int				hd_fd;
+	t_heredoc		*heredocs;
 	struct s_cmd	*next;
 }	t_cmd;
 

@@ -29,6 +29,29 @@ void	add_cmd(t_cmd **head, t_cmd *new)
 	current_cmd->next = new;
 }
 
+static void	add_heredoc(t_cmd *cmd, char *delim, int expand)
+{
+	t_heredoc	*new;
+	t_heredoc	*cur;
+
+	new = malloc(sizeof(t_heredoc));
+	if (!new)
+		return ;
+	new->delim = ft_strdup(delim);
+	new->expand = expand;
+	new->fd = -1;
+	new->next = NULL;
+	if (!cmd->heredocs)
+		cmd->heredocs = new;
+	else
+	{
+		cur = cmd->heredocs;
+		while (cur->next)
+			cur = cur->next;
+		cur->next = new;
+	}
+}
+
 void	handle_redir(t_token **token, t_cmd *cmd)
 {
 	t_token_type	type;
@@ -38,11 +61,7 @@ void	handle_redir(t_token **token, t_cmd *cmd)
 	if (!*token)
 		return ;
 	if (type == HEREDOC)
-	{
-		free(cmd->heredoc);
-		cmd->heredoc = ft_strdup((*token)->value);
-		cmd->heredoc_expand = ((*token)->quote_type == NONE);
-	}
+		add_heredoc(cmd, (*token)->value, (*token)->quote_type == NONE);
 	else
 		add_redir(cmd, type, (*token)->value);
 }
