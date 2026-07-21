@@ -6,7 +6,7 @@
 /*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:30 by mguilber          #+#    #+#             */
-/*   Updated: 2026/07/16 00:00:00 by gabrielbene      ###   ########.fr       */
+/*   Updated: 2026/07/21 19:14:26 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,11 +71,16 @@ int	super_exec(t_cmd *cmd, t_shell *sh)
 		return (1);
 	sh->head = cmd;
 	prepare_heredocs(cmd, sh);
+	if (g_signal == 130 && sh->status != 130)
+		sh->status = g_signal;
+	if (g_signal == 130)
+		return (0);
 	if (cmd->next)
 		ret = super_cmd(cmd, sh);
 	else
 		ret = base_cmd(cmd, sh);
 	close_heredocs(cmd);
+	sh->status = g_signal;
 	if (ret == -2)
 		return (-2);
 	if (ret != 0)
