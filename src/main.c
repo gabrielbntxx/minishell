@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
+/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:55:06 by mguilber          #+#    #+#             */
-/*   Updated: 2026/07/16 00:00:00 by gabrielbene      ###   ########.fr       */
+/*   Updated: 2026/07/21 13:54:07 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

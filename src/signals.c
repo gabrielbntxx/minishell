@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
+/*   By: mguilber <mguilber@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/14 00:00:00 by gabrielbene       #+#    #+#             */
-/*   Updated: 2026/07/16 00:00:00 by gabrielbene      ###   ########.fr       */
+/*   Updated: 2026/07/21 14:06:26 by mguilber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 void	handler1(int sig)
 {
 	(void)sig;
+	close(0);
 	g_signal = 130;
 	write(1, "\n", 1);
 }
