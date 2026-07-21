@@ -69,22 +69,27 @@ static int	replace_expand(char **arg, int y, int end, char *value)
 
 int	expand_one_arg(char **arg, t_shell *sh)
 {
+	int		start;
 	int		y;
 	int		end;
 	char	*value;
+	int		len;
 
-	while (ft_strchr(*arg, '$') != -1)
+	start = 0;
+	while (ft_strchr(*arg + start, '$') != -1)
 	{
-		y = ft_strchr(*arg, '$');
+		y = start + ft_strchr(*arg + start, '$');
 		end = y + 1;
 		value = get_expand_value(*arg, y, &end, sh);
 		if (!value)
 			break ;
+		len = ft_strlen(value);
 		if (replace_expand(arg, y, end, value))
 		{
 			free(*arg);
 			return (1);
 		}
+		start = y + len;
 	}
 	return (0);
 }

@@ -27,7 +27,7 @@ static int	finish_base(t_cmd *cmd, t_shell *sh, int save[2])
 
 	ret = dispatch(cmd, sh);
 	if (ret == 1)
-		execute_cmd(cmd, sh, 1);
+		execute_cmd(cmd, sh, 1, save);
 	ult_dup(save, 3);
 	return (ret);
 }

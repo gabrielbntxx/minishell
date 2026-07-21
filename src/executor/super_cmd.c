@@ -32,7 +32,7 @@ int	super_child(t_cmd *current, t_shell *sh, t_pipe_ctx *ctx)
 		exit_child(sh, 1, NULL);
 	ret = dispatch(current, sh);
 	if (ret == 1)
-		execute_cmd(current, sh, 0);
+		execute_cmd(current, sh, 0, NULL);
 	exit_child(sh, sh->status, NULL);
 	return (0);
 }

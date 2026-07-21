@@ -21,7 +21,7 @@ char	*find_cmd(char **p, char *c);
 void	cmd_not_found(char **args);
 char	*resolve_cmd(t_cmd *cmd, t_shell *sh, char ***paths);
 void	exit_child(t_shell *sh, int code, char **array);
-void	execute_cmd(t_cmd *cmd, t_shell *sh, int mod);
+void	execute_cmd(t_cmd *cmd, t_shell *sh, int mod, int *save);
 
 int		super_exec(t_cmd *cmd, t_shell *sh);
 int		apply_redir(t_cmd *cmd);

@@ -52,24 +52,37 @@ static void	exec_child(char *cmd_path, t_cmd *cmd, char **paths, t_shell *sh)
 	exit_child(sh, code, envp);
 }
 
-void	execute_cmd(t_cmd *cmd, t_shell *sh, int mod)
+static int	spawn_child(int mod, int *save)
 {
-	char	*cmd_path;
-	char	**paths;
-	int		pid;
-	int		status;
+	int	pid;
 
 	pid = -1;
-	status = 0;
-	cmd_path = resolve_cmd(cmd, sh, &paths);
-	if (!cmd_path)
-		return ;
 	if (mod == 1)
 		signal(SIGINT, handler1);
 	if (mod == 1)
 		pid = fork();
 	if (pid == 0)
 		signal(SIGQUIT, SIG_DFL);
+	if (pid == 0 && save)
+	{
+		close(save[0]);
+		close(save[1]);
+	}
+	return (pid);
+}
+
+void	execute_cmd(t_cmd *cmd, t_shell *sh, int mod, int *save)
+{
+	char	*cmd_path;
+	char	**paths;
+	int		pid;
+	int		status;
+
+	status = 0;
+	cmd_path = resolve_cmd(cmd, sh, &paths);
+	if (!cmd_path)
+		return ;
+	pid = spawn_child(mod, save);
 	if (pid == 0 || mod == 0)
 		exec_child(cmd_path, cmd, paths, sh);
 	if (mod == 1)
