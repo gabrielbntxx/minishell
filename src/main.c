@@ -98,7 +98,7 @@ static int	mini_loop(t_shell *sh)
 		if (g_signal)
 			sh->status = g_signal;
 		if (!cmd)
-			break ;
+		  break ;
 		if (*cmd)
 			add_history(cmd);
 		ret = process_line(cmd, sh);

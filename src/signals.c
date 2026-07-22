@@ -12,12 +12,17 @@
 
 #include "../Includes/minishell.h"
 
+void	handler_parent(int sig)
+{
+	(void)sig;
+	g_signal = 130;
+	write(2, "\n", 1);
+}
+
 void	handler1(int sig)
 {
 	(void)sig;
 	close(0);
-	g_signal = 130;
-	write(1, "\n", 1);
 }
 
 void	handler0(int sig)

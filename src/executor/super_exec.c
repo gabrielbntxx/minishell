@@ -43,11 +43,13 @@ static void	prepare_heredocs(t_cmd *cmd, t_shell *sh)
 {
 	while (cmd)
 	{
-		signal(SIGINT, handler1);
+		signal(SIGINT, handler_parent);
 		handl_heredoc(cmd, sh);
+		if (g_signal)
+			break ;
 		cmd = cmd->next;
-		signal(SIGINT, handler0);
 	}
+	signal(SIGINT, handler0);
 }
 
 void	close_heredocs(t_cmd *cmd)
@@ -78,6 +80,12 @@ int	super_exec(t_cmd *cmd, t_shell *sh)
 		return (1);
 	sh->head = cmd;
 	prepare_heredocs(cmd, sh);
+	if (g_signal)
+	{
+		sh->status = 130;
+		close_heredocs(cmd);
+		return (0);
+	}
 	if (cmd->next)
 		ret = super_cmd(cmd, sh);
 	else

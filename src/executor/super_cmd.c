@@ -16,6 +16,7 @@ int	super_child(t_cmd *current, t_shell *sh, t_pipe_ctx *ctx)
 {
 	int	ret;
 
+	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
 	if (ctx->last_fd != -1)
 	{
@@ -41,7 +42,7 @@ static int	fork_child(t_cmd *current, t_shell *sh, t_pipe_ctx *ctx)
 {
 	int	pid;
 
-	signal(SIGINT, handler1);
+	signal(SIGINT, handler_parent);
 	pid = fork();
 	if (pid == 0)
 		super_child(current, sh, ctx);
