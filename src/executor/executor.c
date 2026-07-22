@@ -58,7 +58,7 @@ static int	spawn_child(int mod, int *save)
 
 	pid = -1;
 	if (mod == 1)
-		signal(SIGINT, handler1);
+		signal(SIGINT, handler_parent);
 	if (mod == 1)
 		pid = fork();
 	if (pid == 0)

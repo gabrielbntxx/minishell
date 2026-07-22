@@ -30,6 +30,7 @@
 
 extern int	g_signal;
 
+void	handler_parent(int sig);
 void	handler0(int sig);
 void	handler1(int sig);
 void	update_exit(int status, t_shell *sh);

@@ -65,7 +65,10 @@ static void	read_one_heredoc(t_heredoc *node, t_shell *sh)
 		return ;
 	pid = fork();
 	if (pid == 0)
+	{
+		signal(SIGINT, handler1);
 		heredoc_child(hd, node, sh);
+	}
 	if (pid == -1)
 	{
 		close(hd[0]);
@@ -84,6 +87,8 @@ void	handl_heredoc(t_cmd *cmd, t_shell *sh)
 	node = cmd->heredocs;
 	while (node)
 	{
+		if (g_signal)
+			break ;
 		read_one_heredoc(node, sh);
 		if (node->next && node->fd != -1)
 		{
