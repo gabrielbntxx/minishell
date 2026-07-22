@@ -67,29 +67,40 @@ static int	replace_expand(char **arg, int y, int end, char *value)
 	return (0);
 }
 
+static int	expnd_pos(char **arg, int *start, int y, t_shell *sh)
+{
+	int		end;
+	int		len;
+	char	*value;
+
+	end = y + 1;
+	value = get_expand_value(*arg, y, &end, sh);
+	if (!value)
+	{
+		(*start)++;
+		return (0);
+	}
+	len = ft_strlen(value);
+	if (replace_expand(arg, y, end, value))
+	{
+		free(*arg);
+		return (1);
+	}
+	*start = y + len;
+	return (0);
+}
+
 int	expand_one_arg(char **arg, t_shell *sh)
 {
-	int		start;
-	int		y;
-	int		end;
-	char	*value;
-	int		len;
+	int	start;
+	int	y;
 
 	start = 0;
 	while (ft_strchr(*arg + start, '$') != -1)
 	{
 		y = start + ft_strchr(*arg + start, '$');
-		end = y + 1;
-		value = get_expand_value(*arg, y, &end, sh);
-		if (!value)
-			break ;
-		len = ft_strlen(value);
-		if (replace_expand(arg, y, end, value))
-		{
-			free(*arg);
+		if (expnd_pos(arg, &start, y, sh))
 			return (1);
-		}
-		start = y + len;
 	}
 	return (0);
 }
