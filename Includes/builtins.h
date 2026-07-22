@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
+/*   By: gbenetri <gbenetri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:00 by mguilber          #+#    #+#             */
-/*   Updated: 2026/07/14 00:00:00 by gabrielbene      ###   ########.fr       */
+/*   Updated: 2026/07/14 00:00:00 by gbenetri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   field_split.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
+/*   By: gbenetri <gbenetri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/16 00:00:00 by gabrielbene       #+#    #+#             */
-/*   Updated: 2026/07/16 00:00:00 by gabrielbene      ###   ########.fr       */
+/*   Created: 2026/07/16 00:00:00 by gbenetri          #+#    #+#             */
+/*   Updated: 2026/07/16 00:00:00 by gbenetri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

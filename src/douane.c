@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   douane.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
+/*   By: gbentri <gbenetri@studen    				+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:00 by mguilber          #+#    #+#             */
-/*   Updated: 2026/07/14 00:00:00 by gabrielbene      ###   ########.fr       */
+/*   Updated: 2026/07/14 00:00:00 by gbenetri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

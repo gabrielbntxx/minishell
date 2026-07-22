@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
+/*   By: gbenetri <gbenetri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:52 by mguilber          #+#    #+#             */
-/*   Updated: 2026/06/18 00:40:15 by gabrielbene      ###   ########.fr       */
+/*   Updated: 2026/06/18 00:40:15 by gbenetri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_util.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gabrielbenetrix <gabrielbenetrix@studen    +#+  +:+       +#+        */
+/*   By: gbenetri <gbenetri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:54:39 by mguilber          #+#    #+#             */
-/*   Updated: 2026/07/08 21:55:20 by gabrielbene      ###   ########.fr       */
+/*   Updated: 2026/07/08 21:55:20 by gbenetri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
